@@ -35,7 +35,7 @@ int key_number[8] = {KEY_1,KEY_2,KEY_3,KEY_4,KEY_5,KEY_6,KEY_7,KEY_8};
 
 
 //Gloabal vars that can trigger events
-int gun_fired=0;
+// gun_fired defined in fiend.c
 
 extern int fiend_load_saved_game;
 extern int fiend_new_game;

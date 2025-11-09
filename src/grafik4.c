@@ -306,46 +306,21 @@ float compute_angle(int center_x1,int center_y1,int center_x2,int center_y2)
 {
  float delta_x;
  float delta_y;
- fixed fixtemp;
- fixed ans;
+ float angle_rad;
+ float angle_deg;
 
  delta_x = center_x1 - center_x2;
  delta_y = center_y2 - center_y1;
 
+ // Use standard atan2 instead of deprecated fatan
+ angle_rad = atan2(-delta_y, delta_x);
+ angle_deg = angle_rad * 180.0 / M_PI;
+ 
+ // Normalize to 0-360
+ if(angle_deg < 0)
+   angle_deg += 360.0;
 
- if(delta_x>=0 && delta_y>=0)
-  {
-   fixtemp = ftofix(delta_y/delta_x);
-   ans = fatan(fixtemp);
-   ans = ftofix(64)-ans;
-  }
- else if(delta_x>=0 && delta_y<0)
-  {
-   delta_y=-delta_y;
-   fixtemp = ftofix(delta_y/delta_x);
-   ans = fatan(fixtemp);
-   ans = ans + ftofix(64);
-  }
- else if(delta_x<0 && delta_y<0)
-  {
-   delta_y=-delta_y;
-   delta_x=-delta_x;
-   fixtemp = ftofix(delta_x/delta_y);
-   ans = fatan(fixtemp);
-   ans = ans + ftofix(128);
-  }
- else if(delta_x<0 && delta_y>=0)
-  {
-   delta_x=-delta_x;
-   fixtemp = ftofix(delta_y/delta_x);
-   ans = fatan(fixtemp);
-   ans = ans + ftofix(192);
-  }
-
-
- return fixed_to_degree(ans);
-
-
+ return angle_deg;
 }
 
 

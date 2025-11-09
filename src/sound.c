@@ -47,7 +47,9 @@ int load_sounds(void)
 	
 	while(fscanf(f, "%s %d %d\n", sound_file_name,&sound_info[num_of_sounds].volume,&sound_info[num_of_sounds].num)!=EOF)  //Get the number of tiles and the file names
 	{
+#ifdef USE_FMOD
 		FMOD_RESULT res;
+#endif
 		
 		//make the game of the sound
 		name = get_filename(sound_file_name);
@@ -69,9 +71,9 @@ int load_sounds(void)
 		strcat(final_path, sound_file_name);
 		
 		//sound_info[num_of_sounds].sound = FSOUND_Sample_Load(FSOUND_FREE,final_path,FSOUND_2D,0);//load the sound
-		
+#ifdef USE_FMOD		
 		res = FMOD_System_CreateSound(fmod_system, final_path, FMOD_2D, &soundex_info, &sound_info[num_of_sounds].sound);
-		
+#endif		
 		//if(sound_info[num_of_sounds].sound==NULL){allegro_message("couldn't load %s",final_path);exit(-1);}//error testing...
 		
 		num_of_sounds++;
@@ -94,9 +96,10 @@ void free_sounds(void)
 {
  int i;
 
+#ifdef USE_FMOD
  for(i=0;i<num_of_sounds;i++)
 	 FMOD_Sound_Release(sound_info[i].sound);
-
+#endif
 
  free(sound_info);
 

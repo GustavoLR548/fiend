@@ -269,7 +269,7 @@ int load_particles(void)
 		do
 		{
 			k++;
-			fscanf(f,"%d ",&particle_info[i].anim_frame[k],buffer);
+			fscanf(f,"%d ",&particle_info[i].anim_frame[k]);
 		}while(particle_info[i].anim_frame[k]!=-1);
 			
 		

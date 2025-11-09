@@ -109,6 +109,7 @@ int play_menu_sound(char *name, int loop)
 		num+=temp;
 	}
 	
+#ifdef USE_FMOD
 	//FSOUND_Sample_SetDefaults(sound_info[num].sound,-1,sound_info[num].volume,128,200);
 	FMOD_Sound_SetDefaults(sound_info[num].sound, 44100, ((float)sound_info[num].volume)/256, 128, 200);
 	
@@ -116,6 +117,7 @@ int play_menu_sound(char *name, int loop)
 		FMOD_Sound_SetLoopCount(sound_info[num].sound,FMOD_LOOP_NORMAL);
 
 	FMOD_System_PlaySound(fmod_system, FMOD_CHANNEL_FREE, sound_info[num].sound, 0, &fmod_channel);
+#endif
 	
 	return i;
 }
@@ -130,7 +132,7 @@ static void draw_wave_text(BITMAP *src, BITMAP *dest, int x, int y)
 	
 	for(i=0;i<src->h;i++)
 	{
-		x_add = (fixtof( fsin( degree_to_fixed(i*10 + wave_x) ) )+1)*WAVE_LENGTH;
+		x_add = (sin((i*10 + wave_x) * M_PI / 180.0) + 1) * WAVE_LENGTH;
 		stretch_blit(src,dest,0,i,src->w,1,x-x_add ,y+i,src->w+x_add*2,1);
 	}
 
@@ -150,7 +152,7 @@ static void draw_large_text(BITMAP *dest, char *text, int x, int y)
 {
 	int y_add;
 
-	y_add = (fixtof( fsin( degree_to_fixed(wave_y) ) ))*5;
+	y_add = sin(wave_y * M_PI / 180.0) * 5;
 
 
 	textout_centre_ex(dest,font_menu->dat,text, x,y-6+y_add*2,makecol(40,40,40), -1);
@@ -164,7 +166,7 @@ static void draw_head_text(BITMAP *dest, char *text, int x, int y)
 {
 	int y_add;
 
-	y_add = (fixtof( fsin( degree_to_fixed(wave_y) ) ))*5;
+	y_add = sin(wave_y * M_PI / 180.0) * 5;
 
 
 	textout_centre_ex(dest,font_menu->dat,text, x,y-6+y_add*2,makecol(20,20,20), -1);
@@ -204,7 +206,7 @@ static void update_menu_gfx(void)
 	
 	clear(virt);
 	
-	x_add = (fixtof( fsin( degree_to_fixed(wave_y) ) ))*8;
+	x_add = sin(wave_y * M_PI / 180.0) * 8;
 	
 	blit(bmp_back, virt,0,0,0,0,bmp_back->w,bmp_back->h);
 	draw_additive_sprite(virt, bmp_back,x_add,0);
@@ -561,15 +563,18 @@ static void update_menu_logic(void)
 			{
 				if(menu_row == 0)
 				{
+#ifdef USE_FMOD
 					FMOD_CHANNELGROUP *cgroup;
+#endif
 					fiend_sound_volume-=10;
 					if(fiend_sound_volume<0)
 						fiend_sound_volume = 0;
-
+#ifdef USE_FMOD
 					//FSOUND_SetSFXMasterVolume(fiend_sound_volume);
 					cgroup = NULL;
 					FMOD_System_GetMasterChannelGroup(fmod_system, &cgroup);
 					FMOD_ChannelGroup_SetVolume(cgroup, ((float)fiend_sound_volume)/256);
+#endif
 				}
 				else if(menu_row == 1)
 				{
@@ -592,15 +597,18 @@ static void update_menu_logic(void)
 			{
 				if(menu_row == 0)
 				{
+#ifdef USE_FMOD
 					FMOD_CHANNELGROUP *cgroup;
+#endif
 					fiend_sound_volume+=10;
 					if(fiend_sound_volume>255)
 						fiend_sound_volume = 255;
-
+#ifdef USE_FMOD
 					//FSOUND_SetSFXMasterVolume(fiend_sound_volume);
 					cgroup = NULL;
 					FMOD_System_GetMasterChannelGroup(fmod_system, &cgroup);
 					FMOD_ChannelGroup_SetVolume(cgroup, ((float)fiend_sound_volume)/256);
+#endif
 				}
 				else if(menu_row == 1)
 				{

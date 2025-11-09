@@ -26,7 +26,7 @@ volatile int speed_counter = 0;
 
 int fiend_load_saved_game=0;
 int fiend_new_game=0;
-int fiend_show_intro=1;
+// fiend_show_intro defined in fiend.c
 
 
 //The speed counter function

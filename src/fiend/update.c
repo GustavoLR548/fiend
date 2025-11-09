@@ -24,7 +24,7 @@ int current_map_npc_num;
 int current_map_enemy_num;
 int current_map_item_num;
 
-int outside_lightlevel=31;
+// outside_lightlevel defined in fiend.c
 
 
 

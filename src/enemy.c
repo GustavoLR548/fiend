@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <malloc.h>
 #include <math.h>
+#include <locale.h>
 
 #include "grafik4.h"
 #include "rotate_sprite.h"
@@ -46,6 +47,9 @@ int load_enemys(void)
 	char *file_path ="graphic/enemies/";
 	char final_path[40];
 	int i,j,k,r,g,b;
+	
+	// Set C locale for parsing numbers with periods as decimal separators
+	char *old_locale = setlocale(LC_NUMERIC, "C");
 	
 	enemy_info = calloc(sizeof(ENEMY_INFO), MAX_ENEMY_INFO);
 
@@ -127,7 +131,7 @@ int load_enemys(void)
 			do
 			{
 				k++;
-				fscanf(f,"%d ",&enemy_info[i].animation[j].frame[k],buffer);
+				fscanf(f,"%d ",&enemy_info[i].animation[j].frame[k]);
 			}while(enemy_info[i].animation[j].frame[k]!=-1);
 			
 		}
@@ -160,7 +164,8 @@ int load_enemys(void)
 
 
 
-
+	// Restore original locale
+	setlocale(LC_NUMERIC, old_locale);
 
 	return 0;
 }

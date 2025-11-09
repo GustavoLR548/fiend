@@ -406,11 +406,13 @@ int load_game(char *file)
 			{
 				if(sound_data[i].loop)
 				{
+#ifdef USE_FMOD
 					//sound_data[i].voice_num=FSOUND_PlaySound(FSOUND_FREE, sound_info[sound_data[i].sound_num].sound);
 					FMOD_System_PlaySound(fmod_system, FMOD_CHANNEL_FREE, sound_info[sound_data[i].sound_num].sound, 0, &sound_data[i].voice_num);
 					FMOD_Channel_SetLoopCount(sound_data[i].voice_num, FMOD_LOOP_NORMAL);
 		
 					sound_data[i].playing=1;
+#endif
 				}
 				else
 				{

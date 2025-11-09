@@ -16,7 +16,7 @@
 
 
 //Gloabal vars that can trigger events
-int npc_damaged=0;
+// npc_damaged defined in fiend.c
 
 
 void reset_missiles(void)
