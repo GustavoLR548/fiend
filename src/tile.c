@@ -182,17 +182,33 @@ void draw_tile_layer(BITMAP *virt, int layer,int solid, int xpos, int ypos)
 		  else //get the set and the number of the tiles
 		  {
 			tile_set[1] = (map->layer1+ (i+x) +( (j+y) * map->w))->tile_set;
-			tile_num[1] = (map->layer1+ (i+x) +( (j+y) * map->w))->tile_num; 
-			tile_num[1] = tile_info[tile_set[1]].tile[tile_num[1]].current_tile;
+			tile_num[1] = (map->layer1+ (i+x) +( (j+y) * map->w))->tile_num;
+			// Skip bounds check - set defaults for invalid values
+			if(!(tile_set[1] >= 0 && tile_set[1] < num_of_tilesets && tile_num[1] >= 0 && tile_num[1] < 100)) {
+				tile_set[1] = 0;
+				tile_num[1] = 0;
+			} else {
+				tile_num[1] = tile_info[tile_set[1]].tile[tile_num[1]].current_tile;
+			}
 		  
 			tile_set[2] = (map->layer2+ (i+x) +( (j+y) * map->w))->tile_set;
-			tile_num[2] = (map->layer2+ (i+x) +( (j+y) * map->w))->tile_num;  
-			tile_num[2] = tile_info[tile_set[2]].tile[tile_num[2]].current_tile;
+			tile_num[2] = (map->layer2+ (i+x) +( (j+y) * map->w))->tile_num;
+			if(!(tile_set[2] >= 0 && tile_set[2] < num_of_tilesets && tile_num[2] >= 0 && tile_num[2] < 100)) {
+				tile_set[2] = 0;
+				tile_num[2] = 0;
+			} else {
+				tile_num[2] = tile_info[tile_set[2]].tile[tile_num[2]].current_tile;
+			}
 		  
 		  	tile_set[3] = (map->layer3+ (i+x) +( (j+y) * map->w))->tile_set;
 			tile_num[3] = (map->layer3+ (i+x) +( (j+y) * map->w))->tile_num;
-			tile_num[3] = tile_info[tile_set[3]].tile[tile_num[3]].current_tile;
-		  
+			if(!(tile_set[3] >= 0 && tile_set[3] < num_of_tilesets && tile_num[3] >= 0 && tile_num[3] < 100)) {
+				tile_set[3] = 0;
+				tile_num[3] = 0;
+			} else {
+				tile_num[3] = tile_info[tile_set[3]].tile[tile_num[3]].current_tile;
+			}
+			
 
 			
 			set_trans_blender(0,0,0,128);
@@ -281,8 +297,12 @@ int tile_is_solid(int x, int y)
 			tile_num = (map->layer3+ (x) +( (y) * map->w))->tile_num; 			
 		}
 
-		if(tile_info[tile_set].tile[tile_num].solid>max_solid)
-			max_solid = tile_info[tile_set].tile[tile_num].solid;
+		// Bounds check to prevent crash from corrupted tile data
+		if(tile_set >= 0 && tile_set < num_of_tilesets && tile_num >= 0 && tile_num < 100)
+		{
+			if(tile_info[tile_set].tile[tile_num].solid>max_solid)
+				max_solid = tile_info[tile_set].tile[tile_num].solid;
+		}
 	}
 
 	
@@ -325,6 +345,10 @@ int check_tile_collision(float x, float y, int w, int h)
 					tile_set = (map->layer3+ (i+tile_x) +( (j+tile_y) * map->w))->tile_set;
 					tile_num = (map->layer3+ (i+tile_x) +( (j+tile_y) * map->w))->tile_num; 			
 					}
+
+					// Bounds check to prevent crash from corrupted tile data
+					if(tile_set < 0 || tile_set >= num_of_tilesets || tile_num < 0 || tile_num >= 100)
+						continue;
 
 					if(tile_info[tile_set].tile[tile_num].solid &&
 					   check_collision(x, y, w,h,(float)(tile_x+i)*TILE_SIZE,(float) (tile_y+j)*TILE_SIZE,TILE_SIZE,TILE_SIZE) )

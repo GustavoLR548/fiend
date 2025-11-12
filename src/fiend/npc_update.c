@@ -256,11 +256,15 @@ void update_npc_animation(int num)
 		tile_set = (map->layer1+ ((int)npc_data[num].x/TILE_SIZE) +( ((int)npc_data[num].y/TILE_SIZE) * map->w))->tile_set;
 		tile_num = (map->layer1+ ((int)npc_data[num].x/TILE_SIZE) +( ((int)npc_data[num].y/TILE_SIZE) * map->w))->tile_num;
 		
-		if(strcmp(char_info[type].animation[npc_data[num].action].name, "moving")==0 && (npc_data[num].frame==char_info[type].walk_step1 || npc_data[num].frame==char_info[type].walk_step2))
-			play_fiend_sound(tile_info[tile_set].tile[tile_num].sound,npc_data[num].x,npc_data[num].y,1,0,180);
+		// Bounds check to prevent crash from corrupted tile data
+		if(tile_set >= 0 && tile_set < num_of_tilesets && tile_num >= 0 && tile_num < 100)
+		{
+			if(strcmp(char_info[type].animation[npc_data[num].action].name, "moving")==0 && (npc_data[num].frame==char_info[type].walk_step1 || npc_data[num].frame==char_info[type].walk_step2))
+				play_fiend_sound(tile_info[tile_set].tile[tile_num].sound,npc_data[num].x,npc_data[num].y,1,0,180);
 	
-		if(strcmp(char_info[type].animation[npc_data[num].action].name, "running")==0 && (npc_data[num].frame==char_info[type].run_step1 || npc_data[num].frame==char_info[type].run_step2))
-			play_fiend_sound(tile_info[tile_set].tile[tile_num].sound,npc_data[num].x,npc_data[num].y,1,0,180);
+			if(strcmp(char_info[type].animation[npc_data[num].action].name, "running")==0 && (npc_data[num].frame==char_info[type].run_step1 || npc_data[num].frame==char_info[type].run_step2))
+				play_fiend_sound(tile_info[tile_set].tile[tile_num].sound,npc_data[num].x,npc_data[num].y,1,0,180);
+		}
 	
 	}
 }

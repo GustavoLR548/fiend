@@ -59,6 +59,10 @@ int check_object_tile_collision(float x, float y,int num)
 					tile_num = (map->layer3+ (i+tile_x) +( (j+tile_y) * map->w))->tile_num; 			
 					}
 
+					// Bounds check to prevent crash from corrupted tile data
+					if(tile_set < 0 || tile_set >= num_of_tilesets || tile_num < 0 || tile_num >= 100)
+						continue;
+
 					if(tile_info[tile_set].tile[tile_num].solid) 
 						if(check_angle_collision(x, y, object_info[map->object[num].type].w,object_info[map->object[num].type].h,  map->object[num].angle,   
 							(float)(tile_x+i)*TILE_SIZE+TILE_SIZE/2,(float) (tile_y+j)*TILE_SIZE+TILE_SIZE/2,TILE_SIZE,TILE_SIZE,0) )

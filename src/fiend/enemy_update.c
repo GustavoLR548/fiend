@@ -457,19 +457,23 @@ void update_enemy_animation(int num)
 		tile_set = (map->layer1+ ((int)enemy_data[num].x/TILE_SIZE) +( ((int)enemy_data[num].y/TILE_SIZE) * map->w))->tile_set;
 		tile_num = (map->layer1+ ((int)enemy_data[num].x/TILE_SIZE) +( ((int)enemy_data[num].y/TILE_SIZE) * map->w))->tile_num;
 		
-		if(strcmp(enemy_info[type].animation[enemy_data[num].action].name, "moving")==0 && (enemy_data[num].frame==enemy_info[type].walk_step1 || enemy_data[num].frame==enemy_info[type].walk_step2))
+		// Bounds check to prevent crash from corrupted tile data
+		if(tile_set >= 0 && tile_set < num_of_tilesets && tile_num >= 0 && tile_num < 100)
 		{
-			if(strcmp(enemy_info[type].step_sound,"normal")==0)
-				play_fiend_sound(tile_info[tile_set].tile[tile_num].sound,enemy_data[num].x,enemy_data[num].y,1,0,180);
-			else
-				play_fiend_sound(enemy_info[type].step_sound,enemy_data[num].x,enemy_data[num].y,1,0,180);
-		}
-		else if(strcmp(enemy_info[type].animation[enemy_data[num].action].name, "running")==0 && (enemy_data[num].frame==enemy_info[type].run_step1 || enemy_data[num].frame==enemy_info[type].run_step2))
-		{
-			if(strcmp(enemy_info[type].step_sound,"normal")==0)
-				play_fiend_sound(tile_info[tile_set].tile[tile_num].sound,enemy_data[num].x,enemy_data[num].y,1,0,180);
-			else
-				play_fiend_sound(enemy_info[type].step_sound,enemy_data[num].x,enemy_data[num].y,1,0,180);
+			if(strcmp(enemy_info[type].animation[enemy_data[num].action].name, "moving")==0 && (enemy_data[num].frame==enemy_info[type].walk_step1 || enemy_data[num].frame==enemy_info[type].walk_step2))
+			{
+				if(strcmp(enemy_info[type].step_sound,"normal")==0)
+					play_fiend_sound(tile_info[tile_set].tile[tile_num].sound,enemy_data[num].x,enemy_data[num].y,1,0,180);
+				else
+					play_fiend_sound(enemy_info[type].step_sound,enemy_data[num].x,enemy_data[num].y,1,0,180);
+			}
+			else if(strcmp(enemy_info[type].animation[enemy_data[num].action].name, "running")==0 && (enemy_data[num].frame==enemy_info[type].run_step1 || enemy_data[num].frame==enemy_info[type].run_step2))
+			{
+				if(strcmp(enemy_info[type].step_sound,"normal")==0)
+					play_fiend_sound(tile_info[tile_set].tile[tile_num].sound,enemy_data[num].x,enemy_data[num].y,1,0,180);
+				else
+					play_fiend_sound(enemy_info[type].step_sound,enemy_data[num].x,enemy_data[num].y,1,0,180);
+			}
 		}
 
 	}
