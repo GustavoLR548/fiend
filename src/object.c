@@ -255,7 +255,7 @@ int load_objects(void)
 			do
 			{
 				k++;
-				fscanf(f,"%d ",&object_info[i].animation[j].frame[k],buffer);
+				fscanf(f,"%d ",&object_info[i].animation[j].frame[k]);
 			}while(object_info[i].animation[j].frame[k]!=-1);
 			
 		}

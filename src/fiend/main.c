@@ -26,7 +26,7 @@ volatile int speed_counter = 0;
 
 int fiend_load_saved_game=0;
 int fiend_new_game=0;
-int fiend_show_intro=1;
+// fiend_show_intro defined in fiend.c
 
 
 //The speed counter function
@@ -142,13 +142,23 @@ void the_game(void)
 	if(fiend_new_game)
 	{
 		if(fiend_show_intro)
+		{
 			show_intro_text();
-				
+		}
+		
 		if(!load_edit_map(map, map_file))
 		{
 			allegro_message("Couldn't load map \"%s\".",map_file);
 			return;
 		}
+		
+		fprintf(stderr, "\n========== MAP LOADED SUCCESSFULLY ==========\n");
+		fprintf(stderr, "Map: %s, Size: %dx%d\n", map->name, map->w, map->h);
+		fprintf(stderr, "Player spawn: (%.1f, %.1f) angle=%.1f\n", 
+			map->player_x, map->player_y, map->player_angle);
+		fprintf(stderr, "Light level: %d, Outside: %d\n", map->light_level, map->outside);
+		fprintf(stderr, "Num objects: %d, Num lights: %d\n", map->num_of_objects, map->num_of_lights);
+		fflush(stderr);
 		
 		player.x = map->player_x;
 		player.y = map->player_y;
@@ -158,18 +168,9 @@ void the_game(void)
 	
 		total_reset_npc_ai();
 		reset_npc_data();
-	
 		total_reset_enemy_ai();
 		reset_enemy_data();
-
 		get_current_map_objects();
-	
-		check_triggers(0);	
-	
-	
-	
-		update_before_map();
-	
 		reset_shells();
 		reset_missiles();
 		reset_bloodpools();
@@ -177,6 +178,8 @@ void the_game(void)
 		reset_particles();
 		reset_effects();
 		reset_beams();
+		check_triggers(0);  // Check triggers AFTER resetting effects so messages aren't cleared
+		update_before_map();
 	}
 	else if(fiend_load_saved_game)
 	{
@@ -187,9 +190,17 @@ void the_game(void)
 		else if(ans == 5)load_game("save/save5.sav");
 	}
 	
+	// Reset screen fade flag after loading
+	screen_is_black = 0;
+	
 	//--End that shit
 
 	init_frame_speed();
+	
+	fprintf(stderr, "\n========== ENTERING MAIN GAME LOOP ==========\n");
+	fprintf(stderr, "game_ended=%d, map=%p, player.x=%.1f, player.y=%.1f\n", 
+		game_ended, (void*)map, player.x, player.y);
+	fflush(stderr);
 	
 	while(!game_ended)
 	{

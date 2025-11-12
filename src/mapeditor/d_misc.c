@@ -8,7 +8,7 @@
 //cheating...
 int los_buffer[18][18];
 
-char temp_string[40];
+static char temp_string[40];
 
 char editmode_string[][20] = {"Tiles","Objects","Items","NPC:s","Lights","Player Pos","Links","Areas","Look At Area","SoundEmitors","Enemys","Path Nodes","Brushes","Shadows"};
 

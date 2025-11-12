@@ -116,7 +116,7 @@ int play_fiend_sound(char *name, int x, int y,int lower_at_dist,int loop,int pri
 	else
 		calc_sound_prop(sound_data[i].x,sound_data[i].y,&vol, &pan, sound_info[sound_data[i].sound_num].volume);
 				
-	
+#ifdef USE_FMOD	
 	FMOD_Sound_SetDefaults(sound_info[num].sound,44100,((float)vol)/256,pan,sound_data[i].priority);
 	
 	if(sound_data[i].loop)
@@ -128,6 +128,7 @@ int play_fiend_sound(char *name, int x, int y,int lower_at_dist,int loop,int pri
 	if(sound_data[i].voice_num==NULL)return -1;
 	
 	sound_data[i].playing=1;
+#endif
 	
 	return 	i;	
 }
@@ -150,6 +151,7 @@ void update_sound(void)
 	{
 		if(sound_data[i].used)
 		{
+#ifdef USE_FMOD
 			FMOD_BOOL is_playing;
 			FMOD_Channel_IsPlaying(sound_data[i].voice_num, &is_playing);
 			if(is_playing==FALSE)
@@ -158,6 +160,7 @@ void update_sound(void)
 				sound_data[i].used=0;
 			}
 			else
+#endif
 			{
 				if(!sound_data[i].lower_at_dist)
 				{
@@ -167,10 +170,10 @@ void update_sound(void)
 				else
 					calc_sound_prop(sound_data[i].x,sound_data[i].y,&vol, &pan, sound_info[sound_data[i].sound_num].volume);
 				
-								
+#ifdef USE_FMOD								
 				FMOD_Channel_SetVolume(sound_data[i].voice_num, ((float)vol)/256);
 				FMOD_Channel_SetPan(sound_data[i].voice_num, pan);
-
+#endif
 			}
 
 		}
@@ -187,8 +190,9 @@ void update_sound(void)
 void stop_sound_num(int num)
 {
 	if(!sound_is_on)return;
-	
+#ifdef USE_FMOD	
 	FMOD_Channel_Stop(sound_data[num].voice_num);
+#endif
 	sound_data[num].used=0;
 }
 
@@ -231,7 +235,9 @@ void stop_all_sounds(void)
 	{
 		if(sound_data[i].used)
 		{
+#ifdef USE_FMOD
 			FMOD_Channel_Stop(sound_data[i].voice_num);
+#endif
 			sound_data[i].used=0;
 		}
 	}
@@ -249,7 +255,9 @@ void pause_all_sounds(void)
 	{
 		if(sound_data[i].used)
 		{
+#ifdef USE_FMOD
 			FMOD_Channel_SetPaused(sound_data[i].voice_num,TRUE);
+#endif
 			sound_data[i].used=0;
 		}
 	}
@@ -266,7 +274,9 @@ void resume_all_sounds(void)
 	{
 		if(sound_data[i].used)
 		{
+#ifdef USE_FMOD
 			FMOD_Channel_SetPaused(sound_data[i].voice_num,FALSE);
+#endif
 			sound_data[i].used=0;
 		}
 	}
@@ -281,8 +291,10 @@ void resume_all_sounds(void)
 
 char current_music[50] ="none";
 int music_is_looping=0;
+#ifdef USE_FMOD
 static FMOD_CHANNEL *fmod_music_channel;
 static FMOD_SOUND *music_sound;
+#endif
 static int music_channel;
 
 int play_fiend_music(char* file, int loop)
@@ -295,14 +307,17 @@ int play_fiend_music(char* file, int loop)
 
 	if(strcmp(file,current_music)==0)return 1;
 	
+#ifdef USE_FMOD
 	if(strcmp(current_music,"none")!=0)
 	{
 		FMOD_Channel_Stop(fmod_music_channel);
 		FMOD_Sound_Release(music_sound);
 	}
+#endif
 	
 	sprintf(path,"music/%s",file);
 	
+#ifdef USE_FMOD
 	if(loop)
 	{
 		
@@ -321,13 +336,16 @@ int play_fiend_music(char* file, int loop)
 		make_engine_error(error_string);
 		return 0;
 	}
+#endif
 	
 	strcpy(current_music,file);
 	
+#ifdef USE_FMOD
 	speed_counter=0;
 	FMOD_System_PlaySound(fmod_system, FMOD_CHANNEL_FREE, music_sound, 0, &fmod_music_channel);
 	
 	set_fiend_music_volume(fiend_music_volume);
+#endif
 	
 	return 1;
 }
@@ -336,9 +354,9 @@ int play_fiend_music(char* file, int loop)
 void set_fiend_music_volume(int vol)
 {
 	//if(music_channel <0 || sound_is_on==0)return;
-
+#ifdef USE_FMOD
 	FMOD_Channel_SetVolume(fmod_music_channel, ((float)vol)/256);
-
+#endif
 }
 
 
@@ -347,6 +365,7 @@ void stop_fiend_music(void)
 	if(!sound_is_on)return;
 	if(strcmp(current_music,"none")==0)return;
 	
+#ifdef USE_FMOD
 	if(strcmp(current_music,"none")!=0)
 	{
 		FMOD_Channel_Stop(fmod_music_channel);
@@ -355,33 +374,41 @@ void stop_fiend_music(void)
 
 		strcpy(current_music,"none");
 	}
+#endif
 }
 
 void pause_fiend_music(void)
 {
+#ifdef USE_FMOD
 	FMOD_BOOL paused;
+#endif
 	if(!sound_is_on)return;
 	if(strcmp(current_music,"none")==0)return;
 	
+#ifdef USE_FMOD
 	FMOD_Channel_GetPaused(fmod_music_channel, &paused);
 	if(!paused)
 	{
 		FMOD_Channel_SetPaused(fmod_music_channel, TRUE);
 	}
+#endif
 }
 
 void resume_fiend_music(void)
 {
+#ifdef USE_FMOD
 	FMOD_BOOL paused;
+#endif
 	if(!sound_is_on)return;
 	if(strcmp(current_music,"none")==0)return;
 	
-	
+#ifdef USE_FMOD	
 	FMOD_Channel_GetPaused(fmod_music_channel, &paused);
 	if(paused)
 	{
 		FMOD_Channel_SetPaused(fmod_music_channel, FALSE);
 	}
+#endif
 }
 
 

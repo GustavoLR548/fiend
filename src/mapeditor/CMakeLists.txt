@@ -2,4 +2,8 @@ add_executable(mapeditor WIN32 mapedit.c ../bmp_array.c ../character.c ../consol
 		d_pathnode.c d_sound.c d_trigger.c ../draw.c ../enemy.c ../fiend.c ../grafik4.c ../item.c ../lightmap.c mapdraw.c ../mapio.c menu_edit.c menu_file.c menu_misc.c menu_options.c ../NPC.c 
 		../object.c ../picdata.c ../rotate_sprite.c ../sound.c ../tile.c ../trigger.c)
 
-target_link_libraries(mapeditor ${ALLEGRO_LIBRARY} ${FMOD_LIBRARY})
+if(FMOD_FOUND)
+    target_link_libraries(mapeditor ${ALLEGRO_LIBRARY} ${FMOD_LIBRARY} m)
+else()
+    target_link_libraries(mapeditor ${ALLEGRO_LIBRARY} m)
+endif()

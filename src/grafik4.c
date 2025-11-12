@@ -306,46 +306,25 @@ float compute_angle(int center_x1,int center_y1,int center_x2,int center_y2)
 {
  float delta_x;
  float delta_y;
- fixed fixtemp;
- fixed ans;
+ float angle_rad;
+ float angle_deg;
 
  delta_x = center_x1 - center_x2;
- delta_y = center_y2 - center_y1;
+ delta_y = center_y1 - center_y2;
 
+ // This game uses a compass coordinate system where:
+ // 0° = North (up, negative Y), 90° = East (right, positive X)
+ // 180° = South (down, positive Y), 270° = West (left, negative X)
+ // Standard atan2 is: 0° = East, 90° = North, so we need to rotate by -90°
+ // and adjust signs for screen coordinates (Y increases downward)
+ angle_rad = atan2(delta_x, -delta_y);  // Swap X/Y and negate Y
+ angle_deg = angle_rad * 180.0 / PI;
+ 
+ // Normalize to 0-360
+ if(angle_deg < 0)
+   angle_deg += 360.0;
 
- if(delta_x>=0 && delta_y>=0)
-  {
-   fixtemp = ftofix(delta_y/delta_x);
-   ans = fatan(fixtemp);
-   ans = ftofix(64)-ans;
-  }
- else if(delta_x>=0 && delta_y<0)
-  {
-   delta_y=-delta_y;
-   fixtemp = ftofix(delta_y/delta_x);
-   ans = fatan(fixtemp);
-   ans = ans + ftofix(64);
-  }
- else if(delta_x<0 && delta_y<0)
-  {
-   delta_y=-delta_y;
-   delta_x=-delta_x;
-   fixtemp = ftofix(delta_x/delta_y);
-   ans = fatan(fixtemp);
-   ans = ans + ftofix(128);
-  }
- else if(delta_x<0 && delta_y>=0)
-  {
-   delta_x=-delta_x;
-   fixtemp = ftofix(delta_y/delta_x);
-   ans = fatan(fixtemp);
-   ans = ans + ftofix(192);
-  }
-
-
- return fixed_to_degree(ans);
-
-
+ return angle_deg;
 }
 
 

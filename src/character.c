@@ -11,6 +11,7 @@
 #include <string.h>
 #include <malloc.h>
 #include <math.h>
+#include <locale.h>
 
 #include "grafik4.h"
 
@@ -46,6 +47,8 @@ int load_characters(void)
 	char final_path[40];
 	int i,j,k;
 	
+	// Set C locale for parsing numbers with periods as decimal separators
+	char *old_locale = setlocale(LC_NUMERIC, "C");
 	
 	char_info = calloc(sizeof(CHARACTER_INFO), MAX_CHARACTERS);
 
@@ -85,13 +88,17 @@ int load_characters(void)
 		fscanf(f,"%s %s %s %s %s %s\n",buffer, char_info[i].sound_death, buffer, char_info[i].sound_hurt, buffer, char_info[i].sound_ambient);
 		
 		//blood stain...
-		fscanf(f,"%s %d %s %d %s %f\n",buffer, &char_info[i].blood_x, buffer, &char_info[i].blood_y,buffer,&char_info[i].run_add);
+		int blood_scan = fscanf(f,"%s %d %s %d %s %f",buffer, &char_info[i].blood_x, buffer, &char_info[i].blood_y,buffer,&char_info[i].run_add);
 		
 		//Get step info
-		fscanf(f,"%s %d %s %d %s %d %s %d\n",buffer, &char_info[i].walk_step1, buffer, &char_info[i].walk_step2, buffer, &char_info[i].run_step1, buffer, &char_info[i].run_step2);
+		int step_scan = fscanf(f,"%s %d %s %d %s %d %s %d",buffer, &char_info[i].walk_step1, buffer, &char_info[i].walk_step2, buffer, &char_info[i].run_step1, buffer, &char_info[i].run_step2);
+		if(step_scan < 8 || blood_scan < 6) {
+			sprintf(fiend_errorcode,"Error parsing character file %s",final_path);
+			return 1;
+		}
 
 		//get the number of animations
-		fscanf(f,"%s %d",buffer, &char_info[i].num_of_animations);
+		int scan_result = fscanf(f,"%s %d",buffer, &char_info[i].num_of_animations);
 		
 		//read the animation in fo first you get the name of the animation
 		//then you read the frames til a '-1' is encounterd
@@ -102,7 +109,14 @@ int load_characters(void)
 			do
 			{
 				k++;
-				fscanf(f,"%d ",&char_info[i].animation[j].frame[k],buffer);
+				if(k >= 60) {
+					sprintf(fiend_errorcode,"Too many animation frames in character %d animation %d",i,j);
+					return 1;
+				}
+				if(fscanf(f,"%d",&char_info[i].animation[j].frame[k]) != 1) {
+					sprintf(fiend_errorcode,"Error reading animation frame in character %d animation %d frame %d",i,j,k);
+					return 1;
+				}
 			}while(char_info[i].animation[j].frame[k]!=-1);
 			
 		}
@@ -135,7 +149,8 @@ int load_characters(void)
 
 
 
-
+	// Restore original locale
+	setlocale(LC_NUMERIC, old_locale);
 
 	return 0;
 }

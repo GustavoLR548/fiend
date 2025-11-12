@@ -6,7 +6,6 @@
 #ifndef MAP_H
 #define MAP_H 
 
-
 #define MAX_PATHNODE_NUM 500
 
 typedef struct
@@ -139,11 +138,6 @@ typedef struct
  PATH_NODE path_node[MAX_PATHNODE_NUM]; //the path nodes...
 
 }MAP_DATA;
-
-
-
-
-
 
 #endif
 

@@ -64,7 +64,51 @@ int load_map(MAP_DATA* map, char *file)
 	f = fopen(file, "rb");
 	if(f==NULL){ sprintf(fiend_errorcode,"couldn't load %s",map);return 0;}
 
-	fread(map, sizeof(MAP_DATA), 1,f);
+	// IMPORTANT: The map files were created on a 32-bit system where pointers are 4 bytes.
+	// On 64-bit systems, pointers are 8 bytes, causing struct layout mismatch.
+	// We manually read each field and skip over the 32-bit pointers (4 bytes each)
+	// instead of using fread() on the entire MAP_DATA struct.
+	
+	// Read the fixed-size fields at the beginning
+	fread(map->name, sizeof(char), 40, f);  // name[40]
+	fread(&map->w, sizeof(int), 1, f);      // w
+	fread(&map->h, sizeof(int), 1, f);      // h
+	fread(&map->player_x, sizeof(int), 1, f);     // player_x
+	fread(&map->player_y, sizeof(int), 1, f);     // player_y
+	fread(&map->player_angle, sizeof(int), 1, f); // player_angle
+	fread(&map->outside, sizeof(int), 1, f);      // outside
+	fread(&map->light_level, sizeof(int), 1, f);  // light_level
+	
+	fread(&map->num_of_lights, sizeof(int), 1, f);
+	fseek(f, 4, SEEK_CUR); // Skip 32-bit pointer (light)
+	
+	fseek(f, 4, SEEK_CUR); // Skip 32-bit pointer (layer1)
+	fseek(f, 4, SEEK_CUR); // Skip 32-bit pointer (layer2)
+	fseek(f, 4, SEEK_CUR); // Skip 32-bit pointer (layer3)
+	fseek(f, 4, SEEK_CUR); // Skip 32-bit pointer (shadow)
+	
+	fread(&map->num_of_objects, sizeof(int), 1, f);
+	fseek(f, 4, SEEK_CUR); // Skip 32-bit pointer (object)
+	
+	fread(&map->num_of_areas, sizeof(int), 1, f);
+	fseek(f, 4, SEEK_CUR); // Skip 32-bit pointer (area)
+	
+	fread(&map->num_of_look_at_areas, sizeof(int), 1, f);
+	fseek(f, 4, SEEK_CUR); // Skip 32-bit pointer (look_at_area)
+	
+	fread(&map->num_of_links, sizeof(int), 1, f);
+	fseek(f, 4, SEEK_CUR); // Skip 32-bit pointer (link)
+	
+	fread(&map->num_of_soundemitors, sizeof(int), 1, f);
+	fseek(f, 4, SEEK_CUR); // Skip 32-bit pointer (soundemitor)
+	
+	fread(&map->num_of_triggers, sizeof(int), 1, f);
+	fseek(f, 4, SEEK_CUR); // Skip 32-bit pointer (trigger)
+	
+	fread(map->var, sizeof(VARIABLE_DATA), LOCAL_VAR_NUM, f);  // var array
+	
+	fread(&map->num_of_path_nodes, sizeof(int), 1, f);
+	fread(map->path_node, sizeof(PATH_NODE), MAX_PATHNODE_NUM, f);  // path_node array
 
 	map->light = calloc(sizeof(LIGHT_DATA), map->num_of_lights); 
 	fread(map->light, sizeof(LIGHT_DATA), map->num_of_lights, f);		
@@ -97,8 +141,27 @@ int load_map(MAP_DATA* map, char *file)
 	map->soundemitor = calloc(sizeof(SOUNDEMITOR_DATA), map->num_of_soundemitors); 
 	fread(map->soundemitor, sizeof(SOUNDEMITOR_DATA),map->num_of_soundemitors, f);
 	
-	map->trigger = calloc(sizeof(TRIGGER_DATA), map->num_of_triggers); 
+	// DEBUG: Check file position before reading triggers
+	fprintf(stderr, "\n========== BEFORE READING TRIGGERS ==========\n");
+	fprintf(stderr, "File position: 0x%lX (%ld)\n", ftell(f), ftell(f));
+	fprintf(stderr, "About to read %d triggers of size %zu bytes each\n", 
+		map->num_of_triggers, sizeof(TRIGGER_DATA));
+	fprintf(stderr, "Expected to read %zu bytes total\n", 
+		map->num_of_triggers * sizeof(TRIGGER_DATA));
+	fprintf(stderr, "=============================================\n\n");
+	
+	map->trigger = calloc(sizeof(TRIGGER_DATA), map->num_of_triggers);
 	fread(map->trigger, sizeof(TRIGGER_DATA),map->num_of_triggers, f);
+	
+	// DEBUG: Print what triggers we loaded
+	fprintf(stderr, "\n========== LOADED TRIGGERS ==========\n");
+	fprintf(stderr, "File position after reading triggers: %ld\n", ftell(f));
+	fprintf(stderr, "Number of triggers: %d\n", map->num_of_triggers);
+	for(i=0; i<map->num_of_triggers && i<5; i++) {
+		fprintf(stderr, "Trigger[%d]: name='%s' active=%d type=%d\n", 
+			i, map->trigger[i].name, map->trigger[i].active, map->trigger[i].type);
+	}
+	fprintf(stderr, "=====================================\n\n");
 		
 	
 	
@@ -124,18 +187,81 @@ int load_edit_map(MAP_DATA* map, char *file)
 	MAP_DATA *temp_map;
 	FILE *f;
 	
-	for(i=0;i<map->num_of_lights;i++)
-		destroy_bitmap(lightmap_data[i]);
+	// Free old map memory if it exists (for map transitions)
+	// The first time this is called, new_map() will have already allocated memory
+	// On subsequent calls (map transitions), we need to free the old memory first
+	if(map->light != NULL) {
+		for(i=0;i<map->num_of_lights;i++) {
+			destroy_bitmap(lightmap_data[i]);
+			lightmap_data[i] = NULL;  // Prevent double-free on exit
+		}
+		
+		free(map->light);
+		free(map->layer1);
+		free(map->layer2);
+		free(map->layer3);
+		free(map->shadow);
+		free(map->object);
+		free(map->area);
+		free(map->look_at_area);
+		free(map->link);
+		free(map->soundemitor);
+		free(map->trigger);
+	}
 
 	
 	
 	f = fopen(file, "rb");
 	if(f==NULL){sprintf(fiend_errorcode,"couldn't load %s",map);return 0;}
 
-	// Do some new funny stuff.....
+	// IMPORTANT: The map files were created on a 32-bit system where pointers are 4 bytes.
+	// On 64-bit systems, pointers are 8 bytes, causing struct layout mismatch.
+	// We manually read each field and skip over the 32-bit pointers (4 bytes each)
+	// instead of using fread() on the entire MAP_DATA struct.
+	// This ensures compatibility between 32-bit map files and 64-bit builds.
 	
 	temp_map = calloc(sizeof(MAP_DATA),1);
-	fread(temp_map, sizeof(MAP_DATA), 1,f);
+	
+	// Read the fixed-size fields at the beginning
+	fread(temp_map->name, sizeof(char), 40, f);  // name[40]
+	fread(&temp_map->w, sizeof(int), 1, f);      // w
+	fread(&temp_map->h, sizeof(int), 1, f);      // h
+	fread(&temp_map->player_x, sizeof(int), 1, f);     // player_x
+	fread(&temp_map->player_y, sizeof(int), 1, f);     // player_y
+	fread(&temp_map->player_angle, sizeof(int), 1, f); // player_angle
+	fread(&temp_map->outside, sizeof(int), 1, f);      // outside
+	fread(&temp_map->light_level, sizeof(int), 1, f);  // light_level
+	
+	fread(&temp_map->num_of_lights, sizeof(int), 1, f);
+	fseek(f, 4, SEEK_CUR); // Skip 32-bit pointer (light)
+	
+	fseek(f, 4, SEEK_CUR); // Skip 32-bit pointer (layer1)
+	fseek(f, 4, SEEK_CUR); // Skip 32-bit pointer (layer2)
+	fseek(f, 4, SEEK_CUR); // Skip 32-bit pointer (layer3)
+	fseek(f, 4, SEEK_CUR); // Skip 32-bit pointer (shadow)
+	
+	fread(&temp_map->num_of_objects, sizeof(int), 1, f);
+	fseek(f, 4, SEEK_CUR); // Skip 32-bit pointer (object)
+	
+	fread(&temp_map->num_of_areas, sizeof(int), 1, f);
+	fseek(f, 4, SEEK_CUR); // Skip 32-bit pointer (area)
+	
+	fread(&temp_map->num_of_look_at_areas, sizeof(int), 1, f);
+	fseek(f, 4, SEEK_CUR); // Skip 32-bit pointer (look_at_area)
+	
+	fread(&temp_map->num_of_links, sizeof(int), 1, f);
+	fseek(f, 4, SEEK_CUR); // Skip 32-bit pointer (link)
+	
+	fread(&temp_map->num_of_soundemitors, sizeof(int), 1, f);
+	fseek(f, 4, SEEK_CUR); // Skip 32-bit pointer (soundemitor)
+	
+	fread(&temp_map->num_of_triggers, sizeof(int), 1, f);
+	fseek(f, 4, SEEK_CUR); // Skip 32-bit pointer (trigger)
+	
+	fread(temp_map->var, sizeof(VARIABLE_DATA), LOCAL_VAR_NUM, f);  // var array
+	
+	fread(&temp_map->num_of_path_nodes, sizeof(int), 1, f);
+	fread(temp_map->path_node, sizeof(PATH_NODE), MAX_PATHNODE_NUM, f);  // path_node array
 	
 	map->w = temp_map->w;
 	map->h = temp_map->h;
@@ -163,19 +289,28 @@ int load_edit_map(MAP_DATA* map, char *file)
 	free(temp_map);
 	
 	//stop doing that funny stuff----
-		
-		
+	
+	// Allocate memory for the new map data
+	map->light = calloc(sizeof(LIGHT_DATA), map->num_of_lights);
+	map->layer1 = calloc(sizeof(TILE_DATA), map->w*map->h);
+	map->layer2 = calloc(sizeof(TILE_DATA), map->w*map->h);
+	map->layer3 = calloc(sizeof(TILE_DATA), map->w*map->h);
+	map->shadow = calloc(sizeof(char), map->w*map->h);
+	map->object = calloc(sizeof(OBJECT_DATA), map->num_of_objects);
+	map->area = calloc(sizeof(AREA_DATA), map->num_of_areas);
+	map->look_at_area = calloc(sizeof(LOOK_AT_AREA_DATA), map->num_of_look_at_areas);
+	map->link = calloc(sizeof(LINK_DATA), map->num_of_links);
+	map->soundemitor = calloc(sizeof(SOUNDEMITOR_DATA), map->num_of_soundemitors);
+	map->trigger = calloc(sizeof(TRIGGER_DATA), map->num_of_triggers);
+	
 	fread(map->light, sizeof(LIGHT_DATA), map->num_of_lights, f);
 	
-	
 	fread(map->layer1, sizeof(TILE_DATA), map->w*map->h,f);
-	
 	fread(map->layer2, sizeof(TILE_DATA), map->w*map->h,f);
-	
 	fread(map->layer3, sizeof(TILE_DATA), map->w*map->h,f);
 	
 	fread(map->shadow, sizeof(char), map->w*map->h,f);
-		
+	
 	fread(map->object, sizeof(OBJECT_DATA),map->num_of_objects, f);
 	
 	fread(map->area, sizeof(AREA_DATA),map->num_of_areas, f);
@@ -186,7 +321,26 @@ int load_edit_map(MAP_DATA* map, char *file)
 
 	fread(map->soundemitor, sizeof(SOUNDEMITOR_DATA),map->num_of_soundemitors, f);
 	
+	// DEBUG: Check file position before reading triggers
+	fprintf(stderr, "\n========== BEFORE READING TRIGGERS (load_edit_map) ==========\n");
+	fprintf(stderr, "File position: 0x%lX (%ld)\n", ftell(f), ftell(f));
+	fprintf(stderr, "About to read %d triggers of size %zu bytes each\n", 
+		map->num_of_triggers, sizeof(TRIGGER_DATA));
+	fprintf(stderr, "Expected to read %zu bytes total\n", 
+		map->num_of_triggers * sizeof(TRIGGER_DATA));
+	fprintf(stderr, "============================================================\n\n");
+	
 	fread(map->trigger, sizeof(TRIGGER_DATA),map->num_of_triggers, f);
+	
+	// DEBUG: Print what triggers we loaded
+	fprintf(stderr, "\n========== LOADED TRIGGERS (load_edit_map) ==========\n");
+	fprintf(stderr, "File position after reading triggers: %ld\n", ftell(f));
+	fprintf(stderr, "Number of triggers: %d\n", map->num_of_triggers);
+	for(i=0; i<map->num_of_triggers && i<5; i++) {
+		fprintf(stderr, "Trigger[%d]: name='%s' active=%d type=%d\n", 
+			i, map->trigger[i].name, map->trigger[i].active, map->trigger[i].type);
+	}
+	fprintf(stderr, "====================================================\n\n");
 				
 	
 	map_x=0;
@@ -387,26 +541,40 @@ void release_map(MAP_DATA *map)
 {
   int i;
  	
-  for(i=0;i<map->num_of_lights;i++)
-	destroy_bitmap(lightmap_data[i]);
+  for(i=0;i<map->num_of_lights;i++) {
+	if(lightmap_data[i]) {  // Check for NULL to prevent double-free
+		destroy_bitmap(lightmap_data[i]);
+		lightmap_data[i] = NULL;
+	}
+  }
 
  
 	
   free(map->light);
-  
+  map->light = NULL;
   
   free(map->layer1);
+  map->layer1 = NULL;
   free(map->layer2);
+  map->layer2 = NULL;
   free(map->layer3);
+  map->layer3 = NULL;
 
   free(map->shadow);
+  map->shadow = NULL;
 
   free(map->object);
+  map->object = NULL;
   free(map->area);
+  map->area = NULL;
   free(map->look_at_area);
+  map->look_at_area = NULL;
   free(map->link);
+  map->link = NULL;
   free(map->soundemitor);
+  map->soundemitor = NULL;
   free(map->trigger);
+  map->trigger = NULL;
   
   
 }

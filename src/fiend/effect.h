@@ -29,7 +29,7 @@ typedef struct
 	float sp2;
 }EFFECT_DATA;
 
-EFFECT_DATA effect_data[MAX_EFFECT_NUM];
+extern EFFECT_DATA effect_data[MAX_EFFECT_NUM];
 
 
 extern int screen_is_black;

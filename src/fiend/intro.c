@@ -37,7 +37,7 @@ void show_gripdesign(void)
 	speed_counter = 0;
 	
 
-	while(!key[KEY_ESC] && !end)
+	while(!key[KEY_ESC] && !key[KEY_SPACE] && !key[KEY_ENTER] && !end)
 	{
 		
 		while(speed_counter>0)
@@ -93,7 +93,7 @@ void show_poem(void)
 	y1 = 220;
 	x2 = 0;
 	y2 = 260;
-	while(!key[KEY_ESC] && !end)
+	while(!key[KEY_ESC] && !key[KEY_SPACE] && !key[KEY_ENTER] && !end)
 	{
 		
 		while(speed_counter>0)
@@ -201,14 +201,14 @@ void show_intro_text(void)
 							"You are Nick Cane, a mineral expert at a", 
 							"mine-company in Boston. Today your job",
 							"is to go to a little town in the woods",
-							"called Lauder and do an investegation of",
+							"called Lauder and do an investigation of",
 							"a mine, to see if there is any chance of",
 							"finding any valuable minerals there.",
 							"",
-							"Your comapny arranges a car to drive you",
+							"Your company arranges a car to drive you",
 							"there but since you will arrive quite late",
 							"the car won't be back until the morning.",
-							"You have therefor arranged so that you",
+							"You have therefore arranged so that you",
 							"stay the night at George Smith, the man",
 							"owning the mine.",
 							"",
@@ -549,7 +549,7 @@ void show_intro_text(void)
 	alpha = 0;
 	a_add=3;
 
-	while(strcmp(story_text[row],"END")!=0 && !key[KEY_ESC])
+	while(strcmp(story_text[row],"END")!=0 && !key[KEY_ESC] && !key[KEY_SPACE] && !key[KEY_ENTER])
 	{
 		
 		while(speed_counter>0)
@@ -561,6 +561,8 @@ void show_intro_text(void)
 			if(time%200==0)
 			{
 				row++;
+				// Safety check to prevent array bounds overflow
+				if(row >= 30 || strcmp(story_text[row],"END")==0) break;
 				if(strcmp(story_text[row],"")==0)row++;
 				alpha=0;
 			}
@@ -573,6 +575,9 @@ void show_intro_text(void)
 			speed_counter--;
 		}
 		
+		// Safety check before accessing array
+		if(row >= 30 || strcmp(story_text[row],"END")==0) break;
+		
 		clear(virt);
 		textout_ex(virt,font_avalon2->dat,story_text[row], 0,row*25,makecol(alpha,alpha,alpha), -1);
 
@@ -580,10 +585,15 @@ void show_intro_text(void)
 		{
 			textout_ex(virt,font_avalon2->dat,story_text[i], 0,i*25,makecol(255,255,255), -1);
 		}
-		//textout(virt,font_avalon2->dat,text, x2,y2,makecol(alpha2,alpha2,alpha2));
+		
+		// Show skip hint
+		textout_ex(virt,font_avalon2->dat,"[Press SPACE or ENTER to skip]", 0,450,makecol(100,100,100), -1);
 	
 		blit(virt,screen,0,0,80,0,480,480);
 	}
+
+	// Clear keyboard buffer to prevent keys from being carried over
+	clear_keybuf();
 
 	while(time<310 && !key[KEY_ESC])
 	{

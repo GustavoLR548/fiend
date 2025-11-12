@@ -7,7 +7,7 @@
 #include "../fiend.h"
 #include "mapedit.h"
 
-char temp_string[20];
+static char temp_string[20];
 
 int object_chosen=0;
 extern int current_object;

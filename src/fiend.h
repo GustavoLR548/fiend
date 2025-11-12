@@ -1,5 +1,7 @@
 #include <allegro.h>
+#ifdef USE_FMOD
 #include <fmod.h>
+#endif
 #include <math.h>
 
 #include "map.h"
@@ -112,10 +114,10 @@ extern int game_complete;
 
 
 //Gloabal vars that can trigger events
-int gun_fired;
-int npc_damaged;
+extern int gun_fired;
+extern int npc_damaged;
 
-int outside_lightlevel;
+extern int outside_lightlevel;
 
 
 //Object Globals
@@ -162,14 +164,14 @@ extern int debug_is_on;
 extern int lightning_is_on;
 extern int cache_lights_is_on;
 
-int fiend_sound_volume;
-int fiend_sound_buffer_size;
-int fiend_music_volume;
-int fiend_sound_driver;
+extern int fiend_sound_volume;
+extern int fiend_sound_buffer_size;
+extern int fiend_music_volume;
+extern int fiend_sound_driver;
 
-int fiend_gfx_driver;
+extern int fiend_gfx_driver;
 
-int fiend_show_intro;
+extern int fiend_show_intro;
 
 extern int key_forward;
 extern int key_backward;
@@ -285,9 +287,11 @@ typedef struct
 
 extern BEAM beam[BEAM_NUM];
 
+#ifdef USE_FMOD
 extern FMOD_SYSTEM *fmod_system;
 extern FMOD_CHANNEL *fmod_channel;
 extern FMOD_CREATESOUNDEXINFO soundex_info;
+#endif
 
 
 void init_frame_speed();

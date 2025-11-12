@@ -8,8 +8,9 @@ char map_file[80];
 
 
 //Some Varibales
-int map_x = 0;
-int map_y = 0;
+// map_x and map_y defined in fiend.c
+extern int map_x;
+extern int map_y;
 
 int current_tileset=0;
 int current_tile=0;

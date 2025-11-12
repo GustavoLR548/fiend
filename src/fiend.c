@@ -35,13 +35,19 @@ int fiend_sound_driver=0;
 
 int fiend_gfx_driver=GFX_AUTODETECT_WINDOWED;
 
+int fiend_show_intro=1;
+
 int game_complete=0;
 
+int gun_fired=0;
+int npc_damaged=0;
+int outside_lightlevel=31;
 
-
+#ifdef USE_FMOD
 FMOD_SYSTEM *fmod_system;
 FMOD_CHANNEL *fmod_channel = NULL;
 FMOD_CREATESOUNDEXINFO soundex_info;
+#endif
 
 //some drawing stuff
 BITMAP *virt;
@@ -203,6 +209,7 @@ int init_fiend(void)
   sound_is_on = 0;
 	if(sound_is_on)
 	{
+#ifdef USE_FMOD
 		FMOD_CHANNELGROUP *cgroup;
 		FMOD_RESULT result = FMOD_System_Create(&fmod_system);
 		printf("Create: %d\n", result);
@@ -227,6 +234,7 @@ int init_fiend(void)
 		cgroup = NULL;
 		FMOD_System_GetMasterChannelGroup(fmod_system, &cgroup);
 		FMOD_ChannelGroup_SetVolume(cgroup, ((float)fiend_sound_volume)/256);
+#endif
 	}
 
 	
@@ -302,7 +310,8 @@ void exit_fiend(void)
 	int i;
 
 	for(i=0;i<map->num_of_lights;i++)//release the lightmaps!!!
-		 destroy_bitmap(lightmap_data[i]);
+		if(lightmap_data[i])  // Check for NULL to prevent double-free
+			destroy_bitmap(lightmap_data[i]);
 
 	free(normal_light_data);
 		
@@ -328,8 +337,9 @@ void exit_fiend(void)
     if(csl_bkgd)
 		destroy_bitmap(csl_bkgd);
 
-
+#ifdef USE_FMOD
 	FMOD_System_Close(fmod_system);
+#endif
 
 	allegro_exit();
 }
