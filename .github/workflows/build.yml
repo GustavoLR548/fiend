@@ -217,10 +217,28 @@ jobs:
     
     - name: Create release archives
       run: |
-        cd fiend-linux-x64
+        # Create a clean directory structure for the full release
+        mkdir -p fiend-release
+        cp -r fiend-linux-x64/* fiend-release/
+        
+        # Create archives with proper structure
+        cd fiend-release
         zip -r ../fiend-linux-x64-${{ steps.version.outputs.VERSION }}.zip .
         tar -czf ../fiend-linux-x64-${{ steps.version.outputs.VERSION }}.tar.gz .
-        cd ../fiend-linux-ubuntu22-x64
+        cd ..
+        
+        # Create minimal binary-only archive for Ubuntu 22.04
+        mkdir -p fiend-ubuntu22
+        cp fiend-linux-ubuntu22-x64/fiend fiend-ubuntu22/
+        cp fiend-linux-ubuntu22-x64/mapeditor fiend-ubuntu22/
+        cp -r fiend-linux-x64/data fiend-ubuntu22/
+        cp -r fiend-linux-x64/graphic fiend-ubuntu22/
+        cp -r fiend-linux-x64/maps fiend-ubuntu22/
+        cp -r fiend-linux-x64/music fiend-ubuntu22/
+        cp -r fiend-linux-x64/sound fiend-ubuntu22/
+        cp fiend-linux-x64/readme.txt fiend-ubuntu22/
+        
+        cd fiend-ubuntu22
         zip -r ../fiend-linux-ubuntu22-x64-${{ steps.version.outputs.VERSION }}.zip .
         cd ..
     
@@ -232,7 +250,7 @@ jobs:
       uses: softprops/action-gh-release@v1
       with:
         tag_name: ${{ steps.version.outputs.VERSION }}
-        name: ${{ startsWith(github.ref, 'refs/tags/') && format('Fiend {0}', steps.version.outputs.VERSION) || format('Fiend Nightly Build {0}', steps.version.outputs.VERSION) }}
+        name: ${{ startsWith(github.ref, 'refs/tags/') && format('Fiend {0}', steps.version.outputs.VERSION) || format('Fiend Build {0}', steps.version.outputs.VERSION) }}
         body: |
           ${{ startsWith(github.ref, 'refs/tags/') && 'Stable release' || 'Automated nightly build' }}
           
@@ -241,9 +259,16 @@ jobs:
           **Branch:** ${{ github.ref_name }}
           
           ## Downloads
-          - `fiend-linux-x64-${{ steps.version.outputs.VERSION }}.zip` - Ubuntu 24.04+ (64-bit)
-          - `fiend-linux-x64-${{ steps.version.outputs.VERSION }}.tar.gz` - Ubuntu 24.04+ (64-bit, tar.gz)
-          - `fiend-linux-ubuntu22-x64-${{ steps.version.outputs.VERSION }}.zip` - Ubuntu 22.04 (64-bit)
+          All archives include game executables (fiend, mapeditor) plus all required assets (graphics, maps, music, sound, data).
+          
+          - `fiend-linux-x64-${{ steps.version.outputs.VERSION }}.zip` - Ubuntu 24.04+ (64-bit) - Complete game package
+          - `fiend-linux-x64-${{ steps.version.outputs.VERSION }}.tar.gz` - Ubuntu 24.04+ (64-bit) - Complete game package (tar.gz)
+          - `fiend-linux-ubuntu22-x64-${{ steps.version.outputs.VERSION }}.zip` - Ubuntu 22.04 (64-bit) - Complete game package
+          
+          ## How to Run
+          1. Extract the archive
+          2. Navigate to the extracted folder
+          3. Run `./fiend` to start the game or `./mapeditor` to edit maps
           
           ## Changes
           See commit history for details.
