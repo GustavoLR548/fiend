@@ -310,7 +310,8 @@ void exit_fiend(void)
 	int i;
 
 	for(i=0;i<map->num_of_lights;i++)//release the lightmaps!!!
-		 destroy_bitmap(lightmap_data[i]);
+		if(lightmap_data[i])  // Check for NULL to prevent double-free
+			destroy_bitmap(lightmap_data[i]);
 
 	free(normal_light_data);
 		

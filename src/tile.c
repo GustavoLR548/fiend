@@ -149,6 +149,15 @@ void draw_tile_layer(BITMAP *virt, int layer,int solid, int xpos, int ypos)
     int x,y,x1,y1;
 	int tile_set[4];
 	int	tile_num[4];
+	static int debug_counter = 0;
+	
+	if(debug_counter < 5) {
+		fprintf(stderr, "DEBUG: draw_tile_layer(layer=%d, solid=%d, xpos=%d, ypos=%d)\n", layer, solid, xpos, ypos);
+		fprintf(stderr, "  virt=%p, map->w=%d, map->h=%d, num_of_tilesets=%d\n", 
+			(void*)virt, map ? map->w : 0, map ? map->h : 0, num_of_tilesets);
+		fflush(stderr);
+		debug_counter++;
+	}
 
      x1=0-(xpos%TILE_SIZE);//check where on the tile map you begin to draw
      y1=0-(ypos%TILE_SIZE);

@@ -86,8 +86,10 @@ int check_cond(int t_num,int c_num ,int global)
 		if(num<0){
 			return -1;}
 		
-		if(check_collision(player.x - char_info[0].w/2, player.y - char_info[0].h/2,  char_info[0].w,  char_info[0].h,
-			map->area[num].x - map->area[num].w/2, map->area[num].y - map->area[num].h/2, map->area[num].w, map->area[num].h))
+		int collision = check_collision(player.x - char_info[0].w/2, player.y - char_info[0].h/2,  char_info[0].w,  char_info[0].h,
+			map->area[num].x - map->area[num].w/2, map->area[num].y - map->area[num].h/2, map->area[num].w, map->area[num].h);
+		
+		if(collision)
 		{
 			if(true_state)return 1;
 			else return 0;

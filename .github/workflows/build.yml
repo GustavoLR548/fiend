@@ -1,0 +1,257 @@
+name: Build Fiend
+
+on:
+  push:
+    branches: [ main, feat/*, dev ]
+    tags:
+      - 'v*.*.*'
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build-linux:
+    name: Build on Linux
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Fetch all history for version calculation
+      
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          build-essential \
+          cmake \
+          liballegro4-dev \
+          libx11-dev \
+          libxext-dev \
+          libxcursor-dev \
+          libxxf86vm-dev
+    
+    - name: Configure CMake
+      run: |
+        mkdir -p build
+        cd build
+        cmake .. -DCMAKE_BUILD_TYPE=Release
+    
+    - name: Build
+      run: |
+        cd build
+        make -j$(nproc)
+    
+    - name: Check binaries
+      run: |
+        ls -lh release/fiend
+        ls -lh release/mapeditor
+        file release/fiend
+        file release/mapeditor
+    
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: fiend-linux-x64
+        path: |
+          release/fiend
+          release/mapeditor
+          release/data/
+          release/graphic/
+          release/maps/
+          release/music/
+          release/sound/
+          release/readme.txt
+        if-no-files-found: error
+
+  build-linux-ubuntu-22:
+    name: Build on Ubuntu 22.04
+    runs-on: ubuntu-22.04
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          build-essential \
+          cmake \
+          liballegro4-dev \
+          libx11-dev \
+          libxext-dev \
+          libxcursor-dev \
+          libxxf86vm-dev
+    
+    - name: Configure CMake
+      run: |
+        mkdir -p build
+        cd build
+        cmake .. -DCMAKE_BUILD_TYPE=Release
+    
+    - name: Build
+      run: |
+        cd build
+        make -j$(nproc)
+    
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: fiend-linux-ubuntu22-x64
+        path: |
+          release/fiend
+          release/mapeditor
+        if-no-files-found: error
+
+  # Note: macOS and Windows builds would require significant porting work
+  # Allegro 4 is available on macOS via Homebrew but may need adjustments
+  # Windows would need either Allegro 4 Windows binaries or migration to Allegro 5
+  
+  # Uncomment when ready for cross-platform testing
+  # build-macos:
+  #   name: Build on macOS
+  #   runs-on: macos-latest
+  #   
+  #   steps:
+  #   - name: Checkout code
+  #     uses: actions/checkout@v4
+  #     
+  #   - name: Install dependencies
+  #     run: |
+  #       brew install allegro cmake
+  #   
+  #   - name: Configure CMake
+  #     run: |
+  #       mkdir -p build
+  #       cd build
+  #       cmake .. -DCMAKE_BUILD_TYPE=Release
+  #   
+  #   - name: Build
+  #     run: |
+  #       cd build
+  #       make -j$(sysctl -n hw.ncpu)
+  #   
+  #   - name: Upload artifacts
+  #     uses: actions/upload-artifact@v4
+  #     with:
+  #       name: fiend-macos-x64
+  #       path: |
+  #         release/fiend
+  #         release/mapeditor
+
+  static-analysis:
+    name: Static Analysis
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          cppcheck \
+          clang-tidy
+    
+    - name: Run cppcheck
+      run: |
+        cppcheck --enable=warning,style,performance,portability \
+          --suppress=missingIncludeSystem \
+          --inline-suppr \
+          --error-exitcode=0 \
+          src/ 2>&1 | tee cppcheck-report.txt
+    
+    - name: Upload analysis results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: static-analysis-results
+        path: cppcheck-report.txt
+
+  create-release:
+    name: Create Release
+    needs: [build-linux, build-linux-ubuntu-22]
+    runs-on: ubuntu-latest
+    # Only create releases for main branch or version tags
+    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/')
+    
+    permissions:
+      contents: write
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Generate version number
+      id: version
+      run: |
+        if [[ "${{ github.ref }}" == refs/tags/* ]]; then
+          # If it's a tag, use the tag name
+          VERSION=${GITHUB_REF#refs/tags/}
+        else
+          # Auto-generate version based on date and commit count
+          BUILD_NUMBER=$(git rev-list --count HEAD)
+          DATE=$(date +%Y.%m.%d)
+          SHORT_SHA=$(git rev-parse --short HEAD)
+          VERSION="nightly-${DATE}-build${BUILD_NUMBER}-${SHORT_SHA}"
+        fi
+        echo "VERSION=${VERSION}" >> $GITHUB_OUTPUT
+        echo "Generated version: ${VERSION}"
+    
+    - name: Download Linux artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: fiend-linux-x64
+        path: fiend-linux-x64
+    
+    - name: Download Ubuntu 22.04 artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: fiend-linux-ubuntu22-x64
+        path: fiend-linux-ubuntu22-x64
+    
+    - name: Create release archives
+      run: |
+        cd fiend-linux-x64
+        zip -r ../fiend-linux-x64-${{ steps.version.outputs.VERSION }}.zip .
+        tar -czf ../fiend-linux-x64-${{ steps.version.outputs.VERSION }}.tar.gz .
+        cd ../fiend-linux-ubuntu22-x64
+        zip -r ../fiend-linux-ubuntu22-x64-${{ steps.version.outputs.VERSION }}.zip .
+        cd ..
+    
+    - name: Extract version from tag
+      id: get_version
+      run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+    
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: ${{ steps.version.outputs.VERSION }}
+        name: ${{ startsWith(github.ref, 'refs/tags/') && format('Fiend {0}', steps.version.outputs.VERSION) || format('Fiend Nightly Build {0}', steps.version.outputs.VERSION) }}
+        body: |
+          ${{ startsWith(github.ref, 'refs/tags/') && 'Stable release' || 'Automated nightly build' }}
+          
+          **Build Date:** ${{ steps.version.outputs.DATE }}
+          **Commit:** ${{ steps.version.outputs.SHORT_SHA }}
+          **Branch:** ${{ github.ref_name }}
+          
+          ## Downloads
+          - `fiend-linux-x64-${{ steps.version.outputs.VERSION }}.zip` - Ubuntu 24.04+ (64-bit)
+          - `fiend-linux-x64-${{ steps.version.outputs.VERSION }}.tar.gz` - Ubuntu 24.04+ (64-bit, tar.gz)
+          - `fiend-linux-ubuntu22-x64-${{ steps.version.outputs.VERSION }}.zip` - Ubuntu 22.04 (64-bit)
+          
+          ## Changes
+          See commit history for details.
+        files: |
+          fiend-linux-x64-${{ steps.version.outputs.VERSION }}.zip
+          fiend-linux-x64-${{ steps.version.outputs.VERSION }}.tar.gz
+          fiend-linux-ubuntu22-x64-${{ steps.version.outputs.VERSION }}.zip
+        draft: false
+        prerelease: ${{ github.ref == 'refs/heads/main' }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

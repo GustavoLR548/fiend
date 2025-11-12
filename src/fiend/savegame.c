@@ -9,6 +9,10 @@
 #include <allegro.h>
 #include <time.h>
 #include <stdio.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <errno.h>
+#include <string.h>
 
 #include "../fiend.h"
 #include "../grafik4.h"
@@ -71,8 +75,24 @@ int save_game(char *file, char* name)
 	
 	pause_fiend_music();
 
+	// Create save directory if it doesn't exist
+	struct stat st = {0};
+	if (stat("save", &st) == -1) {
+		fprintf(stderr, "Creating save directory...\n");
+		#ifdef _WIN32
+		mkdir("save");
+		#else
+		mkdir("save", 0755);
+		#endif
+	}
+
 	f = fopen(file, "wb");
-	if(f==NULL)return 0;
+	if(f==NULL) {
+		fprintf(stderr, "ERROR: Could not create save file '%s': %s\n", file, strerror(errno));
+		return 0;
+	}
+	
+	fprintf(stderr, "Saving game to '%s'...\n", file);
 	
 	//set the savedata struct
 	sprintf(savedata.mapfile,"%s", map_file);
@@ -86,6 +106,9 @@ int save_game(char *file, char* name)
 	fwrite(&savedata, sizeof(savedata),1,f);
 
 	//save map info we need
+	// NOTE: Savegames are NOT portable between 32-bit and 64-bit systems
+	// because MAP_DATA contains pointers. Savegames will only work on the
+	// same architecture they were created on.
 	fwrite(map, sizeof(MAP_DATA), 1,f);
 	
 	fwrite(map->light, sizeof(LIGHT_DATA), map->num_of_lights, f);		
@@ -169,6 +192,8 @@ int save_game(char *file, char* name)
 	fwrite(&music_is_looping,sizeof(music_is_looping),1,f);
 		
 	fclose(f);
+
+	fprintf(stderr, "Game saved successfully to '%s'\n", file);
 
 	resume_fiend_music();
 

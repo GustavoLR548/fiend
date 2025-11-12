@@ -5,6 +5,9 @@
 
 #include "picdata.h"
 
+// Force struct packing to match Windows MSVC layout
+#pragma pack(push, 1)
+
 typedef struct
 {
 	char name[20];
@@ -68,6 +71,9 @@ typedef struct
 
 extern OBJECT_INFO *object_info;
 extern int num_of_objects;
+
+// Restore default struct packing
+#pragma pack(pop)
 
 void update_door_objects(void);
 

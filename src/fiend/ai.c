@@ -145,6 +145,21 @@ void update_tile_object_height(void)
 	
 	//check for objects
 	for(i=0;i<map->num_of_objects;i++)
+	{
+		// Bounds check to prevent crash
+		if(map->object[i].type < 0 || map->object[i].type >= num_of_objects)
+		{
+			printf("WARNING: Object %d has invalid type %d (max: %d)\n", i, map->object[i].type, num_of_objects);
+			continue;
+		}
+		if(map->object[i].action < 0 || map->object[i].action >= object_info[map->object[i].type].num_of_animations)
+		{
+			printf("WARNING: Object %d (type %d) has invalid action %d (max: %d)\n", 
+				i, map->object[i].type, map->object[i].action, 
+				object_info[map->object[i].type].num_of_animations);
+			continue;
+		}
+		
 		if(object_info[map->object[i].type].animation[map->object[i].action].solid>0)
 		{
 			
@@ -188,6 +203,7 @@ void update_tile_object_height(void)
 
 
 		}
+	}
 
 
 

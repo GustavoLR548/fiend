@@ -678,10 +678,16 @@ void update_inventory_logic(void)
 			player.active=1;
 						
 			sprintf(string,"save/save%d.sav",menu_row+1);
-			save_game(string,map->name);
+			if(save_game(string,map->name))
+			{
+				make_new_message("You type your progress using the typewriter.",NULL);
+			}
+			else
+			{
+				make_new_message("ERROR: Could not save game! Check console for details.",NULL);
+			}
 			current_menu=0;
 			menu_row=0;
-			make_new_message("You type your progress using the typewriter.",NULL);
 		}
 
 

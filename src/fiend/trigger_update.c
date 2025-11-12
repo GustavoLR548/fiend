@@ -352,7 +352,6 @@ void check_triggers(int type)
 {
 	int i,j,v;
 	int condition_true=0;
-	
 
 	//text_mode(0);
 	//textprintf(screen,font,80,30,makecol(255,255,255),"%d",type);

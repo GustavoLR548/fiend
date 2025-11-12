@@ -289,6 +289,21 @@ void draw_the_objects(void)
 ///////////////////////////////////////////////////////////
 void draw_level(void)
 {
+	static int first_call = 1;
+	if(first_call) {
+		fprintf(stderr, "\n========== DEBUG: draw_level() called for first time ==========\n");
+		fprintf(stderr, "  virt = %p, screen = %p\n", (void*)virt, (void*)screen);
+		fprintf(stderr, "  virt size = %dx%d, screen size = %dx%d\n", 
+			virt ? virt->w : 0, virt ? virt->h : 0,
+			screen ? screen->w : 0, screen ? screen->h : 0);
+		fprintf(stderr, "  map_x = %d, map_y = %d\n", map_x, map_y);
+		fprintf(stderr, "  screen_is_black = %d\n", screen_is_black);
+		fprintf(stderr, "  csl_started = %d\n", csl_started);
+		fprintf(stderr, "===============================================================\n\n");
+		fflush(stderr);
+		first_call = 0;
+	}
+	
 	clear_los_buffer();
 	update_los_buffer(map_x,map_y);
 

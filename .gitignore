@@ -1,0 +1,20 @@
+# Build directory
+/build
+
+# Binaries
+/release/fiend
+/release/mapeditor
+
+# Save files
+/release/save/*.sav
+
+# Test binaries
+/tests/analyze_*
+/tests/calculate_*
+/tests/check_*
+/tests/parse_*
+/tests/test_*
+
+# Log files
+*.log
+release/debug.log
