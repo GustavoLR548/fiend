@@ -1,4 +1,4 @@
-.PHONY: all build clean run run-log test analyze help
+.PHONY: all build clean run run-log test analyze help asan asan-run
 
 # Default target
 all: build
@@ -9,6 +9,29 @@ build:
 	@mkdir -p build
 	@cd build && cmake .. && make -j$$(nproc)
 	@echo "✓ Build complete! Binaries in release/"
+
+# Build with AddressSanitizer for memory debugging
+asan:
+	@echo "Building with AddressSanitizer (memory debugging)..."
+	@mkdir -p build
+	@cd build && rm -rf * && \
+	cmake .. \
+	  -DCMAKE_BUILD_TYPE=Debug \
+	  -DCMAKE_C_FLAGS="-g -fsanitize=address -fno-omit-frame-pointer" \
+	  -DCMAKE_EXE_LINKER_FLAGS="-fsanitize=address" && \
+	make -j$$(nproc)
+	@echo ""
+	@echo "========================================="
+	@echo "✓ Build complete with AddressSanitizer!"
+	@echo "Run 'make asan-run' to test the game"
+	@echo "========================================="
+
+# Run the game with AddressSanitizer
+asan-run: asan
+	@echo "Running Fiend with AddressSanitizer..."
+	@cd release && ./fiend 2>&1 | tee asan-test.log
+	@echo ""
+	@echo "✓ Test complete! Check asan-test.log for any memory errors"
 
 # Clean build artifacts
 clean:
@@ -110,6 +133,8 @@ help:
 	@echo "  make log        - View the last debug.log"
 	@echo "  make gdb        - Run the game with GDB debugger"
 	@echo "  make gdb-run    - Run the game with GDB (auto-start and backtrace)"
+	@echo "  make asan       - Build with AddressSanitizer (memory debugging)"
+	@echo "  make asan-run   - Build and run with AddressSanitizer"
 	@echo "  make editor     - Build and run the map editor"
 	@echo "  make test       - Compile test files in tests/"
 	@echo "  make analyze    - Analyze trigger structure at 0x0001896C"
@@ -120,4 +145,5 @@ help:
 	@echo "  make run-log    # Most common - build and capture output"
 	@echo "  make quick-log  # Fast iteration during development"
 	@echo "  make gdb-run    # Debug crashes with automatic backtrace"
+	@echo "  make asan-run   # Memory debugging with AddressSanitizer"
 	@echo ""

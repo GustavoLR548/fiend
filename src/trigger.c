@@ -150,7 +150,8 @@ void save_local_vars(void)
 	
 	if(num<0)
 	{
-		sprintf(saved_local_var[saved_var_num].name,"%s",map->name);
+		strncpy(saved_local_var[saved_var_num].name, map->name, 39);
+		saved_local_var[saved_var_num].name[39] = '\0';
 	
 		for(i=0;i<LOCAL_VAR_NUM;i++)
 		{
@@ -197,9 +198,12 @@ void save_local_vars(void)
 
 	if(num<0)
 	{
-		sprintf(saved_object[saved_object_num].name,"%s",map->name);
+		strncpy(saved_object[saved_object_num].name, map->name, 39);
+		saved_object[saved_object_num].name[39] = '\0';
 	
-		for(i=0;i<MAX_OBJECT_NUM;i++)
+		// BUGFIX: Only loop through actual objects in map, not MAX_OBJECT_NUM
+		// map->object array is allocated with map->num_of_objects elements
+		for(i=0;i<map->num_of_objects;i++)
 		{
 		saved_object[saved_object_num].object[i].x = map->object[i].x;
 		saved_object[saved_object_num].object[i].y = map->object[i].y;
@@ -220,7 +224,8 @@ void save_local_vars(void)
 	else
 	{
 	
-		for(i=0;i<MAX_OBJECT_NUM;i++)
+		// BUGFIX: Only loop through actual objects in map, not MAX_OBJECT_NUM
+		for(i=0;i<map->num_of_objects;i++)
 		{
 			if(map->object[i].save_object)
 			{
@@ -286,7 +291,8 @@ int load_local_vars(void)
 	}
 	else
 	{
-		for(i=0;i<MAX_OBJECT_NUM;i++)
+		// BUGFIX: Only loop through actual objects in map, not MAX_OBJECT_NUM
+		for(i=0;i<map->num_of_objects;i++)
 		{
 			if(map->object[i].save_object && map->object[i].type == saved_object[num].object[i].type && strcmp(map->object[i].name, saved_object[num].object[i].name)==0)
 			{

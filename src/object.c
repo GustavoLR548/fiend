@@ -365,17 +365,44 @@ void release_objects(void)
 {
 	int i,j,k;
 
-	for(i=0;i<num_of_characters;i++)
+	// BUGFIX: Use num_of_objects, not num_of_characters
+	// The cleanup logic MUST exactly match the loading logic in load_objects()
+	for(i=0;i<num_of_objects;i++)
 		for(j=0;j<object_info[i].num_of_frames;j++)
-			if(object_info[i].additive || object_info[i].trans || !object_info[i].angles || object_info[i].door)
+		{
+			// Free based on how objects were loaded
+			if(!object_info[i].angles || object_info[i].door)
 			{
-				destroy_bitmap(object_info[i].pic[j][0].data);
+				// Branch 1 (line 276): Objects without angles or doors
+				// Only pic[j][0].data allocated, NOT freed during loading
+				if(object_info[i].pic[j][0].data)
+					destroy_bitmap(object_info[i].pic[j][0].data);
+			}
+			else if(object_info[i].additive)
+			{
+				// Branch 2 (line 280): Additive objects with angles
+				// pic[j][k].data for each angle allocated, NOT freed during loading
+				int num_angles = (object_info[i].angles == 1) ? 4 : 8;
+				for(k=0;k<num_angles;k++)
+				{
+					if(object_info[i].pic[j][k].data)
+						destroy_bitmap(object_info[i].pic[j][k].data);
+				}
 			}
 			else
 			{
-				for(k=0;k<8;k++)
-					destroy_rle_sprite(object_info[i].rle_pic[j][k]);
+				// Branch 3 (line 312): Normal objects with angles (including trans)
+				// RLE sprites created, bitmaps FREED during loading (lines 327/341)
+				// Only free RLE sprites, NOT the bitmaps!
+				int num_angles = (object_info[i].angles == 1) ? 4 : 8;
+				for(k=0;k<num_angles;k++)
+				{
+					if(object_info[i].rle_pic[j][k])
+						destroy_rle_sprite(object_info[i].rle_pic[j][k]);
+					// DO NOT free pic[j][k].data - already freed during loading!
+				}
 			}
+		}
 					
 	free(object_info);
 }
