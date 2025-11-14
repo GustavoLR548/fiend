@@ -13,8 +13,8 @@
 
 
 
-char map_file[80] = "maps/lauder_alive/lauder.map";
-
+char map_file[80] = "maps/lauder_dead/lauder.map";
+//char map_file[80] = "maps/lauder_alive/lauder.map";
 
 //some variables
 int game_ended=0;
@@ -72,8 +72,6 @@ void update_game_logic(void)
 		check_look_at_areas();
 
 		update_tiles();
-							
-		//update_sound();
 		
 		if(inventory_is_on)update_inventory_logic();
 		
@@ -87,6 +85,9 @@ void update_game_logic(void)
 
 		update_effects();
 	}
+	
+	// Always update sound, even during menus/messages
+	update_sound();
 
 	update_pickup_message();
 	update_engine_error();

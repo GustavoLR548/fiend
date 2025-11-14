@@ -33,6 +33,7 @@ set(FIEND_SOURCES
 
 # Common source files from parent directory
 set(COMMON_SOURCES
+    ../audio.c
     ../bmp_array.c
     ../character.c
     ../console.c
@@ -57,16 +58,18 @@ set(COMMON_SOURCES
 # Create executable
 add_executable(fiend ${FIEND_SOURCES} ${COMMON_SOURCES})
 
+# Include miniaudio vendor directory
+target_include_directories(fiend PRIVATE 
+    ${CMAKE_SOURCE_DIR}/vendor
+)
+
 # Link libraries
 target_link_libraries(fiend 
     ${ALLEGRO_LIBRARIES}
-    m  # Math library
+    m       # Math library
+    pthread # Required by miniaudio
+    dl      # Required by miniaudio for dlopen
 )
-
-# Link FMOD if available
-if(FMOD_FOUND)
-    target_link_libraries(fiend ${FMOD_LIBRARY})
-endif()
 
 # Set output properties
 set_target_properties(fiend PROPERTIES

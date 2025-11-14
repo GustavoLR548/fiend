@@ -12,6 +12,7 @@
 
 
 #include "../fiend.h"
+#include "../audio.h"
 #include "../grafik4.h"
 #include "../draw.h"
 
@@ -109,15 +110,11 @@ int play_menu_sound(char *name, int loop)
 		num+=temp;
 	}
 	
-#ifdef USE_FMOD
-	//FSOUND_Sample_SetDefaults(sound_info[num].sound,-1,sound_info[num].volume,128,200);
-	FMOD_Sound_SetDefaults(sound_info[num].sound, 44100, ((float)sound_info[num].volume)/256, 128, 200);
-	
-	if(loop)
-		FMOD_Sound_SetLoopCount(sound_info[num].sound,FMOD_LOOP_NORMAL);
-
-	FMOD_System_PlaySound(fmod_system, FMOD_CHANNEL_FREE, sound_info[num].sound, 0, &fmod_channel);
-#endif
+	// Play the sound using the audio wrapper with master volume applied
+	int vol = (sound_info[num].volume * fiend_sound_volume) / 255;
+	if(vol > 255) vol = 255;
+	if(vol < 0) vol = 0;
+	audio_play_sound(sound_info[num].sound, loop ? 1 : 0, vol, 128);
 	
 	return i;
 }
@@ -472,6 +469,9 @@ static void update_menu_logic(void)
 {
 	int i;
 	
+	// Always update sound volumes in real-time
+	update_sound();
+	
 	wave_x+=3;
 	wave_y+=1;
 
@@ -569,6 +569,11 @@ static void update_menu_logic(void)
 					fiend_sound_volume-=10;
 					if(fiend_sound_volume<0)
 						fiend_sound_volume = 0;
+					
+					// Update music volume to match sound volume
+					fiend_music_volume = fiend_sound_volume;
+					printf("[MENU] Volume decreased to %d, calling set_fiend_music_volume()\n", fiend_sound_volume);
+					set_fiend_music_volume(fiend_music_volume);
 #ifdef USE_FMOD
 					//FSOUND_SetSFXMasterVolume(fiend_sound_volume);
 					cgroup = NULL;
@@ -603,6 +608,11 @@ static void update_menu_logic(void)
 					fiend_sound_volume+=10;
 					if(fiend_sound_volume>255)
 						fiend_sound_volume = 255;
+					
+					// Update music volume to match sound volume
+					fiend_music_volume = fiend_sound_volume;
+					printf("[MENU] Volume increased to %d, calling set_fiend_music_volume()\n", fiend_sound_volume);
+					set_fiend_music_volume(fiend_music_volume);
 #ifdef USE_FMOD
 					//FSOUND_SetSFXMasterVolume(fiend_sound_volume);
 					cgroup = NULL;

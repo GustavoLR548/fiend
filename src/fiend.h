@@ -1,7 +1,4 @@
 #include <allegro.h>
-#ifdef USE_FMOD
-#include <fmod.h>
-#endif
 #include <math.h>
 
 #include "map.h"
@@ -286,13 +283,6 @@ typedef struct
 }BEAM;
 
 extern BEAM beam[BEAM_NUM];
-
-#ifdef USE_FMOD
-extern FMOD_SYSTEM *fmod_system;
-extern FMOD_CHANNEL *fmod_channel;
-extern FMOD_CREATESOUNDEXINFO soundex_info;
-#endif
-
 
 void init_frame_speed();
 void reset_frame_speed();

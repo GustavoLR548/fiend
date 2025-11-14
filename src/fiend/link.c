@@ -93,7 +93,7 @@ void check_link_collison(void)
 		//// THE MAP LOADING BEGINS////////
 		///////////////////////////////////
 
-		//stop_all_sounds();
+		stop_all_sounds();
 		save_local_vars();
 
 		//Load the new map...

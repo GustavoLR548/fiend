@@ -14,9 +14,7 @@ typedef struct
 	char name[50];
 	int volume;
 	int num;
-#ifdef USE_FMOD
-	FMOD_SOUND *sound;
-#endif
+	void *sound;  /* opaque audio handle */
 }SOUND_INFO;
 
 
@@ -24,9 +22,7 @@ typedef struct
 typedef struct 
 {
 	int used;
-#ifdef USE_FMOD
-	FMOD_CHANNEL *voice_num;
-#endif
+	void *voice_num;  /* opaque channel handle */
 	int sound_num;
 	int x;
 	int y;

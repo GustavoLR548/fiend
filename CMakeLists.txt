@@ -61,17 +61,6 @@ else()
     message(FATAL_ERROR "Allegro 4 library not found! Install with: sudo apt-get install liballegro4-dev")
 endif()
 
-# Optional FMOD support
-find_package(Fmod)
-
-if(FMOD_FOUND)
-    include_directories(${FMOD_INCLUDE_DIR})
-    add_definitions(-DUSE_FMOD)
-    message(STATUS "Building with FMOD support: ${FMOD_LIBRARY}")
-else()
-    message(STATUS "FMOD not found - building without sound support")
-endif()
-
 # Add subdirectories
 add_subdirectory(src/fiend)
 add_subdirectory(src/mapeditor)
@@ -83,6 +72,6 @@ message(STATUS "  Build Type:    ${CMAKE_BUILD_TYPE}")
 message(STATUS "  C Compiler:    ${CMAKE_C_COMPILER_ID} ${CMAKE_C_COMPILER_VERSION}")
 message(STATUS "  CXX Compiler:  ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}")
 message(STATUS "  Allegro:       Found")
-message(STATUS "  FMOD:          ${FMOD_FOUND}")
+message(STATUS "  Audio:         miniaudio (embedded)")
 message(STATUS "  Output Dir:    ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 message(STATUS "========================================")
