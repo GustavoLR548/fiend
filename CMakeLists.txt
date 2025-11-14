@@ -1,48 +1,88 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 3.10)
 
-project(Fiend)
+project(Fiend VERSION 1.0.0 LANGUAGES C CXX)
 
+# Set C/C++ standards
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# Module path for custom Find modules (keeping for backward compatibility)
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_modules/")
-set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/release)
 
-if (WIN32)
-   ADD_DEFINITIONS (/D _CRT_SECURE_NO_WARNINGS)
-endif (WIN32)
+# Output directory for executables
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/release)
 
-# Set debug flags only for Debug builds
-# Release builds will use default optimizations (-O2 or -O3)
-if(CMAKE_BUILD_TYPE MATCHES Debug)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -O0")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0")
-    message(STATUS "Building in Debug mode with -O0")
-elseif(CMAKE_BUILD_TYPE MATCHES Release)
-    # Add debug symbols even in release for better crash reports
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
-    message(STATUS "Building in Release mode with optimizations")
-else()
-    # Default to debug mode if not specified
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -O0")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0")
-    message(STATUS "Building in unspecified mode (defaulting to Debug)")
+# Windows-specific definitions
+if(WIN32)
+    add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 endif()
 
-# Make FMOD optional
-FIND_PACKAGE(Fmod)
+# Build type configuration
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type (Debug or Release)" FORCE)
+    message(STATUS "No build type specified, defaulting to Release")
+endif()
 
-IF(FMOD_FOUND)
-   INCLUDE_DIRECTORIES(${FMOD_INCLUDE_DIR})
-   ADD_DEFINITIONS(-DUSE_FMOD)
-   message(STATUS "Building with FMOD support")
-ELSE()
-   message(STATUS "FMOD not found - building without sound support")
-ENDIF(FMOD_FOUND)
+# Compiler flags based on build type
+if(CMAKE_BUILD_TYPE MATCHES Debug)
+    add_compile_options(-g -O0 -Wall -Wextra)
+    message(STATUS "Building in Debug mode: -g -O0 -Wall -Wextra")
+elseif(CMAKE_BUILD_TYPE MATCHES Release)
+    # Release with debug symbols for crash reports
+    add_compile_options(-g -O2)
+    add_definitions(-DNDEBUG)
+    message(STATUS "Building in Release mode: -g -O2 -DNDEBUG")
+endif()
 
-FIND_PACKAGE(Allegro REQUIRED)
+# Find required packages
+find_package(PkgConfig)
 
-IF(ALLEGRO_FOUND)
-   INCLUDE_DIRECTORIES(${ALLEGRO_INCLUDE_DIR})
-ENDIF(ALLEGRO_FOUND)
+# Try to find Allegro using pkg-config first (modern approach)
+if(PKG_CONFIG_FOUND)
+    pkg_check_modules(ALLEGRO allegro)
+endif()
 
+# Fall back to custom Find module if pkg-config didn't work
+if(NOT ALLEGRO_FOUND)
+    find_package(Allegro REQUIRED)
+    if(ALLEGRO_FOUND)
+        # Convert old-style variables to new-style for consistency
+        set(ALLEGRO_INCLUDE_DIRS ${ALLEGRO_INCLUDE_DIR})
+        set(ALLEGRO_LIBRARIES ${ALLEGRO_LIBRARY})
+    endif()
+endif()
+
+if(ALLEGRO_FOUND)
+    include_directories(${ALLEGRO_INCLUDE_DIRS})
+    message(STATUS "Found Allegro: ${ALLEGRO_LIBRARIES}")
+else()
+    message(FATAL_ERROR "Allegro 4 library not found! Install with: sudo apt-get install liballegro4-dev")
+endif()
+
+# Optional FMOD support
+find_package(Fmod)
+
+if(FMOD_FOUND)
+    include_directories(${FMOD_INCLUDE_DIR})
+    add_definitions(-DUSE_FMOD)
+    message(STATUS "Building with FMOD support: ${FMOD_LIBRARY}")
+else()
+    message(STATUS "FMOD not found - building without sound support")
+endif()
+
+# Add subdirectories
 add_subdirectory(src/fiend)
 add_subdirectory(src/mapeditor)
+
+# Print build summary
+message(STATUS "========================================")
+message(STATUS "Fiend Build Configuration:")
+message(STATUS "  Build Type:    ${CMAKE_BUILD_TYPE}")
+message(STATUS "  C Compiler:    ${CMAKE_C_COMPILER_ID} ${CMAKE_C_COMPILER_VERSION}")
+message(STATUS "  CXX Compiler:  ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}")
+message(STATUS "  Allegro:       Found")
+message(STATUS "  FMOD:          ${FMOD_FOUND}")
+message(STATUS "  Output Dir:    ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+message(STATUS "========================================")

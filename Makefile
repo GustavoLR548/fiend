@@ -1,14 +1,24 @@
-.PHONY: all build clean run run-log test analyze help asan asan-run
+.PHONY: all build clean run run-log test analyze help asan asan-run release debug
 
 # Default target
 all: build
 
-# Build the game
-build:
-	@echo "Building Fiend..."
+# Build the game (defaults to Release)
+build: release
+
+# Release build (optimized, -O2)
+release:
+	@echo "Building Fiend in Release mode..."
 	@mkdir -p build
-	@cd build && cmake .. && make -j$$(nproc)
-	@echo "✓ Build complete! Binaries in release/"
+	@cd build && cmake -DCMAKE_BUILD_TYPE=Release .. && $(MAKE) -j$$(nproc)
+	@echo "✓ Release build complete! Binary: release/fiend"
+
+# Debug build (no optimization, -O0)
+debug:
+	@echo "Building Fiend in Debug mode..."
+	@mkdir -p build
+	@cd build && cmake -DCMAKE_BUILD_TYPE=Debug .. && $(MAKE) -j$$(nproc)
+	@echo "✓ Debug build complete! Binary: release/fiend"
 
 # Build with AddressSanitizer for memory debugging
 asan:
@@ -19,7 +29,7 @@ asan:
 	  -DCMAKE_BUILD_TYPE=Debug \
 	  -DCMAKE_C_FLAGS="-g -fsanitize=address -fno-omit-frame-pointer" \
 	  -DCMAKE_EXE_LINKER_FLAGS="-fsanitize=address" && \
-	make -j$$(nproc)
+	$(MAKE) -j$$(nproc)
 	@echo ""
 	@echo "========================================="
 	@echo "✓ Build complete with AddressSanitizer!"
@@ -125,25 +135,34 @@ help:
 	@echo "Fiend - Build & Run Targets"
 	@echo "=============================="
 	@echo ""
-	@echo "  make build      - Full build (cmake + compile)"
-	@echo "  make quick      - Quick rebuild (skip cmake)"
+	@echo "Build Targets:"
+	@echo "  make build      - Build in Release mode (default, optimized)"
+	@echo "  make release    - Build in Release mode (-O2 optimization)"
+	@echo "  make debug      - Build in Debug mode (-O0, full symbols)"
+	@echo "  make asan       - Build with AddressSanitizer (memory debugging)"
+	@echo "  make quick      - Quick rebuild (skip cmake configuration)"
+	@echo "  make clean      - Remove all build artifacts"
+	@echo ""
+	@echo "Run Targets:"
 	@echo "  make run        - Build and run the game"
 	@echo "  make run-log    - Build and run with logging to debug.log"
 	@echo "  make quick-log  - Quick rebuild and run with logging"
-	@echo "  make log        - View the last debug.log"
-	@echo "  make gdb        - Run the game with GDB debugger"
-	@echo "  make gdb-run    - Run the game with GDB (auto-start and backtrace)"
-	@echo "  make asan       - Build with AddressSanitizer (memory debugging)"
 	@echo "  make asan-run   - Build and run with AddressSanitizer"
+	@echo "  make log        - View the last debug.log"
+	@echo ""
+	@echo "Debug Targets:"
+	@echo "  make gdb        - Run the game with GDB debugger"
+	@echo "  make gdb-run    - Run with GDB (auto-start and backtrace)"
+	@echo ""
+	@echo "Other Targets:"
 	@echo "  make editor     - Build and run the map editor"
 	@echo "  make test       - Compile test files in tests/"
-	@echo "  make analyze    - Analyze trigger structure at 0x0001896C"
-	@echo "  make clean      - Remove build artifacts"
+	@echo "  make analyze    - Analyze trigger structure"
 	@echo "  make help       - Show this help message"
 	@echo ""
 	@echo "Examples:"
-	@echo "  make run-log    # Most common - build and capture output"
-	@echo "  make quick-log  # Fast iteration during development"
-	@echo "  make gdb-run    # Debug crashes with automatic backtrace"
+	@echo "  make            # Build in Release mode (most common)"
+	@echo "  make run-log    # Build and capture output to debug.log"
+	@echo "  make debug      # Build for debugging with GDB"
 	@echo "  make asan-run   # Memory debugging with AddressSanitizer"
 	@echo ""
