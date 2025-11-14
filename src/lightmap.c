@@ -238,7 +238,11 @@ int tile_is_wall_solid(int x, int y)
 		return 1;
 	
 	tile_set = (map->layer3+ (x) +( (y) * map->w))->tile_set;
-	tile_num = (map->layer3+ (x) +( (y) * map->w))->tile_num; 			
+	tile_num = (map->layer3+ (x) +( (y) * map->w))->tile_num;
+
+	// Bounds check to prevent crash from corrupted tile data
+	if(tile_set < 0 || tile_set >= num_of_tilesets || tile_num < 0 || tile_num >= 100)
+		return 0;
 	
 	if(tile_info[tile_set].tile[tile_num].solid>1)return 1;
 	

@@ -1315,12 +1315,16 @@ void update_player(void)
 		tile_set = (map->layer1+ ((int)player.x/TILE_SIZE) +( ((int)player.y/TILE_SIZE) * map->w))->tile_set;
 		tile_num = (map->layer1+ ((int)player.x/TILE_SIZE) +( ((int)player.y/TILE_SIZE) * map->w))->tile_num;
 		
-		if(strncasecmp(char_info[0].animation[player.action].name, "moving",6)==0 && (player.frame==char_info[0].walk_step1 || player.frame==char_info[0].walk_step2))
-			play_fiend_sound(tile_info[tile_set].tile[tile_num].sound,0,0,0,0,180);
+		// Bounds check to prevent crash from corrupted tile data
+		if(tile_set >= 0 && tile_set < num_of_tilesets && tile_num >= 0 && tile_num < 100)
+		{
+			if(strncasecmp(char_info[0].animation[player.action].name, "moving",6)==0 && (player.frame==char_info[0].walk_step1 || player.frame==char_info[0].walk_step2))
+				play_fiend_sound(tile_info[tile_set].tile[tile_num].sound,0,0,0,0,180);
 
 
-		if(strcmp(char_info[0].animation[player.action].name, "running")==0 && (player.frame==char_info[0].run_step1 || player.frame==char_info[0].run_step2))
-			play_fiend_sound(tile_info[tile_set].tile[tile_num].sound,0,0,0,0,180);
+			if(strcmp(char_info[0].animation[player.action].name, "running")==0 && (player.frame==char_info[0].run_step1 || player.frame==char_info[0].run_step2))
+				play_fiend_sound(tile_info[tile_set].tile[tile_num].sound,0,0,0,0,180);
+		}
 
 		
 	}

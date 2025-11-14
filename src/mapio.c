@@ -71,6 +71,7 @@ int load_map(MAP_DATA* map, char *file)
 	
 	// Read the fixed-size fields at the beginning
 	fread(map->name, sizeof(char), 40, f);  // name[40]
+	map->name[39] = '\0';  // Ensure null termination
 	fread(&map->w, sizeof(int), 1, f);      // w
 	fread(&map->h, sizeof(int), 1, f);      // h
 	fread(&map->player_x, sizeof(int), 1, f);     // player_x
@@ -224,6 +225,7 @@ int load_edit_map(MAP_DATA* map, char *file)
 	
 	// Read the fixed-size fields at the beginning
 	fread(temp_map->name, sizeof(char), 40, f);  // name[40]
+	temp_map->name[39] = '\0';  // Ensure null termination
 	fread(&temp_map->w, sizeof(int), 1, f);      // w
 	fread(&temp_map->h, sizeof(int), 1, f);      // h
 	fread(&temp_map->player_x, sizeof(int), 1, f);     // player_x
@@ -265,6 +267,10 @@ int load_edit_map(MAP_DATA* map, char *file)
 	
 	map->w = temp_map->w;
 	map->h = temp_map->h;
+	
+	fprintf(stderr, "DEBUG load_edit_map: Loaded map, w=%d h=%d (temp: w=%d h=%d)\n", 
+		map->w, map->h, temp_map->w, temp_map->h);
+	
 	map->num_of_lights = temp_map->num_of_lights;
 	map->num_of_areas = temp_map->num_of_areas;
 	map->num_of_look_at_areas = temp_map->num_of_look_at_areas;
@@ -281,7 +287,8 @@ int load_edit_map(MAP_DATA* map, char *file)
 	map->light_level = temp_map->light_level;
 	map->outside = temp_map->outside;
 	
-	strcpy(map->name, temp_map->name);
+	strncpy(map->name, temp_map->name, 39);
+	map->name[39] = '\0';
 
 	memcpy(map->var, temp_map->var, sizeof(VARIABLE_DATA)*LOCAL_VAR_NUM);
 	memcpy(map->path_node, temp_map->path_node, sizeof(PATH_NODE)*MAX_PATHNODE_NUM);
@@ -289,6 +296,26 @@ int load_edit_map(MAP_DATA* map, char *file)
 	free(temp_map);
 	
 	//stop doing that funny stuff----
+	
+	// Validate map dimensions and counts to prevent heap corruption
+	if(map->w < 1 || map->w > 1000 || map->h < 1 || map->h > 1000) {
+		fprintf(stderr, "ERROR: Invalid map dimensions: w=%d h=%d\n", map->w, map->h);
+		fclose(f);
+		return 0;
+	}
+	if(map->num_of_lights < 0 || map->num_of_lights > 10000 ||
+	   map->num_of_objects < 0 || map->num_of_objects > 10000 ||
+	   map->num_of_areas < 0 || map->num_of_areas > 10000 ||
+	   map->num_of_look_at_areas < 0 || map->num_of_look_at_areas > 10000 ||
+	   map->num_of_links < 0 || map->num_of_links > 10000 ||
+	   map->num_of_soundemitors < 0 || map->num_of_soundemitors > 10000 ||
+	   map->num_of_triggers < 0 || map->num_of_triggers > 10000) {
+		fprintf(stderr, "ERROR: Invalid map counts: lights=%d objects=%d areas=%d look_at=%d links=%d sounds=%d triggers=%d\n",
+			map->num_of_lights, map->num_of_objects, map->num_of_areas, map->num_of_look_at_areas,
+			map->num_of_links, map->num_of_soundemitors, map->num_of_triggers);
+		fclose(f);
+		return 0;
+	}
 	
 	// Allocate memory for the new map data
 	map->light = calloc(sizeof(LIGHT_DATA), map->num_of_lights);
@@ -305,9 +332,27 @@ int load_edit_map(MAP_DATA* map, char *file)
 	
 	fread(map->light, sizeof(LIGHT_DATA), map->num_of_lights, f);
 	
-	fread(map->layer1, sizeof(TILE_DATA), map->w*map->h,f);
-	fread(map->layer2, sizeof(TILE_DATA), map->w*map->h,f);
-	fread(map->layer3, sizeof(TILE_DATA), map->w*map->h,f);
+	size_t tiles_read1 = fread(map->layer1, sizeof(TILE_DATA), map->w*map->h,f);
+	size_t tiles_read2 = fread(map->layer2, sizeof(TILE_DATA), map->w*map->h,f);
+	size_t tiles_read3 = fread(map->layer3, sizeof(TILE_DATA), map->w*map->h,f);
+	
+	if(tiles_read1 != (size_t)(map->w*map->h) || tiles_read2 != (size_t)(map->w*map->h) || tiles_read3 != (size_t)(map->w*map->h)) {
+		fprintf(stderr, "ERROR: Incomplete tile data read: expected %d tiles, got layer1=%zu layer2=%zu layer3=%zu\n",
+			map->w*map->h, tiles_read1, tiles_read2, tiles_read3);
+		fclose(f);
+		return 0;
+	}
+	
+	// DEBUG: Sample some tile data to see if it looks valid
+	fprintf(stderr, "\n========== TILE DATA SAMPLE (load_edit_map) ==========\n");
+	fprintf(stderr, "sizeof(TILE_DATA) = %zu bytes\n", sizeof(TILE_DATA));
+	fprintf(stderr, "Map dimensions: %d x %d = %d tiles\n", map->w, map->h, map->w * map->h);
+	fprintf(stderr, "Sample tiles from layer1 at positions:\n");
+	for(int sample_i = 0; sample_i < 5 && sample_i < map->w * map->h; sample_i++) {
+		fprintf(stderr, "  [%d]: tile_set=%d, tile_num=%d\n", 
+			sample_i, map->layer1[sample_i].tile_set, map->layer1[sample_i].tile_num);
+	}
+	fprintf(stderr, "======================================================\n\n");
 	
 	fread(map->shadow, sizeof(char), map->w*map->h,f);
 	

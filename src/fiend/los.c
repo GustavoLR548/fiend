@@ -293,7 +293,7 @@ void update_los_buffer(int xpos, int ypos)
 			}
 
 			//right tile
-			if(l_i<18)
+			if(l_i<17)  // Changed from <18 to <17 since we access l_i+1
 			{
 				if(los_buffer[l_i+1][l_j]==1 || tile_is_wall_solid((i+1)+xpos/32, (j)+ypos/32))
 					c2=1;
@@ -304,7 +304,7 @@ void update_los_buffer(int xpos, int ypos)
 			}
 
 			//down tile
-			if(l_j<18)
+			if(l_j<17)  // Changed from <18 to <17 since we access l_j+1
 			{
 				if(los_buffer[l_i][l_j+1]==1 || tile_is_wall_solid((i)+xpos/32, (j+1)+ypos/32))
 					c3=1;

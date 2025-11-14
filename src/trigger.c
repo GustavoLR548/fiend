@@ -150,7 +150,8 @@ void save_local_vars(void)
 	
 	if(num<0)
 	{
-		sprintf(saved_local_var[saved_var_num].name,"%s",map->name);
+		strncpy(saved_local_var[saved_var_num].name, map->name, 39);
+		saved_local_var[saved_var_num].name[39] = '\0';
 	
 		for(i=0;i<LOCAL_VAR_NUM;i++)
 		{
@@ -197,49 +198,51 @@ void save_local_vars(void)
 
 	if(num<0)
 	{
-		sprintf(saved_object[saved_object_num].name,"%s",map->name);
+		strncpy(saved_object[saved_object_num].name, map->name, 39);
+		saved_object[saved_object_num].name[39] = '\0';
 	
-		for(i=0;i<MAX_OBJECT_NUM;i++)
+		// BUGFIX: Only loop through actual objects in map, not MAX_OBJECT_NUM
+		// map->object array is allocated with map->num_of_objects elements
+		for(i=0;i<map->num_of_objects;i++)
 		{
-			saved_object[saved_object_num].object[i].x = map->object[i].x;
-			saved_object[saved_object_num].object[i].y = map->object[i].y;
-			saved_object[saved_object_num].object[i].angle = map->object[i].angle;
-			saved_object[saved_object_num].object[i].action = map->object[i].action;
-			saved_object[saved_object_num].object[i].frame = map->object[i].frame;
-			saved_object[saved_object_num].object[i].nextframe = map->object[i].nextframe;
-			saved_object[saved_object_num].object[i].active = map->object[i].active;
-			saved_object[saved_object_num].object[i].energy = map->object[i].energy;
-			saved_object[saved_object_num].object[i].type = map->object[i].type;
-			strcpy(saved_object[saved_object_num].object[i].name, map->object[i].name);
+		saved_object[saved_object_num].object[i].x = map->object[i].x;
+		saved_object[saved_object_num].object[i].y = map->object[i].y;
+		saved_object[saved_object_num].object[i].angle = map->object[i].angle;
+		saved_object[saved_object_num].object[i].action = map->object[i].action;
+		saved_object[saved_object_num].object[i].frame = map->object[i].frame;
+		saved_object[saved_object_num].object[i].nextframe = map->object[i].nextframe;
+		saved_object[saved_object_num].object[i].active = map->object[i].active;
+		saved_object[saved_object_num].object[i].energy = map->object[i].energy;
+		saved_object[saved_object_num].object[i].type = map->object[i].type;
+		strncpy(saved_object[saved_object_num].object[i].name, map->object[i].name, 39);
+		saved_object[saved_object_num].object[i].name[39] = '\0';  // Ensure null termination
 
-		}
-		
-		saved_object_num++;
+	}		saved_object_num++;
 
 		//allegro_message("%s",saved_object[0].name);
 	}
 	else
 	{
 	
-		for(i=0;i<MAX_OBJECT_NUM;i++)
+		// BUGFIX: Only loop through actual objects in map, not MAX_OBJECT_NUM
+		for(i=0;i<map->num_of_objects;i++)
 		{
 			if(map->object[i].save_object)
 			{
 				saved_object[num].object[i].x = map->object[i].x;
 				saved_object[num].object[i].y = map->object[i].y;
 				saved_object[num].object[i].angle = map->object[i].angle;
-				saved_object[num].object[i].action = map->object[i].action;
-				saved_object[num].object[i].frame = map->object[i].frame;
-				saved_object[num].object[i].nextframe = map->object[i].nextframe;
-				saved_object[num].object[i].active = map->object[i].active;
-				saved_object[num].object[i].energy = map->object[i].energy;
-				saved_object[num].object[i].type = map->object[i].type;
-				strcpy(saved_object[num].object[i].name, map->object[i].name);
-			}
+			saved_object[num].object[i].action = map->object[i].action;
+			saved_object[num].object[i].frame = map->object[i].frame;
+			saved_object[num].object[i].nextframe = map->object[i].nextframe;
+			saved_object[num].object[i].active = map->object[i].active;
+			saved_object[num].object[i].energy = map->object[i].energy;
+			saved_object[num].object[i].type = map->object[i].type;
+			strncpy(saved_object[num].object[i].name, map->object[i].name, 39);
+			saved_object[num].object[i].name[39] = '\0';  // Ensure null termination
 		}
 	}
-
-	
+}	
 
 }
 
@@ -288,7 +291,8 @@ int load_local_vars(void)
 	}
 	else
 	{
-		for(i=0;i<MAX_OBJECT_NUM;i++)
+		// BUGFIX: Only loop through actual objects in map, not MAX_OBJECT_NUM
+		for(i=0;i<map->num_of_objects;i++)
 		{
 			if(map->object[i].save_object && map->object[i].type == saved_object[num].object[i].type && strcmp(map->object[i].name, saved_object[num].object[i].name)==0)
 			{
