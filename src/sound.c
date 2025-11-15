@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "audio.h"
 #include "fiend.h"
 #include "grafik4.h"
 
@@ -47,11 +48,7 @@ int load_sounds(void)
 	
 	while(fscanf(f, "%s %d %d\n", sound_file_name,&sound_info[num_of_sounds].volume,&sound_info[num_of_sounds].num)!=EOF)  //Get the number of tiles and the file names
 	{
-#ifdef USE_FMOD
-		FMOD_RESULT res;
-#endif
-		
-		//make the game of the sound
+		//make the name of the sound
 		name = get_filename(sound_file_name);
 		strcpy(name2,name);
 		k = strlen(name2);
@@ -70,11 +67,11 @@ int load_sounds(void)
 		strcpy(final_path, file_path);
 		strcat(final_path, sound_file_name);
 		
-		//sound_info[num_of_sounds].sound = FSOUND_Sample_Load(FSOUND_FREE,final_path,FSOUND_2D,0);//load the sound
-#ifdef USE_FMOD		
-		res = FMOD_System_CreateSound(fmod_system, final_path, FMOD_2D, &soundex_info, &sound_info[num_of_sounds].sound);
-#endif		
-		//if(sound_info[num_of_sounds].sound==NULL){allegro_message("couldn't load %s",final_path);exit(-1);}//error testing...
+		/* Load sound using audio wrapper */
+		if (audio_load_sound(final_path, &sound_info[num_of_sounds].sound) != 0) {
+			fprintf(stderr, "Warning: couldn't load %s\n", final_path);
+			sound_info[num_of_sounds].sound = NULL;
+		}
 		
 		num_of_sounds++;
 	}
@@ -96,14 +93,10 @@ void free_sounds(void)
 {
  int i;
 
-#ifdef USE_FMOD
  for(i=0;i<num_of_sounds;i++)
-	 FMOD_Sound_Release(sound_info[i].sound);
-#endif
+	 if (sound_info[i].sound)
+		 audio_free_sound(sound_info[i].sound);
 
  free(sound_info);
-
-
-
 }
 

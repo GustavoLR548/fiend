@@ -6,6 +6,7 @@
 ///////////////////////////////////////////////////
 
 
+#include "audio.h"
 #include "fiend.h"
 #include "draw.h"
 #include "grafik4.h"
@@ -42,12 +43,6 @@ int game_complete=0;
 int gun_fired=0;
 int npc_damaged=0;
 int outside_lightlevel=31;
-
-#ifdef USE_FMOD
-FMOD_SYSTEM *fmod_system;
-FMOD_CHANNEL *fmod_channel = NULL;
-FMOD_CREATESOUNDEXINFO soundex_info;
-#endif
 
 //some drawing stuff
 BITMAP *virt;
@@ -110,7 +105,7 @@ int init_fiend2(void)
 	rectfill(screen,30+80,420,240+80,460,makecol(160,20,10));
 	if(load_items())return CSLMSG_QUIT;
 	
-	if(!sound_is_on)
+	if(sound_is_on)
 	{
 		//csl_textout(2,"Loading sound data...");
 		rectfill(screen,30+80,420,275+80,460,makecol(160,20,10));
@@ -206,35 +201,17 @@ int init_fiend(void)
 		}
 	}
 	
-  sound_is_on = 0;
+	/* Initialize audio system (miniaudio) */
+	sound_is_on = 1;
 	if(sound_is_on)
 	{
-#ifdef USE_FMOD
-		FMOD_CHANNELGROUP *cgroup;
-		FMOD_RESULT result = FMOD_System_Create(&fmod_system);
-		printf("Create: %d\n", result);
-		result = FMOD_System_Init(fmod_system, MAX_SOUNDS_PLAYING, FMOD_INIT_NORMAL, 0);
-		printf("Init: %d\n", result);
-
-		//FSOUND_SetBufferSize(fiend_sound_buffer_size);
-		if(result != FMOD_OK)
+		if (audio_init() != 0)
 		{
-		  printf("Detta failar %d\n", result);
+			printf("Failed to initialize audio\n");
 			strcpy(fiend_errorcode,"couldn't install sound");
 			return 1;
 		}
-		FMOD_System_SetDriver(fmod_system, fiend_sound_driver);
-	
-		memset(&soundex_info, 0, sizeof(FMOD_CREATESOUNDEXINFO));
-		soundex_info.cbsize   = sizeof(FMOD_CREATESOUNDEXINFO);
-	
-		FMOD_System_SetDriver(fmod_system, fiend_sound_driver);
-	
-		//FSOUND_SetSFXMasterVolume(fiend_sound_volume);
-		cgroup = NULL;
-		FMOD_System_GetMasterChannelGroup(fmod_system, &cgroup);
-		FMOD_ChannelGroup_SetVolume(cgroup, ((float)fiend_sound_volume)/256);
-#endif
+		printf("Audio initialized successfully\n");
 	}
 
 	
@@ -337,9 +314,7 @@ void exit_fiend(void)
     if(csl_bkgd)
 		destroy_bitmap(csl_bkgd);
 
-#ifdef USE_FMOD
-	FMOD_System_Close(fmod_system);
-#endif
+	audio_shutdown();
 
 	allegro_exit();
 }
