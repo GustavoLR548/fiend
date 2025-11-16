@@ -14,10 +14,10 @@ set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_modules/")
 # Output directory for executables
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/release)
 
-# Disable CMake's automatic RPATH handling from link_directories()
-set(CMAKE_SKIP_BUILD_RPATH FALSE)
-set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
-set(CMAKE_INSTALL_RPATH_USE_LINK_PATH FALSE)
+# Disable all automatic RPATH handling - we set it manually per target
+set(CMAKE_SKIP_RPATH FALSE)
+set(CMAKE_SKIP_BUILD_RPATH TRUE)
+set(CMAKE_SKIP_INSTALL_RPATH TRUE)
 
 # Windows-specific definitions
 if(WIN32)

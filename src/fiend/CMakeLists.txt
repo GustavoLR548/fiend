@@ -72,11 +72,14 @@ target_link_libraries(fiend
     dl      # Required by miniaudio for dlopen
 )
 
-# Set output properties with RPATH override
+# Set RPATH using target_link_options (avoids shell escaping issues)
+target_link_options(fiend PRIVATE
+    "LINKER:--disable-new-dtags"
+    "LINKER:-rpath,$ORIGIN/lib"
+)
+
+# Set output properties
 set_target_properties(fiend PROPERTIES
     OUTPUT_NAME "fiend"
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
-    BUILD_RPATH "$$ORIGIN/lib"
-    INSTALL_RPATH "$$ORIGIN/lib"
-    BUILD_RPATH_USE_ORIGIN TRUE
 )
