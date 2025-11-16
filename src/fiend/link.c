@@ -12,6 +12,7 @@
 
 #include "../grafik4.h"
 #include "../fiend.h"
+#include "../logger.h"
 
 
 //gets the number on link name
@@ -97,15 +98,15 @@ void check_link_collison(void)
 		stop_all_sounds();
 		
 		// DEBUG: Print before saving map state
-		fprintf(stderr, "DEBUG: Map transition - leaving '%s' for '%s'\n", map->name, map_name);
-		fprintf(stderr, "  saved_object_num before save_local_vars: %d\n", saved_object_num);
+		log_debug("Map transition - leaving '%s' for '%s'", map->name, map_name);
+		log_debug("  saved_object_num before save_local_vars: %d", saved_object_num);
 		
 		save_local_vars();
 		
 		// DEBUG: Print after saving map state
-		fprintf(stderr, "  saved_object_num after save_local_vars: %d\n", saved_object_num);
-		for(int i = 0; i < saved_object_num; i++) {
-			fprintf(stderr, "    saved_object[%d].name='%s'\n", i, saved_object[i].name);
+		log_debug("  saved_object_num after save_local_vars: %d", saved_object_num);
+		for(int i = 0; i < saved_object_num && i < 5; i++) {
+			log_debug("    saved_object[%d].name='%s'", i, saved_object[i].name);
 		}
 
 		//Load the new map...
@@ -122,11 +123,11 @@ void check_link_collison(void)
 		
 		// Check if link was found in the new map
 		if(temp == -1) {
-			fprintf(stderr, "ERROR: Link '%s' not found in map '%s', using first link\n", link_name, map_name);
+			log_error("Link '%s' not found in map '%s', using first link", link_name, map_name);
 			if(map->num_of_links > 0) {
 				temp = 0;  // Use first link as fallback
 			} else {
-				fprintf(stderr, "ERROR: No links in map '%s'!\n", map_name);
+				log_error("No links in map '%s'!", map_name);
 				return;  // Can't continue without any links
 			}
 		}

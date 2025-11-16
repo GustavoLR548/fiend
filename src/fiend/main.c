@@ -10,6 +10,7 @@
 #include "../fiend.h"
 #include "../grafik4.h"
 #include "../console.h"
+#include "../logger.h"
 
 
 // Quick check if sounds are being loaded correctly
@@ -153,13 +154,12 @@ void the_game(void)
 			return;
 		}
 		
-		fprintf(stderr, "\n========== MAP LOADED SUCCESSFULLY ==========\n");
-		fprintf(stderr, "Map: %s, Size: %dx%d\n", map->name, map->w, map->h);
-		fprintf(stderr, "Player spawn: (%.1f, %.1f) angle=%.1f\n", 
+		log_debug("========== MAP LOADED SUCCESSFULLY ==========");
+		log_debug("Map: %s, Size: %dx%d", map->name, map->w, map->h);
+		log_debug("Player spawn: (%.1f, %.1f) angle=%.1f", 
 			map->player_x, map->player_y, map->player_angle);
-		fprintf(stderr, "Light level: %d, Outside: %d\n", map->light_level, map->outside);
-		fprintf(stderr, "Num objects: %d, Num lights: %d\n", map->num_of_objects, map->num_of_lights);
-		fflush(stderr);
+		log_debug("Light level: %d, Outside: %d", map->light_level, map->outside);
+		log_debug("Num objects: %d, Num lights: %d", map->num_of_objects, map->num_of_lights);
 		
 		player.x = map->player_x;
 		player.y = map->player_y;
@@ -203,10 +203,9 @@ void the_game(void)
 
 	init_frame_speed();
 	
-	fprintf(stderr, "\n========== ENTERING MAIN GAME LOOP ==========\n");
-	fprintf(stderr, "game_ended=%d, map=%p, player.x=%.1f, player.y=%.1f\n", 
+	log_debug("========== ENTERING MAIN GAME LOOP ==========");
+	log_debug("game_ended=%d, map=%p, player.x=%.1f, player.y=%.1f", 
 		game_ended, (void*)map, player.x, player.y);
-	fflush(stderr);
 	
 	while(!game_ended)
 	{
@@ -238,6 +237,16 @@ void main(int argc, char *argv[])
 	load_config_file();
 	
 	get_args(argc,argv);
+	
+	// Initialize logger
+	// Use command-line log level if set, otherwise use INFO
+	LogLevel log_level = (fiend_log_level >= 0) ? (LogLevel)fiend_log_level : LOG_LEVEL_INFO;
+	
+	if (!logger_init("logs", log_level, 1, 7)) {
+		fprintf(stderr, "Warning: Failed to initialize logger\n");
+	} else {
+		log_info("Fiend starting up...");
+	}
 
 	install_mouse();
     install_keyboard();
@@ -245,11 +254,13 @@ void main(int argc, char *argv[])
     
 	set_window_title("Fiend");
 
-	if(init_fiend()==CSLMSG_QUIT){allegro_message(fiend_errorcode);return;}
+	if(init_fiend()==CSLMSG_QUIT){allegro_message(fiend_errorcode);logger_cleanup();return;}
 
 	//fiend_menu(0);
 	the_game();
 
+	log_info("Fiend shutting down...");
+	logger_cleanup();
 	exit_fiend();
 	
 }

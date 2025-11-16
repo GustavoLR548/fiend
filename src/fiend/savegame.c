@@ -16,6 +16,7 @@
 
 #include "../fiend.h"
 #include "../grafik4.h"
+#include "../logger.h"
 
 
 //message_vars
@@ -74,20 +75,20 @@ int save_game(char *file, char* name)
 	int i;
 	
 	// DEBUG: Print saved map states before saving
-	fprintf(stderr, "DEBUG: save_game() - About to save game\n");
-	fprintf(stderr, "  Current map: %s\n", map->name);
-	fprintf(stderr, "  saved_object_num=%d (before save_local_vars)\n", saved_object_num);
-	for(i = 0; i < saved_object_num; i++) {
-		fprintf(stderr, "    saved_object[%d].name='%s'\n", i, saved_object[i].name);
+	log_debug("save_game() - About to save game");
+	log_debug("  Current map: %s", map->name);
+	log_debug("  saved_object_num=%d (before save_local_vars)", saved_object_num);
+	for(i = 0; i < saved_object_num && i < 10; i++) {
+		log_debug("    saved_object[%d].name='%s'", i, saved_object[i].name);
 	}
 	
 	// CRITICAL FIX: Save the current map state before writing to disk
 	// Without this, the map you're currently on won't be saved!
 	save_local_vars();
 	
-	fprintf(stderr, "  saved_object_num=%d (after save_local_vars)\n", saved_object_num);
-	for(i = 0; i < saved_object_num; i++) {
-		fprintf(stderr, "    saved_object[%d].name='%s'\n", i, saved_object[i].name);
+	log_debug("  saved_object_num=%d (after save_local_vars)", saved_object_num);
+	for(i = 0; i < saved_object_num && i < 10; i++) {
+		log_debug("    saved_object[%d].name='%s'", i, saved_object[i].name);
 	}
 	
 	pause_fiend_music();
@@ -95,7 +96,7 @@ int save_game(char *file, char* name)
 	// Create save directory if it doesn't exist
 	struct stat st = {0};
 	if (stat("save", &st) == -1) {
-		fprintf(stderr, "Creating save directory...\n");
+		log_info("Creating save directory...");
 		#ifdef _WIN32
 		mkdir("save");
 		#else
@@ -105,11 +106,11 @@ int save_game(char *file, char* name)
 
 	f = fopen(file, "wb");
 	if(f==NULL) {
-		fprintf(stderr, "ERROR: Could not create save file '%s': %s\n", file, strerror(errno));
+		log_error("Could not create save file '%s': %s", file, strerror(errno));
 		return 0;
 	}
 	
-	fprintf(stderr, "Saving game to '%s'...\n", file);
+	log_info("Saving game to '%s'...", file);
 	
 	//set the savedata struct
 	sprintf(savedata.mapfile,"%s", map_file);
@@ -210,7 +211,7 @@ int save_game(char *file, char* name)
 		
 	fclose(f);
 
-	fprintf(stderr, "Game saved successfully to '%s'\n", file);
+	log_info("Game saved successfully to '%s'", file);
 
 	resume_fiend_music();
 
@@ -275,14 +276,14 @@ int load_game(char *file)
 	
 	free(temp_map);
 
-	fprintf(stderr, "Loading saved objects: %d objects\n", map->num_of_objects);
+	log_debug("Loading saved objects: %d objects", map->num_of_objects);
 	fread(map->light, sizeof(LIGHT_DATA), map->num_of_lights, f);		
 	fread(map->object, sizeof(OBJECT_DATA),map->num_of_objects, f);
-	fprintf(stderr, "Loaded objects from save file\n");
+	log_debug("Loaded objects from save file");
 	
 	// Debug: print first few objects
 	for(i=0; i<map->num_of_objects && i<5; i++) {
-		fprintf(stderr, "  Object[%d]: type=%d name='%s' energy=%d\n", 
+		log_debug("  Object[%d]: type=%d name='%s' energy=%d", 
 			i, map->object[i].type, map->object[i].name, map->object[i].energy);
 	}
 	

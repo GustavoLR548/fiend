@@ -12,6 +12,7 @@
 
 #include "../fiend.h"
 #include "../grafik4.h"
+#include "../logger.h"
 
 
 extern int check_cond(int,int,int);
@@ -373,14 +374,14 @@ void check_triggers(int type)
 			              strcmp(map->trigger[i].name, "Scream") == 0 ||
 			              strcmp(map->trigger[i].name, "Death") == 0))
 			{
-				fprintf(stderr, "DEBUG: Checking trigger '%s' (type=%d, active=%d)\n", 
+				log_debug("Checking trigger '%s' (type=%d, active=%d)", 
 				        map->trigger[i].name, map->trigger[i].type, map->trigger[i].active);
-				fprintf(stderr, "  Trigger has %d conditions:\n", MAX_CONDITION_NUM);
-				for(int k=0; k<MAX_CONDITION_NUM; k++)
+				log_debug("  Trigger has %d conditions:", MAX_CONDITION_NUM);
+				for(int k=0; k<MAX_CONDITION_NUM && k<5; k++)
 				{
 					if(map->trigger[i].condition[k].used)
 					{
-						fprintf(stderr, "    Condition[%d]: type=%d, used=1\n", 
+						log_debug("    Condition[%d]: type=%d, used=1", 
 						        k, map->trigger[i].condition[k].type);
 					}
 				}

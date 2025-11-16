@@ -44,6 +44,7 @@ set(COMMON_SOURCES
     ../grafik4.c
     ../item.c
     ../lightmap.c
+    ../logger.c
     ../mapio.c
     ../misc.c
     ../NPC.c

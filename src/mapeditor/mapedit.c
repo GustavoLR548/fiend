@@ -6,6 +6,15 @@
 
 char map_file[80];
 
+// Flag to handle window close button
+static volatile int close_button_pressed = 0;
+
+// Close button callback
+void close_button_handler(void)
+{
+	close_button_pressed = 1;
+}
+
 
 //Some Varibales
 // map_x and map_y defined in fiend.c
@@ -67,6 +76,9 @@ int d_reset_brush_button_proc(int msg,DIALOG *d,int c);
 
 //Draw
 int d_drawmap_proc(int,DIALOG*,int);
+
+//Close button handler
+int d_close_button_watcher_proc(int msg, DIALOG *d, int c);
 
 //Dialog
 int update_the_screen(void);
@@ -310,6 +322,10 @@ DIALOG main_dialog[] =
 	//Choose the shadow
 	{ d_shadow_list_proc, 315,  532, 480, 64,   FG_COLOR,  BG_COLOR,    0,    0,  0,    0,    NULL},
     { d_text_proc,    315,   523,     0,     0,   FG_COLOR,  BG_COLOR,    0,    0,  0,    0,    "Shadow:"},
+    
+    // Invisible watcher to handle window close button
+    { d_close_button_watcher_proc, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL },
+    
     {NULL,                0,    0,    0,    0,    0,    0,    0,    0,       0,    0,    NULL }
 };
 
@@ -336,6 +352,9 @@ int init_mapeditor(void)
     install_timer();
     
 	set_window_title("Fiend Mapedit");
+	
+	// Set up close button callback
+	set_close_button_callback(close_button_handler);
 
 	//init the graphic mode
 	set_color_depth(16);
@@ -357,7 +376,8 @@ int init_mapeditor(void)
 	if(load_tiles())return 1;
 	if(load_characters())return 1;
 	if(load_objects())return 1;
-	if(load_sounds())return 1;
+	// Skip loading sounds in map editor - audio system not needed
+	//if(load_sounds())return 1;
 	if(load_enemys())return 1;
 	if(load_items())return 1;
 	if(load_message_faces())return 1;
@@ -401,7 +421,8 @@ void exit_mapeditor(void)
 {	
 	// Note: lightmaps are freed by release_map() below, not here
 	
-	free_sounds();
+	// Skip freeing sounds - not loaded in map editor
+	//free_sounds();
 	unload_datafile(misc);
 	
 	release_enemy_data();
@@ -421,6 +442,21 @@ void exit_mapeditor(void)
 
 
 
+// Custom dialog procedure to handle window close button
+int d_close_button_watcher_proc(int msg, DIALOG *d, int c)
+{
+	if(msg == MSG_IDLE && close_button_pressed) {
+		int ans = alert("Sure you want to quit?", NULL, NULL, "Yes", "Cancel", '\r', 0);
+		if(ans == 1) {
+			return D_CLOSE;
+		} else {
+			close_button_pressed = 0;
+		}
+	}
+	return D_O_K;
+}
+
+
 int main(int argc, char *argv[])
 {
 	int ret;
@@ -433,7 +469,7 @@ int main(int argc, char *argv[])
 	}
     
 	//begin
-	ret=do_dialog(main_dialog, -1);	
+	ret = do_dialog(main_dialog, -1);	
 
 	//exit.....
 	exit_mapeditor();

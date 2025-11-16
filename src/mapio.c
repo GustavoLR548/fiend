@@ -12,6 +12,7 @@
 #include <malloc.h>
 #include "fiend.h"
 #include "lightmap.h"
+#include "logger.h"
 
 
 extern int map_x;
@@ -189,26 +190,26 @@ int load_map(MAP_DATA* map, char *file)
 	fread(map->soundemitor, sizeof(SOUNDEMITOR_DATA),map->num_of_soundemitors, f);
 	
 	// DEBUG: Check file position before reading triggers
-	fprintf(stderr, "\n========== BEFORE READING TRIGGERS ==========\n");
-	fprintf(stderr, "File position: 0x%lX (%ld)\n", ftell(f), ftell(f));
-	fprintf(stderr, "About to read %d triggers of size %zu bytes each\n", 
+	log_debug("========== BEFORE READING TRIGGERS ==========");
+	log_debug("File position: 0x%lX (%ld)", ftell(f), ftell(f));
+	log_debug("About to read %d triggers of size %zu bytes each", 
 		map->num_of_triggers, sizeof(TRIGGER_DATA));
-	fprintf(stderr, "Expected to read %zu bytes total\n", 
+	log_debug("Expected to read %zu bytes total", 
 		map->num_of_triggers * sizeof(TRIGGER_DATA));
-	fprintf(stderr, "=============================================\n\n");
+	log_debug("=============================================");
 	
 	map->trigger = calloc(sizeof(TRIGGER_DATA), map->num_of_triggers);
 	fread(map->trigger, sizeof(TRIGGER_DATA),map->num_of_triggers, f);
 	
 	// DEBUG: Print what triggers we loaded
-	fprintf(stderr, "\n========== LOADED TRIGGERS ==========\n");
-	fprintf(stderr, "File position after reading triggers: %ld\n", ftell(f));
-	fprintf(stderr, "Number of triggers: %d\n", map->num_of_triggers);
+	log_debug("========== LOADED TRIGGERS ==========");
+	log_debug("File position after reading triggers: %ld", ftell(f));
+	log_debug("Number of triggers: %d", map->num_of_triggers);
 	for(i=0; i<map->num_of_triggers && i<5; i++) {
-		fprintf(stderr, "Trigger[%d]: name='%s' active=%d type=%d\n", 
+		log_debug("Trigger[%d]: name='%s' active=%d type=%d", 
 			i, map->trigger[i].name, map->trigger[i].active, map->trigger[i].type);
 	}
-	fprintf(stderr, "=====================================\n\n");
+	log_debug("=====================================");
 		
 	
 	
@@ -238,7 +239,7 @@ int load_edit_map(MAP_DATA* map, char *file)
 	// The first time this is called, new_map() will have already allocated memory
 	// On subsequent calls (map transitions), we need to free the old memory first
 	if(map->light != NULL) {
-		fprintf(stderr, "DEBUG: Freeing old map->object at %p (%d objects)\n", (void*)map->object, map->num_of_objects);
+		log_debug("Freeing old map->object at %p (%d objects)", (void*)map->object, map->num_of_objects);
 		for(i=0;i<map->num_of_lights;i++) {
 			destroy_bitmap(lightmap_data[i]);
 			lightmap_data[i] = NULL;  // Prevent double-free on exit
@@ -269,7 +270,7 @@ int load_edit_map(MAP_DATA* map, char *file)
 	
 	f = fopen(fixed_path, "rb");
 	if(f==NULL){
-		fprintf(stderr, "ERROR: Could not open map file '%s' (original: '%s')\n", fixed_path, file);
+		log_error("Could not open map file '%s' (original: '%s')", fixed_path, file);
 		sprintf(fiend_errorcode,"couldn't load %s",file);
 		return 0;
 	}
@@ -322,16 +323,16 @@ int load_edit_map(MAP_DATA* map, char *file)
 	fread(temp_map->var, sizeof(VARIABLE_DATA), LOCAL_VAR_NUM, f);  // var array
 	
 	// DEBUG: Show local variables loaded from map file
-	fprintf(stderr, "\n========== LOADED LOCAL VARS FROM MAP FILE ==========\n");
+	log_debug("========== LOADED LOCAL VARS FROM MAP FILE ==========");
 	for(i=0; i<LOCAL_VAR_NUM; i++)
 	{
 		if(strcmp(temp_map->var[i].name, "null") != 0)
 		{
-			fprintf(stderr, "Var[%d]: name='%s' value=%d\n", 
+			log_debug("Var[%d]: name='%s' value=%d", 
 				i, temp_map->var[i].name, temp_map->var[i].value);
 		}
 	}
-	fprintf(stderr, "=====================================================\n\n");
+	log_debug("=====================================================");
 	
 	fread(&temp_map->num_of_path_nodes, sizeof(int), 1, f);
 	fread(temp_map->path_node, sizeof(PATH_NODE), MAX_PATHNODE_NUM, f);  // path_node array
@@ -339,7 +340,7 @@ int load_edit_map(MAP_DATA* map, char *file)
 	map->w = temp_map->w;
 	map->h = temp_map->h;
 	
-	fprintf(stderr, "DEBUG load_edit_map: Loaded map, w=%d h=%d (temp: w=%d h=%d)\n", 
+	log_debug("load_edit_map: Loaded map, w=%d h=%d (temp: w=%d h=%d)", 
 		map->w, map->h, temp_map->w, temp_map->h);
 	
 	map->num_of_lights = temp_map->num_of_lights;
@@ -370,7 +371,7 @@ int load_edit_map(MAP_DATA* map, char *file)
 	
 	// Validate map dimensions and counts to prevent heap corruption
 	if(map->w < 1 || map->w > 1000 || map->h < 1 || map->h > 1000) {
-		fprintf(stderr, "ERROR: Invalid map dimensions: w=%d h=%d\n", map->w, map->h);
+		log_error("Invalid map dimensions: w=%d h=%d", map->w, map->h);
 		fclose(f);
 		return 0;
 	}
@@ -381,7 +382,7 @@ int load_edit_map(MAP_DATA* map, char *file)
 	   map->num_of_links < 0 || map->num_of_links > 10000 ||
 	   map->num_of_soundemitors < 0 || map->num_of_soundemitors > 10000 ||
 	   map->num_of_triggers < 0 || map->num_of_triggers > 10000) {
-		fprintf(stderr, "ERROR: Invalid map counts: lights=%d objects=%d areas=%d look_at=%d links=%d sounds=%d triggers=%d\n",
+		log_error("Invalid map counts: lights=%d objects=%d areas=%d look_at=%d links=%d sounds=%d triggers=%d",
 			map->num_of_lights, map->num_of_objects, map->num_of_areas, map->num_of_look_at_areas,
 			map->num_of_links, map->num_of_soundemitors, map->num_of_triggers);
 		fclose(f);
@@ -389,14 +390,14 @@ int load_edit_map(MAP_DATA* map, char *file)
 	}
 	
 	// Allocate memory for the new map data
-	fprintf(stderr, "DEBUG: Allocating new map arrays for %d objects\n", map->num_of_objects);
+	log_debug("Allocating new map arrays for %d objects", map->num_of_objects);
 	map->light = calloc(sizeof(LIGHT_DATA), map->num_of_lights);
 	map->layer1 = calloc(sizeof(TILE_DATA), map->w*map->h);
 	map->layer2 = calloc(sizeof(TILE_DATA), map->w*map->h);
 	map->layer3 = calloc(sizeof(TILE_DATA), map->w*map->h);
 	map->shadow = calloc(sizeof(char), map->w*map->h);
 	map->object = calloc(sizeof(OBJECT_DATA), map->num_of_objects);
-	fprintf(stderr, "DEBUG: New map->object allocated at %p\n", (void*)map->object);
+	log_debug("New map->object allocated at %p", (void*)map->object);
 	map->area = calloc(sizeof(AREA_DATA), map->num_of_areas);
 	map->look_at_area = calloc(sizeof(LOOK_AT_AREA_DATA), map->num_of_look_at_areas);
 	map->link = calloc(sizeof(LINK_DATA), map->num_of_links);
@@ -410,22 +411,22 @@ int load_edit_map(MAP_DATA* map, char *file)
 	size_t tiles_read3 = fread(map->layer3, sizeof(TILE_DATA), map->w*map->h,f);
 	
 	if(tiles_read1 != (size_t)(map->w*map->h) || tiles_read2 != (size_t)(map->w*map->h) || tiles_read3 != (size_t)(map->w*map->h)) {
-		fprintf(stderr, "ERROR: Incomplete tile data read: expected %d tiles, got layer1=%zu layer2=%zu layer3=%zu\n",
+		log_error("Incomplete tile data read: expected %d tiles, got layer1=%zu layer2=%zu layer3=%zu",
 			map->w*map->h, tiles_read1, tiles_read2, tiles_read3);
 		fclose(f);
 		return 0;
 	}
 	
 	// DEBUG: Sample some tile data to see if it looks valid
-	fprintf(stderr, "\n========== TILE DATA SAMPLE (load_edit_map) ==========\n");
-	fprintf(stderr, "sizeof(TILE_DATA) = %zu bytes\n", sizeof(TILE_DATA));
-	fprintf(stderr, "Map dimensions: %d x %d = %d tiles\n", map->w, map->h, map->w * map->h);
-	fprintf(stderr, "Sample tiles from layer1 at positions:\n");
+	log_debug("========== TILE DATA SAMPLE (load_edit_map) ==========");
+	log_debug("sizeof(TILE_DATA) = %zu bytes", sizeof(TILE_DATA));
+	log_debug("Map dimensions: %d x %d = %d tiles", map->w, map->h, map->w * map->h);
+	log_debug("Sample tiles from layer1 at positions:");
 	for(int sample_i = 0; sample_i < 5 && sample_i < map->w * map->h; sample_i++) {
-		fprintf(stderr, "  [%d]: tile_set=%d, tile_num=%d\n", 
+		log_debug("  [%d]: tile_set=%d, tile_num=%d", 
 			sample_i, map->layer1[sample_i].tile_set, map->layer1[sample_i].tile_num);
 	}
-	fprintf(stderr, "======================================================\n\n");
+	log_debug("======================================================");
 	
 	fread(map->shadow, sizeof(char), map->w*map->h,f);
 	
@@ -440,25 +441,25 @@ int load_edit_map(MAP_DATA* map, char *file)
 	fread(map->soundemitor, sizeof(SOUNDEMITOR_DATA),map->num_of_soundemitors, f);
 	
 	// DEBUG: Check file position before reading triggers
-	fprintf(stderr, "\n========== BEFORE READING TRIGGERS (load_edit_map) ==========\n");
-	fprintf(stderr, "File position: 0x%lX (%ld)\n", ftell(f), ftell(f));
-	fprintf(stderr, "About to read %d triggers of size %zu bytes each\n", 
+	log_debug("========== BEFORE READING TRIGGERS (load_edit_map) ==========");
+	log_debug("File position: 0x%lX (%ld)", ftell(f), ftell(f));
+	log_debug("About to read %d triggers of size %zu bytes each", 
 		map->num_of_triggers, sizeof(TRIGGER_DATA));
-	fprintf(stderr, "Expected to read %zu bytes total\n", 
+	log_debug("Expected to read %zu bytes total", 
 		map->num_of_triggers * sizeof(TRIGGER_DATA));
-	fprintf(stderr, "============================================================\n\n");
+	log_debug("============================================================");
 	
 	fread(map->trigger, sizeof(TRIGGER_DATA),map->num_of_triggers, f);
 	
 	// DEBUG: Print what triggers we loaded
-	fprintf(stderr, "\n========== LOADED TRIGGERS (load_edit_map) ==========\n");
-	fprintf(stderr, "File position after reading triggers: %ld\n", ftell(f));
-	fprintf(stderr, "Number of triggers: %d\n", map->num_of_triggers);
+	log_debug("========== LOADED TRIGGERS (load_edit_map) ==========");
+	log_debug("File position after reading triggers: %ld", ftell(f));
+	log_debug("Number of triggers: %d", map->num_of_triggers);
 	for(i=0; i<map->num_of_triggers && i<5; i++) {
-		fprintf(stderr, "Trigger[%d]: name='%s' active=%d type=%d\n", 
+		log_debug("Trigger[%d]: name='%s' active=%d type=%d", 
 			i, map->trigger[i].name, map->trigger[i].active, map->trigger[i].type);
 	}
-	fprintf(stderr, "====================================================\n\n");
+	log_debug("====================================================");
 				
 	
 	map_x=0;

@@ -161,6 +161,8 @@ extern int debug_is_on;
 extern int lightning_is_on;
 extern int cache_lights_is_on;
 
+extern int fiend_log_level;  // Log level from command line (or -1 if not set)
+
 extern int fiend_sound_volume;
 extern int fiend_sound_buffer_size;
 extern int fiend_music_volume;

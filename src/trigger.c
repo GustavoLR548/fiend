@@ -14,6 +14,7 @@
 #include <string.h>
 
 #include "fiend.h"
+#include "logger.h"
 
 int saved_var_num=0;
 
@@ -253,8 +254,8 @@ int load_local_vars(void)
 	int i;
 	int num= -1;
 
-	fprintf(stderr, "\nDEBUG: load_local_vars() called for map '%s'\n", map->name);
-	fprintf(stderr, "  saved_object_num=%d, saved_var_num=%d\n", saved_object_num, saved_var_num);
+	log_debug("load_local_vars() called for map '%s'", map->name);
+	log_debug("  saved_object_num=%d, saved_var_num=%d", saved_object_num, saved_var_num);
 	
 	//////// Load the vars ///////////
 	for(i=0;i<saved_var_num;i++)
@@ -266,12 +267,12 @@ int load_local_vars(void)
 
 	if(num<0)
 	{
-		fprintf(stderr, "  No saved vars found for this map\n");
+		log_debug("  No saved vars found for this map");
 		// Don't return - still need to check for saved objects!
 	}
 	else
 	{
-		fprintf(stderr, "  Found saved vars at index %d\n", num);
+		log_debug("  Found saved vars at index %d", num);
 		for(i=0;i<LOCAL_VAR_NUM;i++)
 			if(saved_local_var[num].var[i].used)
 				map->var[i].value = saved_local_var[num].var[i].value;
@@ -281,10 +282,10 @@ int load_local_vars(void)
 	//////// Load the objects ///////////
 	num = -1;
 	
-	fprintf(stderr, "  Searching for saved objects...\n");
+	log_debug("  Searching for saved objects...");
 	for(i=0;i<saved_object_num;i++)
 	{
-		fprintf(stderr, "    saved_object[%d].name='%s'\n", i, saved_object[i].name);
+		log_debug("    saved_object[%d].name='%s'", i, saved_object[i].name);
 		if(strcmp(saved_object[i].name,map->name)==0)
 		{
 			num = i;
@@ -295,19 +296,19 @@ int load_local_vars(void)
 
 	if(num<0)
 	{
-		fprintf(stderr, "  No saved objects found for this map\n");
+		log_debug("  No saved objects found for this map");
 		return 0;
 	}
 	else
 	{
-		fprintf(stderr, "DEBUG: load_local_vars for map '%s', restoring %d objects\n", map->name, map->num_of_objects);
-		fprintf(stderr, "DEBUG: map->object pointer = %p\n", (void*)map->object);
+		log_debug("load_local_vars for map '%s', restoring %d objects", map->name, map->num_of_objects);
+		log_debug("map->object pointer = %p", (void*)map->object);
 		// BUGFIX: Only loop through actual objects in map, not MAX_OBJECT_NUM
-		for(i=0;i<map->num_of_objects;i++)
+		for(i=0;i<map->num_of_objects && i<10;i++)
 		{
 			if(map->object[i].save_object && map->object[i].type == saved_object[num].object[i].type && strcmp(map->object[i].name, saved_object[num].object[i].name)==0)
 			{
-				fprintf(stderr, "  Restoring object[%d]: type=%d name='%s' energy: %d -> %d\n",
+				log_debug("  Restoring object[%d]: type=%d name='%s' energy: %d -> %d",
 					i, map->object[i].type, map->object[i].name, 
 					map->object[i].energy, saved_object[num].object[i].energy);
 				map->object[i].x = saved_object[num].object[i].x;
@@ -321,14 +322,29 @@ int load_local_vars(void)
 			}
 			else if(map->object[i].save_object == 0)
 			{
-				fprintf(stderr, "  Skipping object[%d]: type=%d name='%s' (save_object=0)\n",
+				log_debug("  Skipping object[%d]: type=%d name='%s' (save_object=0)",
 					i, map->object[i].type, map->object[i].name);
 			}
 			else
 			{
-				fprintf(stderr, "  Skipping object[%d]: type mismatch or name mismatch (current: type=%d name='%s', saved: type=%d name='%s')\n",
+				log_debug("  Skipping object[%d]: type mismatch or name mismatch (current: type=%d name='%s', saved: type=%d name='%s')",
 					i, map->object[i].type, map->object[i].name,
 					saved_object[num].object[i].type, saved_object[num].object[i].name);
+			}
+		}
+		// Continue loop for remaining objects without logging
+		for(; i<map->num_of_objects; i++)
+		{
+			if(map->object[i].save_object && map->object[i].type == saved_object[num].object[i].type && strcmp(map->object[i].name, saved_object[num].object[i].name)==0)
+			{
+				map->object[i].x = saved_object[num].object[i].x;
+				map->object[i].y= saved_object[num].object[i].y;
+				map->object[i].angle= saved_object[num].object[i].angle;
+				map->object[i].action= saved_object[num].object[i].action;
+				map->object[i].frame= saved_object[num].object[i].frame;
+				map->object[i].nextframe= saved_object[num].object[i].nextframe;
+				map->object[i].active= saved_object[num].object[i].active;
+				map->object[i].energy= saved_object[num].object[i].energy;
 			}
 		}
 		

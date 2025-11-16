@@ -12,6 +12,7 @@
 #include "../draw.h"
 #include "../grafik4.h"
 #include "../console.h"
+#include "../logger.h"
 
 
 #define ITEM_LIGHT_DIST 80
@@ -291,16 +292,15 @@ void draw_level(void)
 {
 	static int first_call = 1;
 	if(first_call) {
-		fprintf(stderr, "\n========== DEBUG: draw_level() called for first time ==========\n");
-		fprintf(stderr, "  virt = %p, screen = %p\n", (void*)virt, (void*)screen);
-		fprintf(stderr, "  virt size = %dx%d, screen size = %dx%d\n", 
+		log_debug("========== draw_level() called for first time ==========");
+		log_debug("  virt = %p, screen = %p", (void*)virt, (void*)screen);
+		log_debug("  virt size = %dx%d, screen size = %dx%d", 
 			virt ? virt->w : 0, virt ? virt->h : 0,
 			screen ? screen->w : 0, screen ? screen->h : 0);
-		fprintf(stderr, "  map_x = %d, map_y = %d\n", map_x, map_y);
-		fprintf(stderr, "  screen_is_black = %d\n", screen_is_black);
-		fprintf(stderr, "  csl_started = %d\n", csl_started);
-		fprintf(stderr, "===============================================================\n\n");
-		fflush(stderr);
+		log_debug("  map_x = %d, map_y = %d", map_x, map_y);
+		log_debug("  screen_is_black = %d", screen_is_black);
+		log_debug("  csl_started = %d", csl_started);
+		log_debug("===============================================================");
 		first_call = 0;
 	}
 	

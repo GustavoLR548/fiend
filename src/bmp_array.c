@@ -12,6 +12,7 @@
 #include "draw.h"
 #include "fiend.h"
 #include "grafik4.h"
+#include "logger.h"
 
 
 #define MAX_BMP_ARRAY_DATA 100
@@ -53,7 +54,7 @@ BMP_ARRAY* load_bmp_array(char *dir_tmp,int item_num)
 	if(item_num==1)
 	{
 		sprintf(file_path,"%s*.bmp",dir);
-        printf("for_each_file_ex(\"%s\",FA_ALL,0,find_one_file,0)\n", file_path);
+		log_debug("Loading bitmap array from: %s", file_path);
 		i= for_each_file/*_ex*/(file_path,FA_ALL/*,0*/,find_one_file,0);
 
 		if(i!=1){allegro_message("couldn't load %s",file_path);exit(-1);}

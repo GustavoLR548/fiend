@@ -7,6 +7,7 @@
 #define MINIAUDIO_IMPLEMENTATION
 #include "../vendor/miniaudio/miniaudio.h"
 #include "audio.h"
+#include "logger.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -35,20 +36,12 @@ int audio_init(void) {
     
     result = ma_engine_init(&engineConfig, &g_audio_engine);
     if (result != MA_SUCCESS) {
-        fprintf(stderr, "Failed to initialize miniaudio engine: %d\n", result);
+        log_error("Failed to initialize miniaudio engine: %d", result);
         return -1;
     }
     
     g_audio_initialized = 1;
-    printf("miniaudio engine initialized successfully\n");
-    
-    /* Print device info for debugging */
-    ma_device* pDevice = ma_engine_get_device(&g_audio_engine);
-    if (pDevice) {
-        printf("Audio device: %s\n", pDevice->playback.name);
-        printf("Sample rate: %d Hz\n", pDevice->sampleRate);
-        printf("Channels: %d\n", pDevice->playback.channels);
-    }
+    log_info("miniaudio engine initialized successfully");
     
     return 0;
 }
@@ -69,13 +62,13 @@ int audio_load_sound(const char* filename, void** sound_ptr) {
     ma_result result;
     
     if (!g_audio_initialized) {
-        fprintf(stderr, "Audio system not initialized\n");
+        log_error("Audio system not initialized");
         return -1;
     }
     
     snd = (audio_sound_t*)malloc(sizeof(audio_sound_t));
     if (!snd) {
-        fprintf(stderr, "Failed to allocate memory for sound\n");
+        log_error("Failed to allocate memory for sound");
         return -1;
     }
     
@@ -85,14 +78,14 @@ int audio_load_sound(const char* filename, void** sound_ptr) {
                                       NULL, NULL, &snd->sound);
     
     if (result != MA_SUCCESS) {
-        fprintf(stderr, "Failed to load sound '%s': %d\n", filename, result);
+        log_error("Failed to load sound '%s': %d", filename, result);
         free(snd);
         return -1;
     }
     
     snd->is_valid = 1;
     *sound_ptr = snd;
-    printf("[AUDIO] Loaded sound: %s\n", filename);
+    log_debug("Loaded sound: %s", filename);
     return 0;
 }
 
@@ -115,7 +108,7 @@ void* audio_play_sound(void* sound_ptr, int loop, int volume, int pan) {
     ma_result result;
     
     if (!snd || !snd->is_valid) {
-        fprintf(stderr, "Invalid sound pointer\n");
+        log_warning("Invalid sound pointer");
         return NULL;
     }
     
@@ -137,11 +130,11 @@ void* audio_play_sound(void* sound_ptr, int loop, int volume, int pan) {
     /* Start playback */
     result = ma_sound_start(&snd->sound);
     if (result != MA_SUCCESS) {
-        fprintf(stderr, "[AUDIO ERROR] Failed to start sound playback: %d\n", result);
+        log_error("Failed to start sound playback: %d", result);
         return NULL;
     }
     
-    printf("[AUDIO] Playing sound: vol=%.2f, pan=%.2f, loop=%d\n", vol_normalized, pan_normalized, loop);
+    log_debug("Playing sound: vol=%.2f, pan=%.2f, loop=%d", vol_normalized, pan_normalized, loop);
     
     /* Return the sound pointer itself as the "channel" */
     return sound_ptr;
@@ -174,11 +167,11 @@ void audio_set_volume(void* channel_ptr, int volume) {
     audio_sound_t* snd = (audio_sound_t*)channel_ptr;
     
     if (!snd || !snd->is_valid) {
-        printf("[AUDIO] audio_set_volume: Invalid channel pointer\n");
+        log_debug("audio_set_volume: Invalid channel pointer");
         return;
     }
     
-    printf("[AUDIO] audio_set_volume: channel=%p, volume=%d (%.2f)\n", channel_ptr, volume, (float)volume / 255.0f);
+    log_debug("audio_set_volume: channel=%p, volume=%d (%.2f)", channel_ptr, volume, (float)volume / 255.0f);
     ma_sound_set_volume(&snd->sound, (float)volume / 255.0f);
 }
 
@@ -222,13 +215,13 @@ int audio_load_music(const char* filename, void** music_ptr) {
     ma_result result;
     
     if (!g_audio_initialized) {
-        fprintf(stderr, "Audio system not initialized\n");
+        log_error("Audio system not initialized");
         return -1;
     }
     
     snd = (audio_sound_t*)malloc(sizeof(audio_sound_t));
     if (!snd) {
-        fprintf(stderr, "Failed to allocate memory for music\n");
+        log_error("Failed to allocate memory for music");
         return -1;
     }
     
@@ -238,13 +231,14 @@ int audio_load_music(const char* filename, void** music_ptr) {
                                       NULL, NULL, &snd->sound);
     
     if (result != MA_SUCCESS) {
-        fprintf(stderr, "Failed to load music '%s': %d\n", filename, result);
+        log_error("Failed to load music '%s': %d", filename, result);
         free(snd);
         return -1;
     }
     
     snd->is_valid = 1;
     *music_ptr = snd;
+    log_debug("Loaded music: %s", filename);
     return 0;
 }
 

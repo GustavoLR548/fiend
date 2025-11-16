@@ -12,6 +12,7 @@
 #include "grafik4.h"
 #include "console.h"
 #include "console_funcs.h"
+#include "logger.h"
 
 //JUst so we get no errors.......
 //more of that lazyness....
@@ -28,6 +29,8 @@ int vsync_is_on=0;
 int debug_is_on=0;
 int lightning_is_on=1;
 int cache_lights_is_on=0;
+
+int fiend_log_level=-1;  // -1 means not set via command line
 
 int fiend_sound_volume=256;
 int fiend_sound_buffer_size=100;
@@ -185,6 +188,10 @@ int init_fiend(void)
   // FIXME: Why doesn't it work without this line?
   fiend_gfx_driver = GFX_AUTODETECT_WINDOWED;
   
+  log_debug("Initializing Fiend engine...");
+  log_debug("Graphics driver: %d", fiend_gfx_driver);
+  log_debug("Color depth: %d", color_depth);
+  
     //init the graphic mode
 
 	if(color_depth==16)
@@ -196,10 +203,13 @@ int init_fiend(void)
 			set_color_depth(15);
 			if(set_gfx_mode(fiend_gfx_driver,640,480,0,0)!=0){
 				strcpy(fiend_errorcode,"couldn't enter graphics mode");
+				log_error("Failed to initialize graphics mode");
 				return 1;
 			}
 		}
 	}
+	
+	log_info("Graphics initialized: 640x480 at %d-bit color", get_color_depth());
 	
 	/* Initialize audio system (miniaudio) */
 	sound_is_on = 1;
@@ -207,11 +217,11 @@ int init_fiend(void)
 	{
 		if (audio_init() != 0)
 		{
-			printf("Failed to initialize audio\n");
 			strcpy(fiend_errorcode,"couldn't install sound");
+			log_error("Failed to initialize audio system");
 			return 1;
 		}
-		printf("Audio initialized successfully\n");
+		log_info("Audio initialized successfully");
 	}
 
 	

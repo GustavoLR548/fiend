@@ -18,6 +18,7 @@
 #include "grafik4.h"
 #include "picdata.h"
 #include "draw_polygon.h"
+#include "logger.h"
 
 
 
@@ -284,7 +285,7 @@ void update_beams(void)
 	int type;
 
 	if (!particle_info) {
-		fprintf(stderr, "ERROR: particle_info is NULL in update_beams!\n");
+		log_error("particle_info is NULL in update_beams!");
 		return;
 	}
 
@@ -295,7 +296,7 @@ void update_beams(void)
 			
 			// Bounds check
 			if (type < 0 || type >= num_of_particles) {
-				fprintf(stderr, "ERROR: Invalid beam type %d in update_beams (num_of_particles=%d), marking unused\n", type, num_of_particles);
+				log_error("Invalid beam type %d in update_beams (num_of_particles=%d), marking unused", type, num_of_particles);
 				beam[i].used = 0;
 				continue;
 			}
@@ -400,7 +401,7 @@ void draw_beams(void)
 	int pic_num;
 
 	if (!particle_info) {
-		fprintf(stderr, "ERROR: particle_info is NULL in draw_beams!\n");
+		log_error("particle_info is NULL in draw_beams!");
 		return;
 	}
 
@@ -411,7 +412,7 @@ void draw_beams(void)
 			
 			// Bounds check
 			if (type < 0 || type >= num_of_particles) {
-				fprintf(stderr, "ERROR: Invalid beam type %d (num_of_particles=%d)\n", type, num_of_particles);
+				log_error("Invalid beam type %d (num_of_particles=%d)", type, num_of_particles);
 				continue;
 			}
 			
@@ -1076,11 +1077,37 @@ void get_args(int argc, char *argv[])
 	for(i=1;i<argc;i++)
 		if(argv[i][0] == '-' || argv[i][0] == '/')
 		{
-			strncpy(temp, argv[i]+1, strlen(argv[i]));
+			// Copy argument without the leading dash
+			strncpy(temp, argv[i]+1, sizeof(temp)-1);
+			temp[sizeof(temp)-1] = '\0';
+			
+			// Handle double-dash arguments (--arg becomes -arg after +1)
+			if(temp[0] == '-') {
+				memmove(temp, temp+1, strlen(temp));
+			}
 						
 			if(strcasecmp(temp,"debug")==0)
 			{
 				debug_is_on =1;
+			}
+			else if(strcasecmp(temp,"log-level")==0)
+			{
+				if(i+1<argc)
+				{
+					// Parse log level string (debug, info, warning, error, none)
+					// or number (0-4)
+					if(strcasecmp(argv[i+1], "debug")==0 || strcmp(argv[i+1], "0")==0)
+						fiend_log_level = 0;
+					else if(strcasecmp(argv[i+1], "info")==0 || strcmp(argv[i+1], "1")==0)
+						fiend_log_level = 1;
+					else if(strcasecmp(argv[i+1], "warning")==0 || strcasecmp(argv[i+1], "warn")==0 || strcmp(argv[i+1], "2")==0)
+						fiend_log_level = 2;
+					else if(strcasecmp(argv[i+1], "error")==0 || strcmp(argv[i+1], "3")==0)
+						fiend_log_level = 3;
+					else if(strcasecmp(argv[i+1], "none")==0 || strcmp(argv[i+1], "4")==0)
+						fiend_log_level = 4;
+					i++;
+				}
 			}
 			else if(strcasecmp(temp,"vsync")==0)
 			{

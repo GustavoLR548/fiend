@@ -38,6 +38,7 @@ set(COMMON_SOURCES
     ../grafik4.c
     ../item.c
     ../lightmap.c
+    ../logger.c
     ../mapio.c
     ../NPC.c
     ../object.c

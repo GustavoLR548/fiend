@@ -11,6 +11,7 @@
 #include <stdio.h>
 
 #include "../fiend.h"
+#include "../logger.h"
 
 // a var for automovement
 extern int auto_move_active;
@@ -970,10 +971,10 @@ int check_sound_events(void)
 {
 	if(type==EVENT_PLAY_SOUND)
 	{
-		fprintf(stderr, "DEBUG: EVENT_PLAY_SOUND trigger fired!\n");
-		fprintf(stderr, "  string1 (sound name): '%s'\n", string1);
-		fprintf(stderr, "  string2 (area name): '%s'\n", string2);
-		fprintf(stderr, "  x (loop): %d\n", x);
+		log_debug("EVENT_PLAY_SOUND trigger fired!");
+		log_debug("  string1 (sound name): '%s'", string1);
+		log_debug("  string2 (area name): '%s'", string2);
+		log_debug("  x (loop): %d", x);
 		
 		if(strcmp(string2,"null")==0 || strcmp(string2,"none")==0)
 			num=-1;
@@ -982,12 +983,12 @@ int check_sound_events(void)
 
 		if(num==-1)
 		{
-			fprintf(stderr, "  Playing sound at position (0,0) - no area\n");
+			log_debug("  Playing sound at position (0,0) - no area");
 			play_fiend_sound(string1,0,0,0,x,210);
 		}
 		else
 		{
-			fprintf(stderr, "  Playing sound at area position (%d,%d)\n", map->area[num].x, map->area[num].y);
+			log_debug("  Playing sound at area position (%d,%d)", map->area[num].x, map->area[num].y);
 			play_fiend_sound(string1,map->area[num].x,map->area[num].y,1,x,210);
 		}
 
@@ -1060,7 +1061,7 @@ int check_var_events(void)
 		// DEBUG: Log timer variable changes
 		if(strcmp(string1, "timer") == 0)
 		{
-			fprintf(stderr, "DEBUG EVENT_LOCAL_VAR_ADD: '%s' %d += %d (will become %d)\n",
+			log_debug("EVENT_LOCAL_VAR_ADD: '%s' %d += %d (will become %d)",
 			        string1, map->var[num].value, x, map->var[num].value + x);
 		}
 

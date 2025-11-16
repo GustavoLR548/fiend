@@ -16,6 +16,7 @@
 #include "fiend.h"
 #include "grafik4.h"
 #include "console.h"
+#include "logger.h"
 
 
 
@@ -152,10 +153,9 @@ void draw_tile_layer(BITMAP *virt, int layer,int solid, int xpos, int ypos)
 	static int debug_counter = 0;
 	
 	if(debug_counter < 5) {
-		fprintf(stderr, "DEBUG: draw_tile_layer(layer=%d, solid=%d, xpos=%d, ypos=%d)\n", layer, solid, xpos, ypos);
-		fprintf(stderr, "  virt=%p, map->w=%d, map->h=%d, num_of_tilesets=%d\n", 
+		log_debug("draw_tile_layer(layer=%d, solid=%d, xpos=%d, ypos=%d)", layer, solid, xpos, ypos);
+		log_debug("  virt=%p, map->w=%d, map->h=%d, num_of_tilesets=%d", 
 			(void*)virt, map ? map->w : 0, map ? map->h : 0, num_of_tilesets);
-		fflush(stderr);
 		debug_counter++;
 	}
 
