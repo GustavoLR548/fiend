@@ -72,14 +72,10 @@ target_link_libraries(fiend
     dl      # Required by miniaudio for dlopen
 )
 
-# Set RPATH using target_link_options (modern CMake approach)
-target_link_options(fiend PRIVATE 
-    "LINKER:--enable-new-dtags"
-    "LINKER:-rpath,$ORIGIN/lib"
-)
-
-# Set output properties
+# Set output properties with RPATH
 set_target_properties(fiend PROPERTIES
     OUTPUT_NAME "fiend"
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
+    BUILD_RPATH "$ORIGIN/lib"
+    INSTALL_RPATH "$ORIGIN/lib"
 )
