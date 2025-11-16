@@ -18,6 +18,7 @@
 #include "fiend.h"
 #include "character.h"
 #include "rotate_sprite.h"
+#include "path_utils.h"
 
 
 
@@ -43,16 +44,25 @@ int load_characters(void)
 	char sprite_file_name[100][15];
     char info_file_name[100][15];
 	int num_of_frames=1;
-	char *file_path ="graphic/characters/";
-	char final_path[40];
+	char file_path[256] = "graphic/characters/";
+	char final_path[256];
 	int i,j,k;
 	
 	// Set C locale for parsing numbers with periods as decimal separators
 	char *old_locale = setlocale(LC_NUMERIC, "C");
 	
+	/* Normalize path separators for the platform */
+	normalize_path(file_path);
+	
+	char characters_txt[256];
+	if(build_path(characters_txt, sizeof(characters_txt), file_path, "characters.txt") != 0) {
+		sprintf(fiend_errorcode,"path too long for characters.txt");
+		return 1;
+	}
+	
 	char_info = calloc(sizeof(CHARACTER_INFO), MAX_CHARACTERS);
 
-	f = fopen("graphic/characters/characters.txt", "r");      //Load the Info file
+	f = fopen(characters_txt, "r");      //Load the Info file
 	
 	if(f==NULL)
 	{sprintf(fiend_errorcode,"couldn't find characters.txt");return 1;} //error testing...
@@ -70,8 +80,10 @@ int load_characters(void)
 	{
 		
 		//----------BEGIN GET INFO-----------------------
-		strcpy(final_path, file_path);
-		strcat(final_path, info_file_name[i]);    //Get the info.
+		if(build_path(final_path, sizeof(final_path), file_path, info_file_name[i]) != 0) {
+			sprintf(fiend_errorcode,"path too long: %s%s", file_path, info_file_name[i]);
+			return 1;
+		}
 
 		f = fopen(final_path, "r");
 		if(f==NULL){sprintf(fiend_errorcode,"couldn't load %s",final_path);return 1;}//error testing...
@@ -127,8 +139,10 @@ int load_characters(void)
 		
 		
 		//--------BEGIN GET DATA------------------
-		strcpy(final_path, file_path);
-		strcat(final_path, sprite_file_name[i]);   //Get the tile data .
+		if(build_path(final_path, sizeof(final_path), file_path, sprite_file_name[i]) != 0) {
+			sprintf(fiend_errorcode,"path too long: %s%s", file_path, sprite_file_name[i]);
+			return 1;
+		}
 
 		
 	    temp_data = load_bmp_array(final_path,char_info[i].num_of_frames);//load the graphic

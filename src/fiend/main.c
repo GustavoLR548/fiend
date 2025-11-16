@@ -6,6 +6,14 @@
 
 
 #include <allegro.h>
+#include <stdio.h>
+
+#ifdef _WIN32
+    #include <direct.h>
+    #define getcwd _getcwd
+#else
+    #include <unistd.h>
+#endif
 
 #include "../fiend.h"
 #include "../grafik4.h"
@@ -232,6 +240,8 @@ void the_game(void)
 
 void main(int argc, char *argv[])
 {
+	char cwd[512];
+	
 	allegro_init();
 	
 	load_config_file();
@@ -246,6 +256,22 @@ void main(int argc, char *argv[])
 		fprintf(stderr, "Warning: Failed to initialize logger\n");
 	} else {
 		log_info("Fiend starting up...");
+	}
+	
+	BITMAP *test_bmp = load_bitmap("graphic/tiles/default/000.bmp", NULL);
+	if (test_bmp) {
+		log_info("  SUCCESS: Loaded with forward slashes!");
+		destroy_bitmap(test_bmp);
+	} else {
+		log_info("  FAILED: Could not load with forward slashes");
+	}
+
+	test_bmp = load_bitmap("graphic\\tiles\\default\\000.bmp", NULL);
+	if (test_bmp) {
+		log_info("  SUCCESS: Loaded with backslashes!");
+		destroy_bitmap(test_bmp);
+	} else {
+		log_info("  FAILED: Could not load with backslashes");
 	}
 
 	install_mouse();

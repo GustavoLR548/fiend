@@ -42,6 +42,7 @@ set(COMMON_SOURCES
     ../mapio.c
     ../NPC.c
     ../object.c
+    ../path_utils.c
     ../picdata.c
     ../rotate_sprite.c
     ../sound.c
@@ -60,10 +61,24 @@ target_include_directories(mapeditor PRIVATE
 # Link libraries
 target_link_libraries(mapeditor 
     ${ALLEGRO_LIBRARIES}
-    m       # Math library
-    pthread # Required by miniaudio
-    dl      # Required by miniaudio for dlopen
 )
+
+# Add platform-specific libraries
+if(UNIX)
+    target_link_libraries(mapeditor
+        m       # Math library
+        pthread # Required by miniaudio
+        dl      # Required by miniaudio for dlopen
+    )
+endif()
+
+# Set RPATH for Linux (not needed on Windows)
+if(UNIX AND NOT APPLE)
+    target_link_options(mapeditor PRIVATE
+        "LINKER:--disable-new-dtags"
+        "LINKER:-rpath,$ORIGIN/lib"
+    )
+endif()
 
 # Set output properties
 set_target_properties(mapeditor PROPERTIES

@@ -48,7 +48,7 @@ static BITMAP *bmp_text[MAX_ROWS];
 
 static DATAFILE *font_menu;
 static DATAFILE *font_menu2;
-static menu_in_game;
+static int menu_in_game;
 
 static int return_value=0;
 

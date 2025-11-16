@@ -1,5 +1,9 @@
 # Build directory
 /build
+/build-mingw
+
+# Test directories
+/test-windows-build
 
 # Binaries
 /release/fiend

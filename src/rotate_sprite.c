@@ -351,8 +351,8 @@ void rotate_fiend_sprite(BITMAP *dest, BITMAP * src, int dest_x, int dest_y, flo
 	//////////////// Calculate the m:s....////////////
 
 	i = (min_y+max_y)/2;//get the middle of the rows....
-	mv = fdiv(min_v_buffer[i]-max_v_buffer[i], min_x_buffer[i]-max_x_buffer[i]); 
-	mu = fdiv(min_u_buffer[i]-max_u_buffer[i], min_x_buffer[i]-max_x_buffer[i]); 
+	mv = fixdiv(min_v_buffer[i]-max_v_buffer[i], min_x_buffer[i]-max_x_buffer[i]); 
+	mu = fixdiv(min_u_buffer[i]-max_u_buffer[i], min_x_buffer[i]-max_x_buffer[i]); 
 
 	
 	///////////////// Some final Clipping ////////////

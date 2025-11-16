@@ -1,0 +1,7 @@
+graphic/faces/farmer_f1.bmp
+graphic/faces/farmer_f2.bmp
+graphic/faces/farmer_m1.bmp
+graphic/faces/farmer_m2.bmp
+graphic/faces/george.bmp
+graphic/faces/joseph.bmp
+graphic/faces/nick.bmp

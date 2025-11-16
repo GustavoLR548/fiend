@@ -49,6 +49,7 @@ set(COMMON_SOURCES
     ../misc.c
     ../NPC.c
     ../object.c
+    ../path_utils.c
     ../picdata.c
     ../rotate_sprite.c
     ../sound.c
@@ -67,10 +68,24 @@ target_include_directories(fiend PRIVATE
 # Link libraries
 target_link_libraries(fiend 
     ${ALLEGRO_LIBRARIES}
-    m       # Math library
-    pthread # Required by miniaudio
-    dl      # Required by miniaudio for dlopen
 )
+
+# Add platform-specific libraries
+if(UNIX)
+    target_link_libraries(fiend
+        m       # Math library
+        pthread # Required by miniaudio
+        dl      # Required by miniaudio for dlopen
+    )
+endif()
+
+# Set RPATH for Linux (not needed on Windows)
+if(UNIX AND NOT APPLE)
+    target_link_options(fiend PRIVATE
+        "LINKER:--disable-new-dtags"
+        "LINKER:-rpath,$ORIGIN/lib"
+    )
+endif()
 
 # Set output properties
 set_target_properties(fiend PROPERTIES

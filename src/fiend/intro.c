@@ -10,9 +10,8 @@
 #include <stdio.h>
 
 #include "../grafik4.h"
-
-
 #include "../fiend.h"
+#include "../logger.h"
 
 DATAFILE *font_intro;
 
@@ -93,6 +92,15 @@ void show_poem(void)
 	y1 = 220;
 	x2 = 0;
 	y2 = 260;
+	
+	// Validate font before using
+	if(font_avalon2 == NULL || font_avalon2->dat == NULL) {
+		log_error("font_avalon2 or font_avalon2->dat is NULL in show_poem()");
+		return;
+	}
+	
+	log_info("Starting poem display with font_avalon2 at %p, dat at %p", font_avalon2, font_avalon2->dat);
+	
 	while(!key[KEY_ESC] && !key[KEY_SPACE] && !key[KEY_ENTER] && !end)
 	{
 		
@@ -130,9 +138,19 @@ void show_poem(void)
 	
 			speed_counter--;
 		}
+		
+		// Extra validation before drawing
+		if(font_avalon2 == NULL || font_avalon2->dat == NULL) {
+			log_error("Font became NULL during poem display loop!");
+			break;
+		}
+		
 		clear(virt);
+		log_debug("About to textout_ex line 1, alpha1=%.1f", alpha1);
 		textout_ex(virt,font_avalon2->dat,text1, x1,y1,makecol(alpha1,alpha1,alpha1), -1);
+		log_debug("About to textout_ex line 2, alpha2=%.1f", alpha2);
 		textout_ex(virt,font_avalon2->dat,text2, x2,y2,makecol(alpha2,alpha2,alpha2), -1);
+		log_debug("Both text lines drawn successfully");
 	
 		blit(virt,screen,0,0,80,0,480,480);
 	}

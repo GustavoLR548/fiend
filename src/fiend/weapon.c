@@ -13,6 +13,7 @@
 
 #include "../fiend.h"
 #include "../grafik4.h"
+#include "../path_utils.h"
 
 
 
@@ -86,8 +87,10 @@ int load_weapons(void)
 	
 	for(i=0;i<num_of_weapons;i++)
 	{
-		strcpy(final_path, file_path);
-		strcat(final_path, info_file_name[i]);    //Get the info.
+		if(build_path(final_path, sizeof(final_path), file_path, info_file_name[i]) != 0) {
+			sprintf(fiend_errorcode,"path too long: %s%s", file_path, info_file_name[i]);
+			return 1;
+		}
 
 		f = fopen(final_path, "r");
 		if(f==NULL){sprintf(fiend_errorcode,"couldn't load %s",final_path);return 1;}//error testing...

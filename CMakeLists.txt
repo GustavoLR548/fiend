@@ -14,6 +14,11 @@ set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_modules/")
 # Output directory for executables
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/release)
 
+# Disable all automatic RPATH handling - we set it manually per target
+set(CMAKE_SKIP_RPATH FALSE)
+set(CMAKE_SKIP_BUILD_RPATH TRUE)
+set(CMAKE_SKIP_INSTALL_RPATH TRUE)
+
 # Windows-specific definitions
 if(WIN32)
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
@@ -87,6 +92,11 @@ else()
     
     if(ALLEGRO_FOUND)
         include_directories(${ALLEGRO_INCLUDE_DIRS})
+        # Add library directories if set by pkg-config (for bundled builds)
+        if(ALLEGRO_LIBRARY_DIRS)
+            link_directories(${ALLEGRO_LIBRARY_DIRS})
+            message(STATUS "Allegro library dirs: ${ALLEGRO_LIBRARY_DIRS}")
+        endif()
         message(STATUS "Found system Allegro: ${ALLEGRO_LIBRARIES}")
     else()
         message(FATAL_ERROR "Allegro 4 library not found! Install with: sudo apt-get install liballegro4-dev")
@@ -96,6 +106,31 @@ endif()
 # Add subdirectories
 add_subdirectory(src/fiend)
 add_subdirectory(src/mapeditor)
+
+# Find Python for resource list generation
+# On Windows with actions/setup-python, this finds the native Python
+# On Unix, this finds python3
+find_package(Python3 COMPONENTS Interpreter)
+if(NOT Python3_FOUND)
+    message(WARNING "Python 3 not found - resource lists will not be generated automatically")
+    set(PYTHON_EXECUTABLE "python3")
+else()
+    set(PYTHON_EXECUTABLE "${Python3_EXECUTABLE}")
+    message(STATUS "Found Python: ${Python3_EXECUTABLE}")
+endif()
+
+# Generate resource list files before building
+add_custom_target(generate_resources ALL
+    COMMAND ${CMAKE_COMMAND} -E echo "Generating resource list files..."
+    COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/data/resource_lists"
+    COMMAND ${PYTHON_EXECUTABLE} "${CMAKE_SOURCE_DIR}/tools/generate_resource_lists.py" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
+    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+    COMMENT "Generating resource lists for faster asset loading"
+    VERBATIM
+)
+
+# Make fiend depend on resource generation
+add_dependencies(fiend generate_resources)
 
 # Print build summary
 message(STATUS "========================================")

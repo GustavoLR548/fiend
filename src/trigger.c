@@ -15,6 +15,7 @@
 
 #include "fiend.h"
 #include "logger.h"
+#include "path_utils.h"
 
 int saved_var_num=0;
 
@@ -81,11 +82,92 @@ static /*int*/ void get_one_face(const char *file,int attr,/*void **/int param)
 
 int load_message_faces(void)
 {
+	FILE *list_file;
+	char file_path[512];
+	char normalized_path[512];
+	char name2[40];
+	char *slash_pos;
+	char *dot_pos;
 	int i;
-
-	i= for_each_file/*_ex*/("graphic/faces/*.bmp",FA_ARCH/*,0*/,get_one_face,0);
-
-	if(face_load_error || i<1)
+	
+	log_info("Loading message faces from resource list");
+	
+	/* Open the faces resource list */
+	list_file = fopen("data/resource_lists/faces.txt", "r");
+	if(list_file == NULL) {
+		log_error("Failed to open data/resource_lists/faces.txt");
+		strcpy(fiend_errorcode,"couldn't load face resource list");
+		return 1;
+	}
+	
+	/* Read each line from the resource list */
+	while(fgets(file_path, sizeof(file_path), list_file) != NULL) {
+		/* Remove trailing newline */
+		file_path[strcspn(file_path, "\r\n")] = '\0';
+		
+		/* Skip empty lines */
+		if(strlen(file_path) == 0) {
+			continue;
+		}
+		
+		/* Normalize path for current platform */
+		strcpy(normalized_path, file_path);
+		normalize_path(normalized_path);
+		
+		log_info("Loading face: %s", normalized_path);
+		
+		/* Check bounds before loading */
+		if(num_of_message_faces >= FACE_NUM) {
+			log_info("Reached maximum face limit (%d), stopping", FACE_NUM);
+			break;
+		}
+		
+		message_face[num_of_message_faces].pic = load_bmp(normalized_path, NULL);
+		
+		if(message_face[num_of_message_faces].pic == NULL) {
+			log_error("Failed to load face: %s", normalized_path);
+			face_load_error = 1;
+			fclose(list_file);
+			strcpy(fiend_errorcode,"couldn't load face from resource list");
+			return 1;
+		}
+		
+	/* Extract filename without path or extension */
+	/* Find last slash (works for both / and \) */
+	slash_pos = strrchr(file_path, '/');
+	if(slash_pos == NULL) {
+		slash_pos = strrchr(file_path, '\\');
+	}
+	
+	if(slash_pos != NULL) {
+		/* Use strncpy to prevent buffer overflow - name2 is only 40 bytes */
+		strncpy(name2, slash_pos + 1, sizeof(name2) - 1);
+		name2[sizeof(name2) - 1] = '\0';
+	} else {
+		strncpy(name2, file_path, sizeof(name2) - 1);
+		name2[sizeof(name2) - 1] = '\0';
+	}
+	
+	/* Remove extension */
+	dot_pos = strrchr(name2, '.');
+	if(dot_pos != NULL) {
+		*dot_pos = '\0';
+	}
+	
+	/* Use strncpy to prevent buffer overflow */
+	strncpy(message_face[num_of_message_faces].name, name2, sizeof(message_face[num_of_message_faces].name) - 1);
+	message_face[num_of_message_faces].name[sizeof(message_face[num_of_message_faces].name) - 1] = '\0';
+	log_info("Loaded face '%s' successfully", message_face[num_of_message_faces].name);
+	
+	num_of_message_faces++;
+	}
+	
+	fclose(list_file);
+	
+	log_info("Loaded %d faces total", num_of_message_faces);
+	
+	// Check if any faces were actually loaded
+	if(face_load_error || num_of_message_faces < 1)
 	{
 		strcpy(fiend_errorcode,"couldn't load graphic/faces/*.bmp");
 		return 1;

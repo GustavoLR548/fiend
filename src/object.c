@@ -14,6 +14,7 @@
 #include "fiend.h"
 #include "draw.h"
 #include "rotate_sprite.h"
+#include "path_utils.h"
 
 
 #define MAX_OBJECTS 300
@@ -195,13 +196,22 @@ int load_objects(void)
 	char buffer[50];
 	char sprite_file_name[300][30];
     char info_file_name[300][30];
-	char *file_path ="graphic/objects/";
-	char final_path[100];
+	char file_path[256] = "graphic/objects/";
+	char final_path[256];
 	int i,j,k,temp;
+
+	/* Normalize path separators for the platform */
+	normalize_path(file_path);
+	
+	char objects_txt[256];
+	if(build_path(objects_txt, sizeof(objects_txt), file_path, "objects.txt") != 0) {
+		sprintf(fiend_errorcode,"path too long for objects.txt");
+		return 1;
+	}
 
 	object_info = calloc(sizeof(OBJECT_INFO),MAX_OBJECTS);
 	
-	f = fopen("graphic/objects/objects.txt", "r");      //Load the Info file
+	f = fopen(objects_txt, "r");      //Load the Info file
 
 	if(f==NULL)
 	{sprintf(fiend_errorcode,"couldn't load objects.txt");return 1;} //error testing...
@@ -218,8 +228,10 @@ int load_objects(void)
 	{
 		
 		//----------BEGIN GET INFO-----------------------
-		strcpy(final_path, file_path);
-		strcat(final_path, info_file_name[i]);    //Get the info.
+		if(build_path(final_path, sizeof(final_path), file_path, info_file_name[i]) != 0) {
+			sprintf(fiend_errorcode,"path too long: %s%s", file_path, info_file_name[i]);
+			return 1;
+		}
 
 		f = fopen(final_path, "r");
 		if(f==NULL){sprintf(fiend_errorcode,"couldn't load %s",final_path); return 1;}//error testing...
@@ -264,8 +276,10 @@ int load_objects(void)
 		//-------END GET INFO---------------
 		
 		//--------BEGIN GET DATA------------------
-		strcpy(final_path, file_path);
-		strcat(final_path, sprite_file_name[i]);   //Get the tile data .
+		if(build_path(final_path, sizeof(final_path), file_path, sprite_file_name[i]) != 0) {
+			sprintf(fiend_errorcode,"path too long: %s%s", file_path, sprite_file_name[i]);
+			return 1;
+		}
 
 	    temp_data = load_bmp_array(final_path,object_info[i].num_of_frames);//load the graphic
 		if(temp_data==NULL){ sprintf(fiend_errorcode,"couldn't load %s",final_path); return 1;}//error testing...
