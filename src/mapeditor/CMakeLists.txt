@@ -67,7 +67,8 @@ target_link_libraries(mapeditor
 
 # Set RPATH using target_link_options (modern CMake approach)
 target_link_options(mapeditor PRIVATE 
-    "-Wl,-rpath,\$ORIGIN/lib"
+    "LINKER:--enable-new-dtags"
+    "LINKER:-rpath,$ORIGIN/lib"
 )
 
 # Set output properties

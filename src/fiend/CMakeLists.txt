@@ -74,7 +74,8 @@ target_link_libraries(fiend
 
 # Set RPATH using target_link_options (modern CMake approach)
 target_link_options(fiend PRIVATE 
-    "-Wl,-rpath,\$ORIGIN/lib"
+    "LINKER:--enable-new-dtags"
+    "LINKER:-rpath,$ORIGIN/lib"
 )
 
 # Set output properties
