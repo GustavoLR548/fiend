@@ -116,7 +116,11 @@ jobs:
           -DWANT_DOCS=OFF \
           -DWANT_EXAMPLES=OFF \
           -DWANT_TOOLS=OFF \
-          -DWANT_TESTS=OFF
+          -DWANT_TESTS=OFF \
+          -DWANT_ALLEGROGL=OFF \
+          -DWANT_LOADPNG=OFF \
+          -DWANT_LOGG=OFF \
+          -DWANT_JPGALLEG=OFF
         
         make -j$(nproc)
         make install
