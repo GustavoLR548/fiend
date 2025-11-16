@@ -14,16 +14,14 @@ set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_modules/")
 # Output directory for executables
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/release)
 
-# Set RPATH for portable library loading
+# Set RPATH for portable library loading - must be set BEFORE add_subdirectory
 # $ORIGIN is a special token that expands to the executable's directory
+set(RPATH_VALUE "$ORIGIN/lib")
+list(APPEND CMAKE_BUILD_RPATH ${RPATH_VALUE})
+set(CMAKE_INSTALL_RPATH ${RPATH_VALUE})
 set(CMAKE_SKIP_BUILD_RPATH FALSE)
 set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
-set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
-
-# Also add RPATH as linker flag - using different escaping methods
-if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-    add_link_options("-Wl,-rpath,\$ORIGIN/lib")
-endif()
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH FALSE)
 
 # Windows-specific definitions
 if(WIN32)
