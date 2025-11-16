@@ -152,13 +152,10 @@ jobs:
         cmake .. \
           -DCMAKE_BUILD_TYPE=Release \
           -DUSE_BUNDLED_ALLEGRO=OFF \
-          -DCMAKE_LIBRARY_PATH="${ALLEGRO_LIB_DIR}" \
-          -DCMAKE_INSTALL_RPATH='$ORIGIN/lib' \
-          -DCMAKE_BUILD_WITH_INSTALL_RPATH=ON \
-          -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=OFF
+          -DCMAKE_LIBRARY_PATH="${ALLEGRO_LIB_DIR}"
         
         # Note: USE_BUNDLED_ALLEGRO=OFF because pkg-config will find our bundled version
-        # RPATH=$ORIGIN/lib means: look for libraries in ../lib relative to executable
+        # RPATH is configured in CMakeLists.txt to look for libraries in ./lib/ relative to executable
     
     - name: Build Fiend
       run: |
