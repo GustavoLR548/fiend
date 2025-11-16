@@ -149,14 +149,18 @@ jobs:
         
         # Verify pkg-config can find Allegro
         echo "=== Testing pkg-config ==="
-        pkg-config --modversion allegro
-        pkg-config --libs allegro
-        pkg-config --cflags allegro
+        echo "PKG_CONFIG_PATH=$PKG_CONFIG_PATH"
+        echo ""
+        pkg-config --modversion allegro || echo "ERROR: pkg-config cannot find allegro"
+        pkg-config --libs allegro || echo "ERROR: pkg-config --libs failed"
+        pkg-config --cflags allegro || echo "ERROR: pkg-config --cflags failed"
+        echo ""
         
         cmake .. \
           -DCMAKE_BUILD_TYPE=Release \
           -DUSE_BUNDLED_ALLEGRO=OFF \
-          -DCMAKE_LIBRARY_PATH="${ALLEGRO_LIB_DIR}"
+          -DCMAKE_LIBRARY_PATH="${ALLEGRO_LIB_DIR}" \
+          -DCMAKE_PREFIX_PATH="$PWD/../external/allegro4/build/install"
         
         # Note: USE_BUNDLED_ALLEGRO=OFF because pkg-config will find our bundled version
         # RPATH is configured in CMakeLists.txt to look for libraries in ./lib/ relative to executable
@@ -166,6 +170,7 @@ jobs:
         cd build
         
         # Set library path for linking
+        export PKG_CONFIG_PATH="$PWD/../external/allegro4/build/install/lib/pkgconfig:$PKG_CONFIG_PATH"
         export ALLEGRO_LIB_DIR="$PWD/../external/allegro4/build/install/lib"
         export LD_LIBRARY_PATH="${ALLEGRO_LIB_DIR}:${LD_LIBRARY_PATH}"
         export LIBRARY_PATH="${ALLEGRO_LIB_DIR}:${LIBRARY_PATH}"
