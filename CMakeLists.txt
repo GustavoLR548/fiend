@@ -18,11 +18,12 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/release)
 # $ORIGIN is a special token that expands to the executable's directory
 set(CMAKE_SKIP_BUILD_RPATH FALSE)
 set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
-set(CMAKE_INSTALL_RPATH "$ORIGIN/lib")
-set(CMAKE_INSTALL_RPATH_USE_LINK_PATH FALSE)
+set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 
-# Also add RPATH as linker flag for extra assurance
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-rpath,'$ORIGIN/lib'")
+# Also add RPATH as linker flag - using different escaping methods
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    add_link_options("-Wl,-rpath,\$ORIGIN/lib")
+endif()
 
 # Windows-specific definitions
 if(WIN32)
