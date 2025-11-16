@@ -65,9 +65,13 @@ target_link_libraries(mapeditor
     dl      # Required by miniaudio for dlopen
 )
 
-# Set output properties with RPATH using LINK_FLAGS
+# Set RPATH using target_link_options (modern CMake approach)
+target_link_options(mapeditor PRIVATE 
+    "LINKER:-rpath,$$ORIGIN/lib"
+)
+
+# Set output properties
 set_target_properties(mapeditor PROPERTIES
     OUTPUT_NAME "mapeditor"
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
-    LINK_FLAGS "-Wl,-rpath,'$ORIGIN/lib'"
 )
