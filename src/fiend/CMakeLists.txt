@@ -76,7 +76,7 @@ target_link_libraries(fiend
 set_target_properties(fiend PROPERTIES
     OUTPUT_NAME "fiend"
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
-    BUILD_RPATH "$ORIGIN/lib"
-    INSTALL_RPATH "$ORIGIN/lib"
+    BUILD_RPATH "$$ORIGIN/lib"
+    INSTALL_RPATH "$$ORIGIN/lib"
     BUILD_RPATH_USE_ORIGIN TRUE
 )
