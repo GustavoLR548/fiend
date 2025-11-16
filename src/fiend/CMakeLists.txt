@@ -72,10 +72,8 @@ target_link_libraries(fiend
     dl      # Required by miniaudio for dlopen
 )
 
-# Set output properties with RPATH
+# Set output properties
 set_target_properties(fiend PROPERTIES
     OUTPUT_NAME "fiend"
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
-    BUILD_RPATH "$ORIGIN/lib"
-    INSTALL_RPATH "$ORIGIN/lib"
 )
