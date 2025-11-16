@@ -1,0 +1,135 @@
+# Fiend - Dependency Information
+
+This file documents all dependencies for building and running Fiend.
+For preservation purposes, core dependencies are bundled as git submodules.
+
+## Runtime Dependencies
+
+### Required
+- Allegro 4.4.3.1 (game engine)
+  - Bundled: external/allegro4 (git submodule)
+  - License: Giftware (permissive)
+  - URL: https://github.com/liballeg/allegro5/tree/4.4
+  - Commit: 8a386b275 (tag: 4.4.3.1)
+
+### System Dependencies (Linux)
+- X11 libraries (libX11, libXext, libXcursor)
+- ALSA or PulseAudio for audio
+- OpenGL for graphics acceleration (optional)
+- pthreads
+
+## Build Dependencies
+
+### Required
+- CMake 3.10 or later
+- C compiler (GCC 7+, Clang 6+)
+- C++ compiler (for mixed C/C++ code)
+- make or ninja
+
+### Optional
+- Git (for cloning and submodule management)
+- pkg-config (for finding system libraries)
+
+## Embedded Dependencies
+
+### miniaudio
+- Location: src/audio.c (single-header library)
+- Version: Unknown (embedded in source)
+- Purpose: Audio playback wrapper
+- License: Public Domain / MIT-0
+- URL: https://github.com/mackron/miniaudio
+
+## Platform-Specific Notes
+
+### Linux
+- Allegro 4 typically requires: libx11-dev, libasound2-dev, libpulse-dev
+- All available via standard package managers
+- Reference platform: Ubuntu 22.04 LTS, Debian 12
+
+### Windows
+- Allegro 4 can be built with MinGW
+- DirectX headers may be required
+- Bundled build recommended to avoid DLL hell
+
+### macOS
+- Allegro 4 available via Homebrew: `brew install allegro@4`
+- May require additional frameworks
+- Bundled build may need additional configuration
+
+## Preservation Strategy
+
+### Why Bundle Allegro?
+1. Allegro 4 is legacy software (superseded by Allegro 5)
+2. Package manager availability may decrease over time
+3. Ensures bit-identical builds 50+ years from now
+4. Enables offline building without external services
+5. Documents exact version used for original development
+
+### Submodule Pinning
+The external/allegro4 submodule is pinned to tag 4.4.3.1:
+```
+Commit: 8a386b275
+Tag: 4.4.3.1
+Branch: 4.4 (tracking branch, not used for builds)
+Date: Release date of 4.4.3.1
+```
+
+To verify:
+```bash
+cd external/allegro4
+git describe --tags
+# Should output: 4.4.3.1
+```
+
+### Updating Dependencies
+
+To update the Allegro submodule (not recommended without testing):
+```bash
+cd external/allegro4
+git fetch --tags
+git checkout <new-tag>
+cd ../..
+git add external/allegro4
+git commit -m "Update Allegro to <new-tag>"
+```
+
+## License Compatibility
+
+- Fiend: (check COPYING file for project license)
+- Allegro 4.4.3.1: Giftware license (very permissive, commercial use OK)
+- miniaudio: Public Domain / MIT-0 (no restrictions)
+
+All dependencies have permissive licenses compatible with distribution.
+
+## Verification Checksums
+
+### Allegro 4.4.3.1 Submodule
+```
+Git Commit: 8a386b275
+Tree SHA: (run `git rev-parse 4.4.3.1^{tree}` in external/allegro4)
+```
+
+To verify submodule integrity:
+```bash
+cd external/allegro4
+git fsck
+git verify-tag 4.4.3.1  # If tag is signed
+```
+
+## Historical Notes
+
+### Original Development Environment
+- Platform: Linux (distribution unknown)
+- Allegro: 4.x (exact version unknown until preservation effort)
+- Compiler: GCC (version unknown)
+- Build System: Originally unknown, CMake added later
+
+### Preservation Date
+- November 2024: Added git submodule for Allegro 4.4.3.1
+- November 2024: Created BUILD.md and DEPENDENCIES.txt
+- November 2024: Pinned to specific release tag
+
+---
+
+Last Updated: November 2024
+Maintained for: Long-term preservation (50+ year horizon)

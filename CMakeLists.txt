@@ -36,29 +36,61 @@ elseif(CMAKE_BUILD_TYPE MATCHES Release)
     message(STATUS "Building in Release mode: -g -O2 -DNDEBUG")
 endif()
 
-# Find required packages
-find_package(PkgConfig)
+# Option to use bundled Allegro (experimental - requires manual build)
+# For preservation: bundled Allegro source is in external/allegro4 submodule
+option(USE_BUNDLED_ALLEGRO "Link against bundled Allegro 4.4.3.1 submodule" OFF)
 
-# Try to find Allegro using pkg-config first (modern approach)
-if(PKG_CONFIG_FOUND)
-    pkg_check_modules(ALLEGRO allegro)
-endif()
-
-# Fall back to custom Find module if pkg-config didn't work
-if(NOT ALLEGRO_FOUND)
-    find_package(Allegro REQUIRED)
-    if(ALLEGRO_FOUND)
-        # Convert old-style variables to new-style for consistency
-        set(ALLEGRO_INCLUDE_DIRS ${ALLEGRO_INCLUDE_DIR})
+if(USE_BUNDLED_ALLEGRO)
+    message(STATUS "Using bundled Allegro 4.4.3.1 from external/allegro4")
+    
+    # User must build Allegro separately - see BUILD.md
+    # Look for the built library in expected locations
+    find_library(ALLEGRO_LIBRARY 
+        NAMES allegro liballegro allegro-4.4
+        PATHS 
+            "${CMAKE_SOURCE_DIR}/external/allegro4/build/lib"
+            "${CMAKE_SOURCE_DIR}/external/allegro4/lib"
+        NO_DEFAULT_PATH
+    )
+    
+    if(ALLEGRO_LIBRARY)
         set(ALLEGRO_LIBRARIES ${ALLEGRO_LIBRARY})
+        set(ALLEGRO_INCLUDE_DIRS 
+            "${CMAKE_SOURCE_DIR}/external/allegro4/include"
+            "${CMAKE_SOURCE_DIR}/external/allegro4/build/include")
+        include_directories(${ALLEGRO_INCLUDE_DIRS})
+        message(STATUS "Found bundled Allegro: ${ALLEGRO_LIBRARY}")
+    else()
+        message(FATAL_ERROR "Bundled Allegro not found! Build it first - see BUILD.md")
     endif()
-endif()
-
-if(ALLEGRO_FOUND)
-    include_directories(${ALLEGRO_INCLUDE_DIRS})
-    message(STATUS "Found Allegro: ${ALLEGRO_LIBRARIES}")
+    
 else()
-    message(FATAL_ERROR "Allegro 4 library not found! Install with: sudo apt-get install liballegro4-dev")
+    # Use system-installed Allegro (default)
+    message(STATUS "Looking for system-installed Allegro")
+    
+    find_package(PkgConfig)
+    
+    # Try to find Allegro using pkg-config first (modern approach)
+    if(PKG_CONFIG_FOUND)
+        pkg_check_modules(ALLEGRO allegro)
+    endif()
+    
+    # Fall back to custom Find module if pkg-config didn't work
+    if(NOT ALLEGRO_FOUND)
+        find_package(Allegro REQUIRED)
+        if(ALLEGRO_FOUND)
+            # Convert old-style variables to new-style for consistency
+            set(ALLEGRO_INCLUDE_DIRS ${ALLEGRO_INCLUDE_DIR})
+            set(ALLEGRO_LIBRARIES ${ALLEGRO_LIBRARY})
+        endif()
+    endif()
+    
+    if(ALLEGRO_FOUND)
+        include_directories(${ALLEGRO_INCLUDE_DIRS})
+        message(STATUS "Found system Allegro: ${ALLEGRO_LIBRARIES}")
+    else()
+        message(FATAL_ERROR "Allegro 4 library not found! Install with: sudo apt-get install liballegro4-dev")
+    endif()
 endif()
 
 # Add subdirectories
@@ -71,7 +103,11 @@ message(STATUS "Fiend Build Configuration:")
 message(STATUS "  Build Type:    ${CMAKE_BUILD_TYPE}")
 message(STATUS "  C Compiler:    ${CMAKE_C_COMPILER_ID} ${CMAKE_C_COMPILER_VERSION}")
 message(STATUS "  CXX Compiler:  ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}")
-message(STATUS "  Allegro:       Found")
+if(USE_BUNDLED_ALLEGRO)
+    message(STATUS "  Allegro:       Bundled 4.4.3.1 (submodule)")
+else()
+    message(STATUS "  Allegro:       System (${ALLEGRO_LIBRARIES})")
+endif()
 message(STATUS "  Audio:         miniaudio (embedded)")
 message(STATUS "  Output Dir:    ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 message(STATUS "========================================")
