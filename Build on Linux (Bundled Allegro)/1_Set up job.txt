@@ -1,0 +1,43 @@
+﻿2025-11-16T21:56:44.2429823Z Current runner version: '2.329.0'
+2025-11-16T21:56:44.2453839Z ##[group]Runner Image Provisioner
+2025-11-16T21:56:44.2454779Z Hosted Compute Agent
+2025-11-16T21:56:44.2455294Z Version: 20251016.436
+2025-11-16T21:56:44.2455895Z Commit: 8ab8ac8bfd662a3739dab9fe09456aba92132568
+2025-11-16T21:56:44.2456579Z Build Date: 2025-10-15T20:44:12Z
+2025-11-16T21:56:44.2457453Z ##[endgroup]
+2025-11-16T21:56:44.2457996Z ##[group]Operating System
+2025-11-16T21:56:44.2458637Z Ubuntu
+2025-11-16T21:56:44.2459133Z 24.04.3
+2025-11-16T21:56:44.2459554Z LTS
+2025-11-16T21:56:44.2460040Z ##[endgroup]
+2025-11-16T21:56:44.2460515Z ##[group]Runner Image
+2025-11-16T21:56:44.2461088Z Image: ubuntu-24.04
+2025-11-16T21:56:44.2461556Z Version: 20251112.124.1
+2025-11-16T21:56:44.2462649Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20251112.124/images/ubuntu/Ubuntu2404-Readme.md
+2025-11-16T21:56:44.2464030Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20251112.124
+2025-11-16T21:56:44.2465171Z ##[endgroup]
+2025-11-16T21:56:44.2467949Z ##[group]GITHUB_TOKEN Permissions
+2025-11-16T21:56:44.2470174Z Actions: write
+2025-11-16T21:56:44.2470700Z ArtifactMetadata: write
+2025-11-16T21:56:44.2471237Z Attestations: write
+2025-11-16T21:56:44.2471802Z Checks: write
+2025-11-16T21:56:44.2472289Z Contents: write
+2025-11-16T21:56:44.2472759Z Deployments: write
+2025-11-16T21:56:44.2473364Z Discussions: write
+2025-11-16T21:56:44.2473861Z Issues: write
+2025-11-16T21:56:44.2474315Z Metadata: read
+2025-11-16T21:56:44.2474850Z Models: read
+2025-11-16T21:56:44.2475300Z Packages: write
+2025-11-16T21:56:44.2475795Z Pages: write
+2025-11-16T21:56:44.2476314Z PullRequests: write
+2025-11-16T21:56:44.2476861Z RepositoryProjects: write
+2025-11-16T21:56:44.2477800Z SecurityEvents: write
+2025-11-16T21:56:44.2478364Z Statuses: write
+2025-11-16T21:56:44.2478877Z ##[endgroup]
+2025-11-16T21:56:44.2480794Z Secret source: Actions
+2025-11-16T21:56:44.2481601Z Prepare workflow directory
+2025-11-16T21:56:44.2798847Z Prepare all required actions
+2025-11-16T21:56:44.2835882Z Getting action download info
+2025-11-16T21:56:44.7150139Z Download action repository 'actions/checkout@v4' (SHA:08eba0b27e820071cde6df949e0beb9ba4906955)
+2025-11-16T21:56:45.1577697Z Download action repository 'actions/upload-artifact@v4' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+2025-11-16T21:56:45.4527580Z Complete job name: Build on Linux (Bundled Allegro)

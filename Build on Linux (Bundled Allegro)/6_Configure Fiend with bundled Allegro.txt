@@ -1,0 +1,71 @@
+﻿2025-11-16T21:57:37.7850098Z ##[group]Run mkdir -p build
+2025-11-16T21:57:37.7850399Z [36;1mmkdir -p build[0m
+2025-11-16T21:57:37.7850601Z [36;1mcd build[0m
+2025-11-16T21:57:37.7850784Z [36;1m[0m
+2025-11-16T21:57:37.7850972Z [36;1m# Set paths to find our bundled Allegro[0m
+2025-11-16T21:57:37.7851438Z [36;1mexport PKG_CONFIG_PATH="$PWD/../external/allegro4/build/install/lib/pkgconfig:$PKG_CONFIG_PATH"[0m
+2025-11-16T21:57:37.7851963Z [36;1mexport ALLEGRO_LIB_DIR="$PWD/../external/allegro4/build/install/lib"[0m
+2025-11-16T21:57:37.7852285Z [36;1m[0m
+2025-11-16T21:57:37.7852469Z [36;1m# Verify pkg-config can find Allegro[0m
+2025-11-16T21:57:37.7852732Z [36;1mecho "=== Testing pkg-config ==="[0m
+2025-11-16T21:57:37.7853003Z [36;1mecho "PKG_CONFIG_PATH=$PKG_CONFIG_PATH"[0m
+2025-11-16T21:57:37.7853249Z [36;1mecho ""[0m
+2025-11-16T21:57:37.7853567Z [36;1mpkg-config --modversion allegro || echo "ERROR: pkg-config cannot find allegro"[0m
+2025-11-16T21:57:37.7854032Z [36;1mpkg-config --libs allegro || echo "ERROR: pkg-config --libs failed"[0m
+2025-11-16T21:57:37.7854497Z [36;1mpkg-config --cflags allegro || echo "ERROR: pkg-config --cflags failed"[0m
+2025-11-16T21:57:37.7854835Z [36;1mecho ""[0m
+2025-11-16T21:57:37.7854991Z [36;1m[0m
+2025-11-16T21:57:37.7855146Z [36;1mcmake .. \[0m
+2025-11-16T21:57:37.7855351Z [36;1m  -DCMAKE_BUILD_TYPE=Release \[0m
+2025-11-16T21:57:37.7855598Z [36;1m  -DUSE_BUNDLED_ALLEGRO=OFF \[0m
+2025-11-16T21:57:37.7855865Z [36;1m  -DCMAKE_LIBRARY_PATH="${ALLEGRO_LIB_DIR}" \[0m
+2025-11-16T21:57:37.7856213Z [36;1m  -DCMAKE_PREFIX_PATH="$PWD/../external/allegro4/build/install"[0m
+2025-11-16T21:57:37.7856515Z [36;1m[0m
+2025-11-16T21:57:37.7856797Z [36;1m# Note: USE_BUNDLED_ALLEGRO=OFF because pkg-config will find our bundled version[0m
+2025-11-16T21:57:37.7857637Z [36;1m# RPATH is configured in CMakeLists.txt to look for libraries in ./lib/ relative to executable[0m
+2025-11-16T21:57:37.7889163Z shell: /usr/bin/bash -e {0}
+2025-11-16T21:57:37.7889388Z ##[endgroup]
+2025-11-16T21:57:37.7947304Z === Testing pkg-config ===
+2025-11-16T21:57:37.7948075Z PKG_CONFIG_PATH=/home/runner/work/fiend/fiend/build/../external/allegro4/build/install/lib/pkgconfig:
+2025-11-16T21:57:37.7948647Z 
+2025-11-16T21:57:37.7957458Z 4.4.3
+2025-11-16T21:57:37.7968711Z -L/home/runner/work/fiend/fiend/external/allegro4/build/install/lib -lalleg 
+2025-11-16T21:57:37.7979222Z -I/home/runner/work/fiend/fiend/external/allegro4/build/install/include 
+2025-11-16T21:57:37.7980777Z 
+2025-11-16T21:57:37.8408136Z -- The C compiler identification is GNU 13.3.0
+2025-11-16T21:57:37.8914175Z -- The CXX compiler identification is GNU 13.3.0
+2025-11-16T21:57:37.8995458Z -- Detecting C compiler ABI info
+2025-11-16T21:57:37.9478980Z -- Detecting C compiler ABI info - done
+2025-11-16T21:57:37.9648113Z -- Check for working C compiler: /usr/bin/cc - skipped
+2025-11-16T21:57:37.9651475Z -- Detecting C compile features
+2025-11-16T21:57:37.9655832Z -- Detecting C compile features - done
+2025-11-16T21:57:37.9758338Z -- Detecting CXX compiler ABI info
+2025-11-16T21:57:38.0336756Z -- Detecting CXX compiler ABI info - done
+2025-11-16T21:57:38.0511378Z -- Check for working CXX compiler: /usr/bin/c++ - skipped
+2025-11-16T21:57:38.0515097Z -- Detecting CXX compile features
+2025-11-16T21:57:38.0521658Z -- Detecting CXX compile features - done
+2025-11-16T21:57:38.0571428Z -- Building in Release mode: -g -O2 -DNDEBUG
+2025-11-16T21:57:38.0571969Z -- Looking for system-installed Allegro
+2025-11-16T21:57:38.0602963Z -- Found PkgConfig: /usr/bin/pkg-config (found version "1.8.1")
+2025-11-16T21:57:38.0610146Z -- Checking for module 'allegro'
+2025-11-16T21:57:38.0694529Z --   Found allegro, version 4.4.3
+2025-11-16T21:57:38.0894623Z -- Allegro library dirs: /home/runner/work/fiend/fiend/external/allegro4/build/install/lib
+2025-11-16T21:57:38.0895429Z -- Found system Allegro: alleg
+2025-11-16T21:57:38.0909541Z -- ========================================
+2025-11-16T21:57:38.0910083Z -- Fiend Build Configuration:
+2025-11-16T21:57:38.0910542Z --   Build Type:    Release
+2025-11-16T21:57:38.0911334Z --   C Compiler:    GNU 13.3.0
+2025-11-16T21:57:38.0911765Z --   CXX Compiler:  GNU 13.3.0
+2025-11-16T21:57:38.0912232Z --   Allegro:       System (alleg)
+2025-11-16T21:57:38.0912694Z --   Audio:         miniaudio (embedded)
+2025-11-16T21:57:38.0913245Z --   Output Dir:    /home/runner/work/fiend/fiend/release
+2025-11-16T21:57:38.0913784Z -- ========================================
+2025-11-16T21:57:38.0914258Z -- Configuring done (0.3s)
+2025-11-16T21:57:38.1065800Z CMake Warning:
+2025-11-16T21:57:38.1066255Z   Manually-specified variables were not used by the project:
+2025-11-16T21:57:38.1066572Z 
+2025-11-16T21:57:38.1066737Z     CMAKE_LIBRARY_PATH
+2025-11-16T21:57:38.1066941Z 
+2025-11-16T21:57:38.1066945Z 
+2025-11-16T21:57:38.1067123Z -- Generating done (0.0s)
+2025-11-16T21:57:38.1069931Z -- Build files have been written to: /home/runner/work/fiend/fiend/build

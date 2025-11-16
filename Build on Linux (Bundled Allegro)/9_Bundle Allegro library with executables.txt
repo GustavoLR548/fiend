@@ -1,0 +1,32 @@
+﻿2025-11-16T21:57:57.9863967Z ##[group]Run echo "Copying bundled Allegro library..."
+2025-11-16T21:57:57.9864373Z [36;1mecho "Copying bundled Allegro library..."[0m
+2025-11-16T21:57:57.9864656Z [36;1mmkdir -p release/lib[0m
+2025-11-16T21:57:57.9864993Z [36;1mcp external/allegro4/build/install/lib/liballeg*.so* release/lib/[0m
+2025-11-16T21:57:57.9865326Z [36;1m[0m
+2025-11-16T21:57:57.9865542Z [36;1m# Create wrapper scripts that set LD_LIBRARY_PATH[0m
+2025-11-16T21:57:57.9865827Z [36;1mcat > release/fiend.sh << 'EOF'[0m
+2025-11-16T21:57:57.9866055Z [36;1m#!/bin/bash[0m
+2025-11-16T21:57:57.9866299Z [36;1mSCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"[0m
+2025-11-16T21:57:57.9866683Z [36;1mexport LD_LIBRARY_PATH="${SCRIPT_DIR}/lib:${LD_LIBRARY_PATH}"[0m
+2025-11-16T21:57:57.9866998Z [36;1mexec "${SCRIPT_DIR}/fiend" "$@"[0m
+2025-11-16T21:57:57.9867443Z [36;1mEOF[0m
+2025-11-16T21:57:57.9867606Z [36;1m[0m
+2025-11-16T21:57:57.9867777Z [36;1mcat > release/mapeditor.sh << 'EOF'[0m
+2025-11-16T21:57:57.9868009Z [36;1m#!/bin/bash[0m
+2025-11-16T21:57:57.9868270Z [36;1mSCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"[0m
+2025-11-16T21:57:57.9868630Z [36;1mexport LD_LIBRARY_PATH="${SCRIPT_DIR}/lib:${LD_LIBRARY_PATH}"[0m
+2025-11-16T21:57:57.9868942Z [36;1mexec "${SCRIPT_DIR}/mapeditor" "$@"[0m
+2025-11-16T21:57:57.9869171Z [36;1mEOF[0m
+2025-11-16T21:57:57.9869323Z [36;1m[0m
+2025-11-16T21:57:57.9869528Z [36;1mchmod +x release/fiend.sh release/mapeditor.sh[0m
+2025-11-16T21:57:57.9869777Z [36;1m[0m
+2025-11-16T21:57:57.9869951Z [36;1mecho "Bundled library structure:"[0m
+2025-11-16T21:57:57.9870195Z [36;1mls -lh release/lib/[0m
+2025-11-16T21:57:57.9902004Z shell: /usr/bin/bash -e {0}
+2025-11-16T21:57:57.9902229Z ##[endgroup]
+2025-11-16T21:57:57.9949089Z Copying bundled Allegro library...
+2025-11-16T21:57:58.0032215Z Bundled library structure:
+2025-11-16T21:57:58.0044279Z total 3.5M
+2025-11-16T21:57:58.0044653Z -rw-r--r-- 1 runner runner 1.2M Nov 16 21:57 liballeg.so
+2025-11-16T21:57:58.0045164Z -rw-r--r-- 1 runner runner 1.2M Nov 16 21:57 liballeg.so.4.4
+2025-11-16T21:57:58.0045765Z -rw-r--r-- 1 runner runner 1.2M Nov 16 21:57 liballeg.so.4.4.3

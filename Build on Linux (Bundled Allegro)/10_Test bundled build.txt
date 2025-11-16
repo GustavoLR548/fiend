@@ -1,0 +1,15 @@
+﻿2025-11-16T21:57:58.0070086Z ##[group]Run cd release
+2025-11-16T21:57:58.0070337Z [36;1mcd release[0m
+2025-11-16T21:57:58.0070629Z [36;1mexport LD_LIBRARY_PATH="$PWD/lib:${LD_LIBRARY_PATH}"[0m
+2025-11-16T21:57:58.0070977Z [36;1mecho "Testing fiend --version (if supported)..."[0m
+2025-11-16T21:57:58.0071304Z [36;1m./fiend --help || echo "Fiend executable ready"[0m
+2025-11-16T21:57:58.0071583Z [36;1mecho "Testing mapeditor..."[0m
+2025-11-16T21:57:58.0071884Z [36;1m./mapeditor --help || echo "Mapeditor executable ready"[0m
+2025-11-16T21:57:58.0102127Z shell: /usr/bin/bash -e {0}
+2025-11-16T21:57:58.0102348Z ##[endgroup]
+2025-11-16T21:57:58.0149980Z Testing fiend --version (if supported)...
+2025-11-16T21:57:58.2333248Z /home/runner/work/_temp/dd652acc-2bf2-4b68-a042-a1d1af713375.sh: line 4:  5219 Segmentation fault      (core dumped) ./fiend --help
+2025-11-16T21:57:58.2334318Z Fiend executable ready
+2025-11-16T21:57:58.2334708Z Testing mapeditor...
+2025-11-16T21:57:58.3446613Z /home/runner/work/_temp/dd652acc-2bf2-4b68-a042-a1d1af713375.sh: line 6:  5226 Segmentation fault      (core dumped) ./mapeditor --help
+2025-11-16T21:57:58.3448441Z Mapeditor executable ready

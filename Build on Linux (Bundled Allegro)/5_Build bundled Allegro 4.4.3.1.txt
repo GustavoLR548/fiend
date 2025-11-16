@@ -1,0 +1,520 @@
+﻿2025-11-16T21:57:21.8415133Z ##[group]Run echo "Building Allegro from submodule..."
+2025-11-16T21:57:21.8415518Z [36;1mecho "Building Allegro from submodule..."[0m
+2025-11-16T21:57:21.8415787Z [36;1mcd external/allegro4[0m
+2025-11-16T21:57:21.8416006Z [36;1mmkdir -p build[0m
+2025-11-16T21:57:21.8416195Z [36;1mcd build[0m
+2025-11-16T21:57:21.8416362Z [36;1m[0m
+2025-11-16T21:57:21.8416514Z [36;1mcmake .. \[0m
+2025-11-16T21:57:21.8416710Z [36;1m  -DCMAKE_BUILD_TYPE=Release \[0m
+2025-11-16T21:57:21.8416975Z [36;1m  -DCMAKE_INSTALL_PREFIX="$PWD/install" \[0m
+2025-11-16T21:57:21.8417443Z [36;1m  -DSHARED=ON \[0m
+2025-11-16T21:57:21.8417655Z [36;1m  -DWANT_DOCS=OFF \[0m
+2025-11-16T21:57:21.8417866Z [36;1m  -DWANT_EXAMPLES=OFF \[0m
+2025-11-16T21:57:21.8418083Z [36;1m  -DWANT_TOOLS=OFF \[0m
+2025-11-16T21:57:21.8418278Z [36;1m  -DWANT_TESTS=OFF \[0m
+2025-11-16T21:57:21.8418481Z [36;1m  -DWANT_ALLEGROGL=OFF \[0m
+2025-11-16T21:57:21.8418698Z [36;1m  -DWANT_LOADPNG=OFF \[0m
+2025-11-16T21:57:21.8418908Z [36;1m  -DWANT_LOGG=OFF \[0m
+2025-11-16T21:57:21.8419135Z [36;1m  -DWANT_JPGALLEG=OFF[0m
+2025-11-16T21:57:21.8419335Z [36;1m[0m
+2025-11-16T21:57:21.8419491Z [36;1mmake -j$(nproc)[0m
+2025-11-16T21:57:21.8419684Z [36;1mmake install[0m
+2025-11-16T21:57:21.8419852Z [36;1m[0m
+2025-11-16T21:57:21.8420043Z [36;1mecho "=== Allegro built and installed ==="[0m
+2025-11-16T21:57:21.8420324Z [36;1mecho "Install directory: $PWD/install"[0m
+2025-11-16T21:57:21.8420566Z [36;1mecho ""[0m
+2025-11-16T21:57:21.8420749Z [36;1mecho "=== Library files ==="[0m
+2025-11-16T21:57:21.8420974Z [36;1mls -la install/lib/[0m
+2025-11-16T21:57:21.8421343Z [36;1mecho ""[0m
+2025-11-16T21:57:21.8421534Z [36;1mecho "=== pkg-config files ==="[0m
+2025-11-16T21:57:21.8421792Z [36;1mls -la install/lib/pkgconfig/[0m
+2025-11-16T21:57:21.8422014Z [36;1mecho ""[0m
+2025-11-16T21:57:21.8422207Z [36;1mecho "=== allegro.pc content ==="[0m
+2025-11-16T21:57:21.8422552Z [36;1mcat install/lib/pkgconfig/allegro.pc || echo "allegro.pc not found"[0m
+2025-11-16T21:57:21.8422897Z [36;1mcd ../../..[0m
+2025-11-16T21:57:21.8451304Z shell: /usr/bin/bash -e {0}
+2025-11-16T21:57:21.8451520Z ##[endgroup]
+2025-11-16T21:57:21.8495513Z Building Allegro from submodule...
+2025-11-16T21:57:22.1963875Z CMake Deprecation Warning at CMakeLists.txt:25 (cmake_minimum_required):
+2025-11-16T21:57:22.1964553Z   Compatibility with CMake < 3.10 will be removed from a future version of
+2025-11-16T21:57:22.1965057Z   CMake.
+2025-11-16T21:57:22.1965247Z 
+2025-11-16T21:57:22.1965531Z   Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+2025-11-16T21:57:22.1966177Z   to tell CMake that the project requires at least <min> but has been updated
+2025-11-16T21:57:22.1966739Z   to work with policies introduced by <max> or earlier.
+2025-11-16T21:57:22.1967032Z 
+2025-11-16T21:57:22.1967037Z 
+2025-11-16T21:57:23.4630732Z -- The C compiler identification is GNU 13.3.0
+2025-11-16T21:57:24.2525749Z -- The CXX compiler identification is GNU 13.3.0
+2025-11-16T21:57:24.4584630Z -- Detecting C compiler ABI info
+2025-11-16T21:57:24.7600707Z -- Detecting C compiler ABI info - done
+2025-11-16T21:57:24.7782688Z -- Check for working C compiler: /usr/bin/cc - skipped
+2025-11-16T21:57:24.8096816Z -- Detecting C compile features
+2025-11-16T21:57:24.8104369Z -- Detecting C compile features - done
+2025-11-16T21:57:24.8675432Z -- Detecting CXX compiler ABI info
+2025-11-16T21:57:24.9586804Z -- Detecting CXX compiler ABI info - done
+2025-11-16T21:57:24.9773676Z -- Check for working CXX compiler: /usr/bin/c++ - skipped
+2025-11-16T21:57:24.9778278Z -- Detecting CXX compile features
+2025-11-16T21:57:24.9785730Z -- Detecting CXX compile features - done
+2025-11-16T21:57:25.0530974Z -- Found PkgConfig: /usr/bin/pkg-config (found version "1.8.1")
+2025-11-16T21:57:25.0670162Z -- Looking for include file dirent.h
+2025-11-16T21:57:25.1923379Z -- Looking for include file dirent.h - found
+2025-11-16T21:57:25.1926071Z -- Looking for include file inttypes.h
+2025-11-16T21:57:25.2568485Z -- Looking for include file inttypes.h - found
+2025-11-16T21:57:25.2570901Z -- Looking for include file linux/awe_voice.h
+2025-11-16T21:57:25.2861012Z -- Looking for include file linux/awe_voice.h - not found
+2025-11-16T21:57:25.2863036Z -- Looking for include file linux/input.h
+2025-11-16T21:57:25.5307908Z -- Looking for include file linux/input.h - found
+2025-11-16T21:57:25.5310464Z -- Looking for include files sys/types.h, linux/joystick.h
+2025-11-16T21:57:25.6236274Z -- Looking for include files sys/types.h, linux/joystick.h - found
+2025-11-16T21:57:25.6238567Z -- Looking for include file linux/soundcard.h
+2025-11-16T21:57:25.6851245Z -- Looking for include file linux/soundcard.h - found
+2025-11-16T21:57:25.6853468Z -- Looking for include file machine/soundcard.h
+2025-11-16T21:57:25.7108921Z -- Looking for include file machine/soundcard.h - not found
+2025-11-16T21:57:25.7111594Z -- Looking for include file soundcard.h
+2025-11-16T21:57:25.7356926Z -- Looking for include file soundcard.h - not found
+2025-11-16T21:57:25.7359805Z -- Looking for include file stdint.h
+2025-11-16T21:57:25.7864187Z -- Looking for include file stdint.h - found
+2025-11-16T21:57:25.7866857Z -- Looking for include file sys/io.h
+2025-11-16T21:57:25.8418653Z -- Looking for include file sys/io.h - found
+2025-11-16T21:57:25.8420838Z -- Looking for include file sys/stat.h
+2025-11-16T21:57:25.9018205Z -- Looking for include file sys/stat.h - found
+2025-11-16T21:57:25.9021064Z -- Looking for include file sys/time.h
+2025-11-16T21:57:25.9538069Z -- Looking for include file sys/time.h - found
+2025-11-16T21:57:25.9540858Z -- Looking for include file sys/soundcard.h
+2025-11-16T21:57:26.0062630Z -- Looking for include file sys/soundcard.h - found
+2025-11-16T21:57:26.0064844Z -- Looking for include file sys/utsname.h
+2025-11-16T21:57:26.0620990Z -- Looking for include file sys/utsname.h - found
+2025-11-16T21:57:26.0621865Z -- Looking for getexecname
+2025-11-16T21:57:26.1177988Z -- Looking for getexecname - not found
+2025-11-16T21:57:26.1178780Z -- Looking for memcmp
+2025-11-16T21:57:26.1806513Z -- Looking for memcmp - found
+2025-11-16T21:57:26.1807964Z -- Looking for mkstemp
+2025-11-16T21:57:26.2312935Z -- Looking for mkstemp - found
+2025-11-16T21:57:26.2313603Z -- Looking for mmap
+2025-11-16T21:57:26.2827611Z -- Looking for mmap - found
+2025-11-16T21:57:26.2828065Z -- Looking for mprotect
+2025-11-16T21:57:26.3333092Z -- Looking for mprotect - found
+2025-11-16T21:57:26.3333697Z -- Looking for sched_yield
+2025-11-16T21:57:26.3845013Z -- Looking for sched_yield - found
+2025-11-16T21:57:26.3845827Z -- Looking for stricmp
+2025-11-16T21:57:26.4362857Z -- Looking for stricmp - not found
+2025-11-16T21:57:26.4363595Z -- Looking for strlwr
+2025-11-16T21:57:26.4863572Z -- Looking for strlwr - not found
+2025-11-16T21:57:26.4864293Z -- Looking for strupr
+2025-11-16T21:57:26.5362171Z -- Looking for strupr - not found
+2025-11-16T21:57:26.5362849Z -- Looking for sysconf
+2025-11-16T21:57:26.5880517Z -- Looking for sysconf - found
+2025-11-16T21:57:26.5881921Z -- Performing Test ALLEGRO_HAVE_SV_PROCFS_H
+2025-11-16T21:57:26.6262330Z -- Performing Test ALLEGRO_HAVE_SV_PROCFS_H - Failed
+2025-11-16T21:57:26.6263651Z -- Performing Test ALLEGRO_HAVE_PROCFS_ARGCV
+2025-11-16T21:57:26.6539084Z -- Performing Test ALLEGRO_HAVE_PROCFS_ARGCV - Failed
+2025-11-16T21:57:26.6541053Z -- Performing Test MAP_FAILED_DEFINED
+2025-11-16T21:57:26.7286335Z -- Performing Test MAP_FAILED_DEFINED - Success
+2025-11-16T21:57:26.7288161Z -- Performing Test ALLEGRO_USE_CONSTRUCTOR
+2025-11-16T21:57:26.7869655Z -- Performing Test ALLEGRO_USE_CONSTRUCTOR - Success
+2025-11-16T21:57:26.7929763Z -- Performing Test ALLEGRO_HAVE_POSIX_MONOTONIC_CLOCK
+2025-11-16T21:57:26.9257445Z -- Performing Test ALLEGRO_HAVE_POSIX_MONOTONIC_CLOCK - Success
+2025-11-16T21:57:26.9564128Z -- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+2025-11-16T21:57:27.0262381Z -- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+2025-11-16T21:57:27.0272855Z -- Found Threads: TRUE
+2025-11-16T21:57:27.0288938Z -- Performing Test OSS_COMPILES
+2025-11-16T21:57:27.0814477Z -- Performing Test OSS_COMPILES - Success
+2025-11-16T21:57:27.0824943Z -- Found OSS: 1
+2025-11-16T21:57:27.0831243Z -- Checking for module 'alsa'
+2025-11-16T21:57:27.0915314Z --   Found alsa, version 1.2.11
+2025-11-16T21:57:27.1127938Z -- Checking for module 'jack'
+2025-11-16T21:57:27.2380565Z --   Package 'jack', required by 'virtual:world', not found
+2025-11-16T21:57:27.2382964Z -- Looking for alOpenPort in audio
+2025-11-16T21:57:27.2795266Z -- Looking for alOpenPort in audio - not found
+2025-11-16T21:57:27.3386084Z -- Found X11: /usr/include
+2025-11-16T21:57:27.3390335Z -- Looking for XOpenDisplay in /usr/lib/x86_64-linux-gnu/libX11.so;/usr/lib/x86_64-linux-gnu/libXext.so
+2025-11-16T21:57:27.3934300Z -- Looking for XOpenDisplay in /usr/lib/x86_64-linux-gnu/libX11.so;/usr/lib/x86_64-linux-gnu/libXext.so - found
+2025-11-16T21:57:27.3935096Z -- Looking for gethostbyname
+2025-11-16T21:57:27.4443895Z -- Looking for gethostbyname - found
+2025-11-16T21:57:27.4444506Z -- Looking for connect
+2025-11-16T21:57:27.4953236Z -- Looking for connect - found
+2025-11-16T21:57:27.4953842Z -- Looking for remove
+2025-11-16T21:57:27.5462100Z -- Looking for remove - found
+2025-11-16T21:57:27.5462640Z -- Looking for shmat
+2025-11-16T21:57:27.5970618Z -- Looking for shmat - found
+2025-11-16T21:57:27.5982498Z -- Looking for XOpenIM in X11
+2025-11-16T21:57:27.6526965Z -- Looking for XOpenIM in X11 - found
+2025-11-16T21:57:27.6528048Z -- Looking for XDGAQueryExtension in Xxf86dga
+2025-11-16T21:57:27.6935117Z -- Looking for XDGAQueryExtension in Xxf86dga - not found
+2025-11-16T21:57:27.6987731Z CMake Warning (dev) at CMakeLists.txt:967 (get_target_property):
+2025-11-16T21:57:27.6988493Z   Policy CMP0045 is not set: Error on non-existent target in
+2025-11-16T21:57:27.6988994Z   get_target_property.  Run "cmake --help-policy CMP0045" for policy details.
+2025-11-16T21:57:27.6989714Z   Use the cmake_policy command to set the policy and suppress this warning.
+2025-11-16T21:57:27.6990063Z 
+2025-11-16T21:57:27.6990253Z   get_target_property() called with non-existent target "allegrogl".
+2025-11-16T21:57:27.6990752Z This warning is for project developers.  Use -Wno-dev to suppress it.
+2025-11-16T21:57:27.6991049Z 
+2025-11-16T21:57:27.6991261Z CMake Warning (dev) at CMakeLists.txt:967 (get_target_property):
+2025-11-16T21:57:27.6991920Z   Policy CMP0045 is not set: Error on non-existent target in
+2025-11-16T21:57:27.6992520Z   get_target_property.  Run "cmake --help-policy CMP0045" for policy details.
+2025-11-16T21:57:27.6993230Z   Use the cmake_policy command to set the policy and suppress this warning.
+2025-11-16T21:57:27.6993639Z 
+2025-11-16T21:57:27.6993901Z   get_target_property() called with non-existent target "jpgalleg".
+2025-11-16T21:57:27.6994539Z This warning is for project developers.  Use -Wno-dev to suppress it.
+2025-11-16T21:57:27.6994883Z 
+2025-11-16T21:57:27.6995077Z CMake Warning (dev) at CMakeLists.txt:967 (get_target_property):
+2025-11-16T21:57:27.6995496Z   Policy CMP0045 is not set: Error on non-existent target in
+2025-11-16T21:57:27.6995973Z   get_target_property.  Run "cmake --help-policy CMP0045" for policy details.
+2025-11-16T21:57:27.6996479Z   Use the cmake_policy command to set the policy and suppress this warning.
+2025-11-16T21:57:27.6996787Z 
+2025-11-16T21:57:27.6996965Z   get_target_property() called with non-existent target "loadpng".
+2025-11-16T21:57:27.6997624Z This warning is for project developers.  Use -Wno-dev to suppress it.
+2025-11-16T21:57:27.6997913Z 
+2025-11-16T21:57:27.6998082Z CMake Warning (dev) at CMakeLists.txt:967 (get_target_property):
+2025-11-16T21:57:27.6998503Z   Policy CMP0045 is not set: Error on non-existent target in
+2025-11-16T21:57:27.6998962Z   get_target_property.  Run "cmake --help-policy CMP0045" for policy details.
+2025-11-16T21:57:27.6999473Z   Use the cmake_policy command to set the policy and suppress this warning.
+2025-11-16T21:57:27.6999773Z 
+2025-11-16T21:57:27.6999939Z   get_target_property() called with non-existent target "logg".
+2025-11-16T21:57:27.7000388Z This warning is for project developers.  Use -Wno-dev to suppress it.
+2025-11-16T21:57:27.7000882Z 
+2025-11-16T21:57:27.7007584Z -- Configuring done (5.5s)
+2025-11-16T21:57:27.7254922Z -- Generating done (0.0s)
+2025-11-16T21:57:27.7260940Z -- Build files have been written to: /home/runner/work/fiend/fiend/external/allegro4/build
+2025-11-16T21:57:27.7501211Z [  1%] Building C object CMakeFiles/alleg-alsamidi.dir/src/unix/alsamidi.c.o
+2025-11-16T21:57:27.7503232Z [  1%] Building C object CMakeFiles/alleg-alsadigi.dir/src/unix/alsa9.c.o
+2025-11-16T21:57:27.7573238Z [  2%] Building C object CMakeFiles/allegro.dir/src/allegro.c.o
+2025-11-16T21:57:27.7574180Z [  3%] Building C object CMakeFiles/allegro.dir/src/blit.c.o
+2025-11-16T21:57:27.9262233Z [  3%] Linking C shared module lib/alleg-alsamidi.so
+2025-11-16T21:57:27.9592141Z [  3%] Built target alleg-alsamidi
+2025-11-16T21:57:27.9617306Z [  4%] Building C object CMakeFiles/allegro.dir/src/bmp.c.o
+2025-11-16T21:57:28.0107682Z [  5%] Linking C shared module lib/alleg-alsadigi.so
+2025-11-16T21:57:28.0162158Z [  5%] Building C object CMakeFiles/allegro.dir/src/clip3d.c.o
+2025-11-16T21:57:28.0437012Z [  5%] Built target alleg-alsadigi
+2025-11-16T21:57:28.0469888Z [  6%] Building C object CMakeFiles/allegro.dir/src/clip3df.c.o
+2025-11-16T21:57:28.3131523Z [  7%] Building C object CMakeFiles/allegro.dir/src/colblend.c.o
+2025-11-16T21:57:28.4752459Z [  8%] Building C object CMakeFiles/allegro.dir/src/color.c.o
+2025-11-16T21:57:28.7018491Z [  8%] Building C object CMakeFiles/allegro.dir/src/config.c.o
+2025-11-16T21:57:28.7947787Z [  9%] Building C object CMakeFiles/allegro.dir/src/datafile.c.o
+2025-11-16T21:57:28.8630013Z /home/runner/work/fiend/fiend/external/allegro4/src/datafile.c: In function ‘initialise_datafile’:
+2025-11-16T21:57:28.8631764Z /home/runner/work/fiend/fiend/external/allegro4/src/datafile.c:2151:12: warning: variable ‘s’ set but not used [-Wunused-but-set-variable]
+2025-11-16T21:57:28.8632811Z  2151 |    SAMPLE *s;
+2025-11-16T21:57:28.8633124Z       |            ^
+2025-11-16T21:57:28.9632235Z [ 10%] Building C object CMakeFiles/allegro.dir/src/dataregi.c.o
+2025-11-16T21:57:29.0386375Z [ 11%] Building C object CMakeFiles/allegro.dir/src/digmid.c.o
+2025-11-16T21:57:29.1387364Z [ 11%] Building C object CMakeFiles/allegro.dir/src/dither.c.o
+2025-11-16T21:57:29.2172139Z [ 12%] Building C object CMakeFiles/allegro.dir/src/dispsw.c.o
+2025-11-16T21:57:29.3041981Z [ 13%] Building C object CMakeFiles/allegro.dir/src/drvlist.c.o
+2025-11-16T21:57:29.3929203Z [ 13%] Building C object CMakeFiles/allegro.dir/src/file.c.o
+2025-11-16T21:57:29.4317618Z [ 14%] Building C object CMakeFiles/allegro.dir/src/fli.c.o
+2025-11-16T21:57:29.4406311Z [ 15%] Building C object CMakeFiles/allegro.dir/src/flood.c.o
+2025-11-16T21:57:29.5047407Z [ 16%] Building C object CMakeFiles/allegro.dir/src/font.c.o
+2025-11-16T21:57:29.6101999Z [ 16%] Building C object CMakeFiles/allegro.dir/src/fontbios.c.o
+2025-11-16T21:57:29.6896663Z [ 17%] Building C object CMakeFiles/allegro.dir/src/fontbmp.c.o
+2025-11-16T21:57:29.8381812Z [ 18%] Building C object CMakeFiles/allegro.dir/src/fontdat.c.o
+2025-11-16T21:57:29.8456832Z [ 19%] Building C object CMakeFiles/allegro.dir/src/fontgrx.c.o
+2025-11-16T21:57:29.9198540Z [ 19%] Building C object CMakeFiles/allegro.dir/src/fonttxt.c.o
+2025-11-16T21:57:29.9405163Z [ 20%] Building C object CMakeFiles/allegro.dir/src/fsel.c.o
+2025-11-16T21:57:30.0140145Z [ 21%] Building C object CMakeFiles/allegro.dir/src/gfx.c.o
+2025-11-16T21:57:30.0206473Z [ 22%] Building C object CMakeFiles/allegro.dir/src/glyph.c.o
+2025-11-16T21:57:30.0852819Z [ 22%] Building C object CMakeFiles/allegro.dir/src/graphics.c.o
+2025-11-16T21:57:30.1974032Z [ 23%] Building C object CMakeFiles/allegro.dir/src/gsprite.c.o
+2025-11-16T21:57:30.2000345Z [ 24%] Building C object CMakeFiles/allegro.dir/src/gui.c.o
+2025-11-16T21:57:30.3278035Z [ 25%] Building C object CMakeFiles/allegro.dir/src/guiproc.c.o
+2025-11-16T21:57:30.4929508Z [ 25%] Building C object CMakeFiles/allegro.dir/src/inline.c.o
+2025-11-16T21:57:30.6433089Z [ 26%] Building C object CMakeFiles/allegro.dir/src/joystick.c.o
+2025-11-16T21:57:30.8035351Z [ 27%] Building C object CMakeFiles/allegro.dir/src/keyboard.c.o
+2025-11-16T21:57:30.8761985Z [ 27%] Building C object CMakeFiles/allegro.dir/src/lbm.c.o
+2025-11-16T21:57:30.9733458Z [ 28%] Building C object CMakeFiles/allegro.dir/src/libc.c.o
+2025-11-16T21:57:31.0116286Z [ 29%] Building C object CMakeFiles/allegro.dir/src/lzss.c.o
+2025-11-16T21:57:31.0124691Z [ 30%] Building C object CMakeFiles/allegro.dir/src/math.c.o
+2025-11-16T21:57:31.0639640Z [ 30%] Building C object CMakeFiles/allegro.dir/src/math3d.c.o
+2025-11-16T21:57:31.0762929Z [ 31%] Building C object CMakeFiles/allegro.dir/src/midi.c.o
+2025-11-16T21:57:31.1172892Z [ 32%] Building C object CMakeFiles/allegro.dir/src/mixer.c.o
+2025-11-16T21:57:31.2122642Z [ 33%] Building C object CMakeFiles/allegro.dir/src/modesel.c.o
+2025-11-16T21:57:31.4731498Z [ 33%] Building C object CMakeFiles/allegro.dir/src/mouse.c.o
+2025-11-16T21:57:31.5434913Z [ 34%] Building C object CMakeFiles/allegro.dir/src/pcx.c.o
+2025-11-16T21:57:31.5541270Z [ 35%] Building C object CMakeFiles/allegro.dir/src/poly3d.c.o
+2025-11-16T21:57:31.6156635Z /home/runner/work/fiend/fiend/external/allegro4/src/poly3d.c: In function ‘draw_polygon_segment’:
+2025-11-16T21:57:31.6160154Z /home/runner/work/fiend/fiend/external/allegro4/src/poly3d.c:978:24: warning: left shift of negative value [-Wshift-negative-value]
+2025-11-16T21:57:31.6161123Z   978 |             width = -1 << 16;
+2025-11-16T21:57:31.6161665Z       |                        ^~
+2025-11-16T21:57:31.7166887Z [ 36%] Building C object CMakeFiles/allegro.dir/src/polygon.c.o
+2025-11-16T21:57:31.7574125Z [ 36%] Building C object CMakeFiles/allegro.dir/src/quantize.c.o
+2025-11-16T21:57:31.8593823Z [ 37%] Building C object CMakeFiles/allegro.dir/src/quat.c.o
+2025-11-16T21:57:32.0164657Z [ 38%] Building C object CMakeFiles/allegro.dir/src/readbmp.c.o
+2025-11-16T21:57:32.0610766Z [ 38%] Building C object CMakeFiles/allegro.dir/src/readfont.c.o
+2025-11-16T21:57:32.1192285Z [ 39%] Building C object CMakeFiles/allegro.dir/src/readsmp.c.o
+2025-11-16T21:57:32.1517415Z [ 40%] Building C object CMakeFiles/allegro.dir/src/rle.c.o
+2025-11-16T21:57:32.2140841Z [ 41%] Building C object CMakeFiles/allegro.dir/src/rotate.c.o
+2025-11-16T21:57:32.2833378Z [ 41%] Building C object CMakeFiles/allegro.dir/src/rsfb.c.o
+2025-11-16T21:57:32.2859222Z [ 42%] Building C object CMakeFiles/allegro.dir/src/scene3d.c.o
+2025-11-16T21:57:32.3038447Z [ 43%] Building C object CMakeFiles/allegro.dir/src/sound.c.o
+2025-11-16T21:57:32.3432755Z /home/runner/work/fiend/fiend/external/allegro4/src/scene3d.c: In function ‘init_poly’:
+2025-11-16T21:57:32.3434209Z /home/runner/work/fiend/fiend/external/allegro4/src/scene3d.c:373:25: warning: this statement may fall through [-Wimplicit-fallthrough=]
+2025-11-16T21:57:32.3435267Z   373 |             poly->flags |= INTERP_THRU;
+2025-11-16T21:57:32.3435944Z /home/runner/work/fiend/fiend/external/allegro4/src/scene3d.c:374:10: note: here
+2025-11-16T21:57:32.3436626Z   374 |          case DRAW_MODE_COPY_PATTERN:
+2025-11-16T21:57:32.3437045Z       |          ^~~~
+2025-11-16T21:57:32.6006515Z [ 44%] Building C object CMakeFiles/allegro.dir/src/spline.c.o
+2025-11-16T21:57:32.6248652Z [ 44%] Building C object CMakeFiles/allegro.dir/src/stream.c.o
+2025-11-16T21:57:32.6333691Z [ 45%] Building C object CMakeFiles/allegro.dir/src/text.c.o
+2025-11-16T21:57:32.7225654Z [ 46%] Building C object CMakeFiles/allegro.dir/src/tga.c.o
+2025-11-16T21:57:32.7473406Z [ 47%] Building C object CMakeFiles/allegro.dir/src/timer.c.o
+2025-11-16T21:57:32.7742584Z [ 47%] Building C object CMakeFiles/allegro.dir/src/unicode.c.o
+2025-11-16T21:57:32.8004896Z [ 48%] Building C object CMakeFiles/allegro.dir/src/vtable.c.o
+2025-11-16T21:57:32.8572273Z [ 49%] Building C object CMakeFiles/allegro.dir/src/vtable15.c.o
+2025-11-16T21:57:32.9198739Z [ 50%] Building C object CMakeFiles/allegro.dir/src/vtable16.c.o
+2025-11-16T21:57:32.9829590Z [ 50%] Building C object CMakeFiles/allegro.dir/src/vtable24.c.o
+2025-11-16T21:57:33.0258032Z [ 51%] Building C object CMakeFiles/allegro.dir/src/vtable32.c.o
+2025-11-16T21:57:33.0320905Z [ 52%] Building C object CMakeFiles/allegro.dir/src/vtable8.c.o
+2025-11-16T21:57:33.0446924Z [ 52%] Building C object CMakeFiles/allegro.dir/src/c/cblit16.c.o
+2025-11-16T21:57:33.0861731Z [ 53%] Building C object CMakeFiles/allegro.dir/src/c/cblit24.c.o
+2025-11-16T21:57:33.0949885Z [ 54%] Building C object CMakeFiles/allegro.dir/src/c/cblit32.c.o
+2025-11-16T21:57:33.1543160Z [ 55%] Building C object CMakeFiles/allegro.dir/src/c/cblit8.c.o
+2025-11-16T21:57:33.2001660Z [ 55%] Building C object CMakeFiles/allegro.dir/src/c/ccpu.c.o
+2025-11-16T21:57:33.2123729Z [ 56%] Building C object CMakeFiles/allegro.dir/src/c/ccsprite.c.o
+2025-11-16T21:57:33.2527882Z [ 57%] Building C object CMakeFiles/allegro.dir/src/c/cgfx15.c.o
+2025-11-16T21:57:33.2640492Z [ 58%] Building C object CMakeFiles/allegro.dir/src/c/cgfx16.c.o
+2025-11-16T21:57:33.2766783Z [ 58%] Building C object CMakeFiles/allegro.dir/src/c/cgfx24.c.o
+2025-11-16T21:57:33.4386919Z [ 59%] Building C object CMakeFiles/allegro.dir/src/c/cgfx32.c.o
+2025-11-16T21:57:33.4522110Z [ 60%] Building C object CMakeFiles/allegro.dir/src/c/cgfx8.c.o
+2025-11-16T21:57:33.4603225Z [ 61%] Building C object CMakeFiles/allegro.dir/src/c/cmisc.c.o
+2025-11-16T21:57:33.5332209Z [ 61%] Building C object CMakeFiles/allegro.dir/src/c/cscan15.c.o
+2025-11-16T21:57:33.5483525Z [ 62%] Building C object CMakeFiles/allegro.dir/src/c/cscan16.c.o
+2025-11-16T21:57:33.6093754Z [ 63%] Building C object CMakeFiles/allegro.dir/src/c/cscan24.c.o
+2025-11-16T21:57:33.6359541Z [ 63%] Building C object CMakeFiles/allegro.dir/src/c/cscan32.c.o
+2025-11-16T21:57:33.8645609Z [ 64%] Building C object CMakeFiles/allegro.dir/src/c/cscan8.c.o
+2025-11-16T21:57:33.8897085Z [ 65%] Building C object CMakeFiles/allegro.dir/src/c/cspr15.c.o
+2025-11-16T21:57:33.9511253Z [ 66%] Building C object CMakeFiles/allegro.dir/src/c/cspr16.c.o
+2025-11-16T21:57:33.9824191Z [ 66%] Building C object CMakeFiles/allegro.dir/src/c/cspr24.c.o
+2025-11-16T21:57:34.2032394Z [ 67%] Building C object CMakeFiles/allegro.dir/src/c/cspr32.c.o
+2025-11-16T21:57:34.6208685Z [ 68%] Building C object CMakeFiles/allegro.dir/src/c/cspr8.c.o
+2025-11-16T21:57:34.6686552Z [ 69%] Building C object CMakeFiles/allegro.dir/src/c/cstretch.c.o
+2025-11-16T21:57:34.7094438Z [ 69%] Building C object CMakeFiles/allegro.dir/src/c/czscan15.c.o
+2025-11-16T21:57:34.8093281Z [ 70%] Building C object CMakeFiles/allegro.dir/src/c/czscan16.c.o
+2025-11-16T21:57:34.8496136Z [ 71%] Building C object CMakeFiles/allegro.dir/src/c/czscan24.c.o
+2025-11-16T21:57:34.9463473Z [ 72%] Building C object CMakeFiles/allegro.dir/src/c/czscan32.c.o
+2025-11-16T21:57:35.0458660Z [ 72%] Building C object CMakeFiles/allegro.dir/src/c/czscan8.c.o
+2025-11-16T21:57:35.1186850Z [ 73%] Building C object CMakeFiles/allegro.dir/src/misc/ccolconv.c.o
+2025-11-16T21:57:35.1752354Z [ 74%] Building C object CMakeFiles/allegro.dir/src/misc/colconv.c.o
+2025-11-16T21:57:35.2465777Z [ 75%] Building C object CMakeFiles/allegro.dir/src/unix/alsa9.c.o
+2025-11-16T21:57:35.2715204Z [ 75%] Building C object CMakeFiles/allegro.dir/src/unix/alsamidi.c.o
+2025-11-16T21:57:35.3044454Z [ 76%] Building C object CMakeFiles/allegro.dir/src/unix/arts.c.o
+2025-11-16T21:57:35.3274248Z [ 77%] Building C object CMakeFiles/allegro.dir/src/unix/sgial.c.o
+2025-11-16T21:57:35.3274993Z [ 77%] Building C object CMakeFiles/allegro.dir/src/unix/jack.c.o
+2025-11-16T21:57:35.3618321Z [ 78%] Building C object CMakeFiles/allegro.dir/src/unix/udjgpp.c.o
+2025-11-16T21:57:35.3822544Z [ 79%] Building C object CMakeFiles/allegro.dir/src/unix/udrvlist.c.o
+2025-11-16T21:57:35.3842811Z [ 80%] Building C object CMakeFiles/allegro.dir/src/unix/udummy.c.o
+2025-11-16T21:57:35.3852410Z [ 80%] Building C object CMakeFiles/allegro.dir/src/unix/uesd.c.o
+2025-11-16T21:57:35.3999900Z [ 81%] Building C object CMakeFiles/allegro.dir/src/unix/ufile.c.o
+2025-11-16T21:57:35.4387831Z [ 82%] Building C object CMakeFiles/allegro.dir/src/unix/ugfxdrv.c.o
+2025-11-16T21:57:35.4629972Z [ 83%] Building C object CMakeFiles/allegro.dir/src/unix/ujoydrv.c.o
+2025-11-16T21:57:35.4954902Z [ 83%] Building C object CMakeFiles/allegro.dir/src/unix/ukeybd.c.o
+2025-11-16T21:57:35.5077629Z /home/runner/work/fiend/fiend/external/allegro4/src/unix/ufile.c: In function ‘al_findnext’:
+2025-11-16T21:57:35.5082175Z /home/runner/work/fiend/fiend/external/allegro4/src/unix/ufile.c:416:10: warning: ‘__builtin___strncat_chk’ specified bound depends on the length of the source argument [-Wstringop-overflow=]
+2025-11-16T21:57:35.5083857Z   416 |          strncat(tempname, entry->d_name, NAMLEN(entry));
+2025-11-16T21:57:35.5084574Z       |          ^
+2025-11-16T21:57:35.5094912Z /home/runner/work/fiend/fiend/external/allegro4/src/unix/ufile.c:34:28: note: length computed here
+2025-11-16T21:57:35.5095851Z    34 |    #define NAMLEN(dirent) (strlen((dirent)->d_name))
+2025-11-16T21:57:35.5096364Z       |                           ~^~~~~~~~~~~~~~~~~~~~~~~~~
+2025-11-16T21:57:35.5112614Z /home/runner/work/fiend/fiend/external/allegro4/src/unix/ufile.c:413:11: note: in expansion of macro ‘NAMLEN’
+2025-11-16T21:57:35.5113667Z   413 |       if (NAMLEN(entry) >= sizeof(tempname))
+2025-11-16T21:57:35.5114118Z       |           ^~~~~~
+2025-11-16T21:57:35.5115817Z /home/runner/work/fiend/fiend/external/allegro4/src/unix/ufile.c:421:10: warning: ‘__builtin___strncat_chk’ output may be truncated copying between 0 and 1023 bytes from a string of length 1023 [-Wstringop-truncation]
+2025-11-16T21:57:35.5117680Z   421 |          strncat(filename, tempname, sizeof(filename) - strlen(filename) - 1);
+2025-11-16T21:57:35.5118273Z       |          ^
+2025-11-16T21:57:35.5238615Z [ 84%] Building C object CMakeFiles/allegro.dir/src/unix/umain.c.o
+2025-11-16T21:57:35.5483083Z [ 85%] Building C object CMakeFiles/allegro.dir/src/unix/umodules.c.o
+2025-11-16T21:57:35.5492031Z [ 86%] Building C object CMakeFiles/allegro.dir/src/unix/umouse.c.o
+2025-11-16T21:57:35.5725697Z [ 86%] Building C object CMakeFiles/allegro.dir/src/unix/uoss.c.o
+2025-11-16T21:57:35.6023571Z [ 87%] Building C object CMakeFiles/allegro.dir/src/unix/uossmidi.c.o
+2025-11-16T21:57:35.6399125Z /home/runner/work/fiend/fiend/external/allegro4/src/unix/uoss.c: In function ‘oss_update’:
+2025-11-16T21:57:35.6401069Z /home/runner/work/fiend/fiend/external/allegro4/src/unix/uoss.c:177:10: warning: ignoring return value of ‘write’ declared with attribute ‘warn_unused_result’ [-Wunused-result]
+2025-11-16T21:57:35.6402477Z   177 |          write(oss_fd, oss_bufdata, oss_bufsize);
+2025-11-16T21:57:35.6402942Z       |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+2025-11-16T21:57:35.6655984Z [ 88%] Building C object CMakeFiles/allegro.dir/src/unix/uptimer.c.o
+2025-11-16T21:57:35.6698923Z /home/runner/work/fiend/fiend/external/allegro4/src/unix/uossmidi.c: In function ‘seq_set_fm_patches’:
+2025-11-16T21:57:35.6701059Z /home/runner/work/fiend/fiend/external/allegro4/src/unix/uossmidi.c:264:7: warning: ignoring return value of ‘write’ declared with attribute ‘warn_unused_result’ [-Wunused-result]
+2025-11-16T21:57:35.6702377Z   264 |       write(fd, &ins, sizeof(ins));
+2025-11-16T21:57:35.6702797Z       |       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+2025-11-16T21:57:35.6704283Z /home/runner/work/fiend/fiend/external/allegro4/src/unix/uossmidi.c:272:7: warning: ignoring return value of ‘write’ declared with attribute ‘warn_unused_result’ [-Wunused-result]
+2025-11-16T21:57:35.6705561Z   272 |       write(fd, &ins, sizeof(ins));
+2025-11-16T21:57:35.6705980Z       |       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+2025-11-16T21:57:35.6706888Z /home/runner/work/fiend/fiend/external/allegro4/src/unix/uossmidi.c: In function ‘seqbuf_dump’:
+2025-11-16T21:57:35.6709051Z /home/runner/work/fiend/fiend/external/allegro4/src/unix/uossmidi.c:110:7: warning: ignoring return value of ‘write’ declared with attribute ‘warn_unused_result’ [-Wunused-result]
+2025-11-16T21:57:35.6710338Z   110 |       write(seq_fd, _seqbuf, _seqbufptr);
+2025-11-16T21:57:35.6710769Z       |       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+2025-11-16T21:57:35.6745572Z [ 88%] Building C object CMakeFiles/allegro.dir/src/unix/usigalrm.c.o
+2025-11-16T21:57:35.7299047Z [ 89%] Building C object CMakeFiles/allegro.dir/src/unix/usnddrv.c.o
+2025-11-16T21:57:35.7713336Z [ 90%] Building C object CMakeFiles/allegro.dir/src/unix/ustimer.c.o
+2025-11-16T21:57:35.7799043Z [ 91%] Building C object CMakeFiles/allegro.dir/src/unix/usystem.c.o
+2025-11-16T21:57:35.7872687Z [ 91%] Building C object CMakeFiles/allegro.dir/src/unix/uthreads.c.o
+2025-11-16T21:57:35.7918664Z [ 92%] Building C object CMakeFiles/allegro.dir/src/unix/utimer.c.o
+2025-11-16T21:57:35.8312964Z [ 93%] Building C object CMakeFiles/allegro.dir/src/linux/ljoy.c.o
+2025-11-16T21:57:35.8432129Z /home/runner/work/fiend/fiend/external/allegro4/src/unix/usystem.c: In function ‘_unix_get_executable_name’:
+2025-11-16T21:57:35.8434233Z /home/runner/work/fiend/fiend/external/allegro4/src/unix/usystem.c:412:7: warning: ignoring return value of ‘fgets’ declared with attribute ‘warn_unused_result’ [-Wunused-result]
+2025-11-16T21:57:35.8435635Z   412 |       fgets(linkname, sizeof(linkname), pipe);
+2025-11-16T21:57:35.8436121Z       |       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+2025-11-16T21:57:35.8437870Z /home/runner/work/fiend/fiend/external/allegro4/src/unix/usystem.c:420:7: warning: ignoring return value of ‘fgets’ declared with attribute ‘warn_unused_result’ [-Wunused-result]
+2025-11-16T21:57:35.8439218Z   420 |       fgets(linkname, sizeof(linkname), pipe);
+2025-11-16T21:57:35.8439712Z       |       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+2025-11-16T21:57:35.8440756Z /home/runner/work/fiend/fiend/external/allegro4/src/unix/usystem.c: In function ‘_find_executable_file’:
+2025-11-16T21:57:35.8442968Z /home/runner/work/fiend/fiend/external/allegro4/src/unix/usystem.c:276:10: warning: ignoring return value of ‘getcwd’ declared with attribute ‘warn_unused_result’ [-Wunused-result]
+2025-11-16T21:57:35.8444129Z   276 |          getcwd(pathname, sizeof(pathname));
+2025-11-16T21:57:35.8444530Z       |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+2025-11-16T21:57:35.8734662Z [ 94%] Building C object CMakeFiles/allegro.dir/src/x/xgfxdrv.c.o
+2025-11-16T21:57:35.9463219Z [ 94%] Building C object CMakeFiles/allegro.dir/src/x/xkeyboard.c.o
+2025-11-16T21:57:35.9570366Z [ 95%] Building C object CMakeFiles/allegro.dir/src/x/xmouse.c.o
+2025-11-16T21:57:35.9714638Z [ 96%] Building C object CMakeFiles/allegro.dir/src/x/xsystem.c.o
+2025-11-16T21:57:35.9908161Z [ 97%] Building C object CMakeFiles/allegro.dir/src/x/xtimer.c.o
+2025-11-16T21:57:36.0270516Z /home/runner/work/fiend/fiend/external/allegro4/src/x/xkeyboard.c: In function ‘_xwin_get_keyboard_mapping’:
+2025-11-16T21:57:36.0277528Z /home/runner/work/fiend/fiend/external/allegro4/src/x/xkeyboard.c:620:10: warning: ‘XKeycodeToKeysym’ is deprecated [-Wdeprecated-declarations]
+2025-11-16T21:57:36.0282583Z   620 |          KeySym sym = XKeycodeToKeysym(_xwin.display,
+2025-11-16T21:57:36.0283493Z       |          ^~~~~~
+2025-11-16T21:57:36.0287869Z In file included from /home/runner/work/fiend/fiend/external/allegro4/src/x/xkeyboard.c:24:
+2025-11-16T21:57:36.0292301Z /usr/include/X11/Xlib.h:1687:15: note: declared here
+2025-11-16T21:57:36.0297592Z  1687 | extern KeySym XKeycodeToKeysym(
+2025-11-16T21:57:36.0299490Z       |               ^~~~~~~~~~~~~~~~
+2025-11-16T21:57:36.0427706Z [ 97%] Building C object CMakeFiles/allegro.dir/src/x/xvtable.c.o
+2025-11-16T21:57:36.1017678Z [ 98%] Building C object CMakeFiles/allegro.dir/src/x/xwin.c.o
+2025-11-16T21:57:36.1131286Z [ 99%] Building C object CMakeFiles/allegro.dir/src/x/xdga2.c.o
+2025-11-16T21:57:37.5565362Z [100%] Linking C shared library lib/liballeg.so
+2025-11-16T21:57:37.6198966Z [100%] Built target allegro
+2025-11-16T21:57:37.6437854Z [  1%] Built target alleg-alsadigi
+2025-11-16T21:57:37.6527599Z [  2%] Built target alleg-alsamidi
+2025-11-16T21:57:37.7459029Z [100%] Built target allegro
+2025-11-16T21:57:37.7528120Z Install the project...
+2025-11-16T21:57:37.7554463Z -- Install configuration: "Release"
+2025-11-16T21:57:37.7557934Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/lib/allegro/4.4.3/modules.lst
+2025-11-16T21:57:37.7561092Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/lib/allegro/4.4.3/alleg-alsadigi.so
+2025-11-16T21:57:37.7564615Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/lib/allegro/4.4.3/alleg-alsamidi.so
+2025-11-16T21:57:37.7567918Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/lib/liballeg.so.4.4.3
+2025-11-16T21:57:37.7582120Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/lib/liballeg.so.4.4
+2025-11-16T21:57:37.7583274Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/lib/liballeg.so
+2025-11-16T21:57:37.7585945Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/platform/alplatf.h
+2025-11-16T21:57:37.7588850Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/platform/alunixac.h
+2025-11-16T21:57:37.7590470Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro.h
+2025-11-16T21:57:37.7592550Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/3d.h
+2025-11-16T21:57:37.7594432Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/3dmaths.h
+2025-11-16T21:57:37.7596312Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/alcompat.h
+2025-11-16T21:57:37.7598488Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/alinline.h
+2025-11-16T21:57:37.7600495Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/base.h
+2025-11-16T21:57:37.7602263Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/color.h
+2025-11-16T21:57:37.7604260Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/compiled.h
+2025-11-16T21:57:37.7606077Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/config.h
+2025-11-16T21:57:37.7608227Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/datafile.h
+2025-11-16T21:57:37.7610081Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/debug.h
+2025-11-16T21:57:37.7611933Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/digi.h
+2025-11-16T21:57:37.7613904Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/draw.h
+2025-11-16T21:57:37.7615877Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/file.h
+2025-11-16T21:57:37.7617918Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/fix.h
+2025-11-16T21:57:37.7619989Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/fixed.h
+2025-11-16T21:57:37.7621884Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/fli.h
+2025-11-16T21:57:37.7623775Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/fmaths.h
+2025-11-16T21:57:37.7625673Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/font.h
+2025-11-16T21:57:37.7627729Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/gfx.h
+2025-11-16T21:57:37.7629927Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/graphics.h
+2025-11-16T21:57:37.7631869Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/gui.h
+2025-11-16T21:57:37.7633899Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/joystick.h
+2025-11-16T21:57:37.7635812Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/keyboard.h
+2025-11-16T21:57:37.7638201Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/lzss.h
+2025-11-16T21:57:37.7640048Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/matrix.h
+2025-11-16T21:57:37.7641956Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/midi.h
+2025-11-16T21:57:37.7643882Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/mouse.h
+2025-11-16T21:57:37.7645793Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/palette.h
+2025-11-16T21:57:37.7647889Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/quat.h
+2025-11-16T21:57:37.7649837Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/rle.h
+2025-11-16T21:57:37.7651811Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/sound.h
+2025-11-16T21:57:37.7653707Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/stream.h
+2025-11-16T21:57:37.7655600Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/system.h
+2025-11-16T21:57:37.7657812Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/text.h
+2025-11-16T21:57:37.7659765Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/timer.h
+2025-11-16T21:57:37.7661656Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/unicode.h
+2025-11-16T21:57:37.7664289Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/inline/3dmaths.inl
+2025-11-16T21:57:37.7666152Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/inline/asm.inl
+2025-11-16T21:57:37.7668276Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/inline/color.inl
+2025-11-16T21:57:37.7670240Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/inline/draw.inl
+2025-11-16T21:57:37.7672236Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/inline/fix.inl
+2025-11-16T21:57:37.7674354Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/inline/fmaths.inl
+2025-11-16T21:57:37.7676265Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/inline/gfx.inl
+2025-11-16T21:57:37.7678542Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/inline/matrix.inl
+2025-11-16T21:57:37.7680426Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/inline/rle.inl
+2025-11-16T21:57:37.7682345Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/inline/system.inl
+2025-11-16T21:57:37.7684886Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/internal/aintern.h
+2025-11-16T21:57:37.7687499Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/internal/aintvga.h
+2025-11-16T21:57:37.7689449Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/internal/alconfig.h
+2025-11-16T21:57:37.7691575Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/platform/aintbeos.h
+2025-11-16T21:57:37.7693553Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/platform/aintdos.h
+2025-11-16T21:57:37.7695513Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/platform/aintlnx.h
+2025-11-16T21:57:37.7697755Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/platform/aintmac.h
+2025-11-16T21:57:37.7699849Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/platform/aintosx.h
+2025-11-16T21:57:37.7701847Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/platform/aintpsp.h
+2025-11-16T21:57:37.7703729Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/platform/aintqnx.h
+2025-11-16T21:57:37.7705685Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/platform/aintunix.h
+2025-11-16T21:57:37.7707649Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/platform/aintwin.h
+2025-11-16T21:57:37.7709821Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/platform/al386gcc.h
+2025-11-16T21:57:37.7711806Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/platform/al386vc.h
+2025-11-16T21:57:37.7713839Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/platform/al386wat.h
+2025-11-16T21:57:37.7715909Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/platform/albcc32.h
+2025-11-16T21:57:37.7718089Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/platform/albecfg.h
+2025-11-16T21:57:37.7720022Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/platform/albeos.h
+2025-11-16T21:57:37.7721947Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/platform/aldjgpp.h
+2025-11-16T21:57:37.7723936Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/platform/aldmc.h
+2025-11-16T21:57:37.7725843Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/platform/aldos.h
+2025-11-16T21:57:37.7728085Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/platform/almac.h
+2025-11-16T21:57:37.7730287Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/platform/almaccfg.h
+2025-11-16T21:57:37.7732431Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/platform/almngw32.h
+2025-11-16T21:57:37.7734175Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/platform/almsvc.h
+2025-11-16T21:57:37.7736146Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/platform/alosx.h
+2025-11-16T21:57:37.7738023Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/platform/alosxcfg.h
+2025-11-16T21:57:37.7740083Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/platform/alpsp.h
+2025-11-16T21:57:37.7741979Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/platform/alpspcfg.h
+2025-11-16T21:57:37.7743746Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/platform/alqnx.h
+2025-11-16T21:57:37.7745719Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/platform/alqnxcfg.h
+2025-11-16T21:57:37.7762958Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/platform/alucfg.h
+2025-11-16T21:57:37.7764349Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/platform/alunix.h
+2025-11-16T21:57:37.7765780Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/platform/alwatcom.h
+2025-11-16T21:57:37.7767081Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/platform/alwin.h
+2025-11-16T21:57:37.7768137Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/platform/astdint.h
+2025-11-16T21:57:37.7769451Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/allegro/platform/macdef.h
+2025-11-16T21:57:37.7770347Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/include/xalleg.h
+2025-11-16T21:57:37.7771220Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/bin/allegro-config
+2025-11-16T21:57:37.7771937Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/lib/pkgconfig/allegro.pc
+2025-11-16T21:57:37.7772696Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/lib/pkgconfig/allegrogl.pc
+2025-11-16T21:57:37.7773453Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/lib/pkgconfig/jpgalleg.pc
+2025-11-16T21:57:37.7774196Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/lib/pkgconfig/loadpng.pc
+2025-11-16T21:57:37.7774923Z -- Installing: /home/runner/work/fiend/fiend/external/allegro4/build/install/lib/pkgconfig/logg.pc
+2025-11-16T21:57:37.7782457Z === Allegro built and installed ===
+2025-11-16T21:57:37.7783007Z Install directory: /home/runner/work/fiend/fiend/external/allegro4/build/install
+2025-11-16T21:57:37.7783365Z 
+2025-11-16T21:57:37.7783509Z === Library files ===
+2025-11-16T21:57:37.7795904Z total 1208
+2025-11-16T21:57:37.7796281Z drwxr-xr-x 4 runner runner    4096 Nov 16 21:57 .
+2025-11-16T21:57:37.7796711Z drwxr-xr-x 5 runner runner    4096 Nov 16 21:57 ..
+2025-11-16T21:57:37.7797315Z drwxr-xr-x 3 runner runner    4096 Nov 16 21:57 allegro
+2025-11-16T21:57:37.7797792Z lrwxrwxrwx 1 runner runner      15 Nov 16 21:57 liballeg.so -> liballeg.so.4.4
+2025-11-16T21:57:37.7798719Z lrwxrwxrwx 1 runner runner      17 Nov 16 21:57 liballeg.so.4.4 -> liballeg.so.4.4.3
+2025-11-16T21:57:37.7799343Z -rw-r--r-- 1 runner runner 1220520 Nov 16 21:57 liballeg.so.4.4.3
+2025-11-16T21:57:37.7799973Z drwxr-xr-x 2 runner runner    4096 Nov 16 21:57 pkgconfig
+2025-11-16T21:57:37.7800340Z 
+2025-11-16T21:57:37.7800515Z === pkg-config files ===
+2025-11-16T21:57:37.7811016Z total 28
+2025-11-16T21:57:37.7811408Z drwxr-xr-x 2 runner runner 4096 Nov 16 21:57 .
+2025-11-16T21:57:37.7811822Z drwxr-xr-x 4 runner runner 4096 Nov 16 21:57 ..
+2025-11-16T21:57:37.7812261Z -rw-r--r-- 1 runner runner  387 Nov 16 21:57 allegro.pc
+2025-11-16T21:57:37.7812838Z -rw-r--r-- 1 runner runner  416 Nov 16 21:57 allegrogl.pc
+2025-11-16T21:57:37.7813425Z -rw-r--r-- 1 runner runner  414 Nov 16 21:57 jpgalleg.pc
+2025-11-16T21:57:37.7814047Z -rw-r--r-- 1 runner runner  411 Nov 16 21:57 loadpng.pc
+2025-11-16T21:57:37.7814583Z -rw-r--r-- 1 runner runner  412 Nov 16 21:57 logg.pc
+2025-11-16T21:57:37.7814970Z 
+2025-11-16T21:57:37.7815139Z === allegro.pc content ===
+2025-11-16T21:57:37.7822878Z prefix=/home/runner/work/fiend/fiend/external/allegro4/build/install
+2025-11-16T21:57:37.7823513Z exec_prefix=${prefix}
+2025-11-16T21:57:37.7823841Z libdir=${exec_prefix}/lib
+2025-11-16T21:57:37.7824198Z includedir=${prefix}/include
+2025-11-16T21:57:37.7824557Z version=4.4.3
+2025-11-16T21:57:37.7824877Z suffix=
+2025-11-16T21:57:37.7825035Z 
+2025-11-16T21:57:37.7825203Z Name: allegro
+2025-11-16T21:57:37.7825551Z Description: Allegro game programming library
+2025-11-16T21:57:37.7825948Z Version: ${version}
+2025-11-16T21:57:37.7826499Z Libs: -L${libdir} -lalleg${suffix}
+2025-11-16T21:57:37.7827111Z Libs.private:  -lm -lrt -lX11 -lXext -lXext -lXcursor -lXcursor -lXxf86vm -ldl
+2025-11-16T21:57:37.7827899Z Cflags: -I${includedir}

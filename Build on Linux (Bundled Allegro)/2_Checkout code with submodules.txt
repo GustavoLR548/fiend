@@ -1,0 +1,101 @@
+﻿2025-11-16T21:56:45.5313544Z ##[group]Run actions/checkout@v4
+2025-11-16T21:56:45.5314561Z with:
+2025-11-16T21:56:45.5314998Z   fetch-depth: 0
+2025-11-16T21:56:45.5315502Z   submodules: recursive
+2025-11-16T21:56:45.5316065Z   repository: GustavoLR548/fiend
+2025-11-16T21:56:45.5316949Z   token: ***
+2025-11-16T21:56:45.5317589Z   ssh-strict: true
+2025-11-16T21:56:45.5318071Z   ssh-user: git
+2025-11-16T21:56:45.5318582Z   persist-credentials: true
+2025-11-16T21:56:45.5319187Z   clean: true
+2025-11-16T21:56:45.5319696Z   sparse-checkout-cone-mode: true
+2025-11-16T21:56:45.5320363Z   fetch-tags: false
+2025-11-16T21:56:45.5320892Z   show-progress: true
+2025-11-16T21:56:45.5321403Z   lfs: false
+2025-11-16T21:56:45.5321892Z   set-safe-directory: true
+2025-11-16T21:56:45.5322734Z ##[endgroup]
+2025-11-16T21:56:45.6409730Z Syncing repository: GustavoLR548/fiend
+2025-11-16T21:56:45.6411788Z ##[group]Getting Git version info
+2025-11-16T21:56:45.6412707Z Working directory is '/home/runner/work/fiend/fiend'
+2025-11-16T21:56:45.6414003Z [command]/usr/bin/git version
+2025-11-16T21:56:45.7167120Z git version 2.51.2
+2025-11-16T21:56:45.7194983Z ##[endgroup]
+2025-11-16T21:56:45.7210017Z Temporarily overriding HOME='/home/runner/work/_temp/596fcd58-4edf-44ff-b0f4-72e2ab3c621b' before making global git config changes
+2025-11-16T21:56:45.7212903Z Adding repository directory to the temporary git global config as a safe directory
+2025-11-16T21:56:45.7222060Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/fiend/fiend
+2025-11-16T21:56:45.7291088Z Deleting the contents of '/home/runner/work/fiend/fiend'
+2025-11-16T21:56:45.7294793Z ##[group]Initializing the repository
+2025-11-16T21:56:45.7298614Z [command]/usr/bin/git init /home/runner/work/fiend/fiend
+2025-11-16T21:56:45.7804416Z hint: Using 'master' as the name for the initial branch. This default branch name
+2025-11-16T21:56:45.7806300Z hint: is subject to change. To configure the initial branch name to use in all
+2025-11-16T21:56:45.7808096Z hint: of your new repositories, which will suppress this warning, call:
+2025-11-16T21:56:45.7809289Z hint:
+2025-11-16T21:56:45.7809963Z hint: 	git config --global init.defaultBranch <name>
+2025-11-16T21:56:45.7810917Z hint:
+2025-11-16T21:56:45.7811769Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2025-11-16T21:56:45.7813329Z hint: 'development'. The just-created branch can be renamed via this command:
+2025-11-16T21:56:45.7814392Z hint:
+2025-11-16T21:56:45.7814832Z hint: 	git branch -m <name>
+2025-11-16T21:56:45.7815397Z hint:
+2025-11-16T21:56:45.7816229Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2025-11-16T21:56:45.7841015Z Initialized empty Git repository in /home/runner/work/fiend/fiend/.git/
+2025-11-16T21:56:45.7852684Z [command]/usr/bin/git remote add origin https://github.com/GustavoLR548/fiend
+2025-11-16T21:56:45.7919208Z ##[endgroup]
+2025-11-16T21:56:45.7920152Z ##[group]Disabling automatic garbage collection
+2025-11-16T21:56:45.7923024Z [command]/usr/bin/git config --local gc.auto 0
+2025-11-16T21:56:45.7950570Z ##[endgroup]
+2025-11-16T21:56:45.7951424Z ##[group]Setting up auth
+2025-11-16T21:56:45.7957019Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2025-11-16T21:56:45.7986608Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2025-11-16T21:56:45.9458167Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2025-11-16T21:56:45.9490925Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2025-11-16T21:56:45.9709311Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2025-11-16T21:56:45.9743288Z ##[endgroup]
+2025-11-16T21:56:45.9744901Z ##[group]Fetching the repository
+2025-11-16T21:56:45.9764135Z [command]/usr/bin/git -c protocol.version=2 fetch --prune --no-recurse-submodules origin +refs/heads/*:refs/remotes/origin/* +refs/tags/*:refs/tags/*
+2025-11-16T21:56:47.9401531Z From https://github.com/GustavoLR548/fiend
+2025-11-16T21:56:47.9403211Z  * [new branch]      master              -> origin/master
+2025-11-16T21:56:47.9404006Z  * [new tag]         nightly-2025.11.16-build48-da9fb50 -> nightly-2025.11.16-build48-da9fb50
+2025-11-16T21:56:47.9404864Z  * [new tag]         v1.0.0-preservation -> v1.0.0-preservation
+2025-11-16T21:56:47.9483842Z [command]/usr/bin/git branch --list --remote origin/master
+2025-11-16T21:56:47.9506501Z   origin/master
+2025-11-16T21:56:47.9514935Z [command]/usr/bin/git rev-parse refs/remotes/origin/master
+2025-11-16T21:56:47.9534998Z f0ad95c5daf154babda1ad65061502ea14b5a15f
+2025-11-16T21:56:47.9540811Z ##[endgroup]
+2025-11-16T21:56:47.9541253Z ##[group]Determining the checkout info
+2025-11-16T21:56:47.9542091Z ##[endgroup]
+2025-11-16T21:56:47.9546187Z [command]/usr/bin/git sparse-checkout disable
+2025-11-16T21:56:47.9615569Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2025-11-16T21:56:47.9641286Z ##[group]Checking out the ref
+2025-11-16T21:56:47.9645425Z [command]/usr/bin/git checkout --progress --force -B master refs/remotes/origin/master
+2025-11-16T21:56:48.5265525Z Reset branch 'master'
+2025-11-16T21:56:48.5266141Z branch 'master' set up to track 'origin/master'.
+2025-11-16T21:56:48.5301916Z ##[endgroup]
+2025-11-16T21:56:48.5302546Z ##[group]Setting up auth for fetching submodules
+2025-11-16T21:56:48.5309726Z [command]/usr/bin/git config --global http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2025-11-16T21:56:48.5346845Z [command]/usr/bin/git config --global --unset-all url.https://github.com/.insteadOf
+2025-11-16T21:56:48.5374254Z [command]/usr/bin/git config --global --add url.https://github.com/.insteadOf git@github.com:
+2025-11-16T21:56:48.5401344Z [command]/usr/bin/git config --global --add url.https://github.com/.insteadOf org-9157977@github.com:
+2025-11-16T21:56:48.5425479Z ##[endgroup]
+2025-11-16T21:56:48.5425918Z ##[group]Fetching submodules
+2025-11-16T21:56:48.5429720Z [command]/usr/bin/git submodule sync --recursive
+2025-11-16T21:56:48.5650508Z [command]/usr/bin/git -c protocol.version=2 submodule update --init --force --recursive
+2025-11-16T21:56:48.5862615Z Submodule 'external/allegro4' (https://github.com/liballeg/allegro5.git) registered for path 'external/allegro4'
+2025-11-16T21:56:48.5887809Z Cloning into '/home/runner/work/fiend/fiend/external/allegro4'...
+2025-11-16T21:56:52.1313599Z Submodule path 'external/allegro4': checked out '8a386b2754608b66d46f10abf993abf8ab16902d'
+2025-11-16T21:56:52.1356408Z [command]/usr/bin/git submodule foreach --recursive git config --local gc.auto 0
+2025-11-16T21:56:52.1581920Z Entering 'external/allegro4'
+2025-11-16T21:56:52.1628079Z ##[endgroup]
+2025-11-16T21:56:52.1628785Z ##[group]Persisting credentials for submodules
+2025-11-16T21:56:52.1635483Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'url\.https\:\/\/github\.com\/\.insteadOf' && git config --local --unset-all 'url.https://github.com/.insteadOf' || :"
+2025-11-16T21:56:52.1840602Z Entering 'external/allegro4'
+2025-11-16T21:56:52.1896027Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local 'http.https://github.com/.extraheader' 'AUTHORIZATION: basic ***' && git config --local --show-origin --name-only --get-regexp remote.origin.url"
+2025-11-16T21:56:52.2102520Z Entering 'external/allegro4'
+2025-11-16T21:56:52.2140017Z file:/home/runner/work/fiend/fiend/.git/modules/external/allegro4/config	remote.origin.url
+2025-11-16T21:56:52.2179774Z [command]/usr/bin/git submodule foreach --recursive git config --local --add 'url.https://github.com/.insteadOf' 'git@github.com:'
+2025-11-16T21:56:52.2387003Z Entering 'external/allegro4'
+2025-11-16T21:56:52.2436155Z [command]/usr/bin/git submodule foreach --recursive git config --local --add 'url.https://github.com/.insteadOf' 'org-9157977@github.com:'
+2025-11-16T21:56:52.2640214Z Entering 'external/allegro4'
+2025-11-16T21:56:52.2685256Z ##[endgroup]
+2025-11-16T21:56:52.2720789Z [command]/usr/bin/git log -1 --format=%H
+2025-11-16T21:56:52.2743601Z f0ad95c5daf154babda1ad65061502ea14b5a15f
