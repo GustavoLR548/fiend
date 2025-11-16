@@ -58,6 +58,7 @@ int misc_minimap_proc(void);
 int edit_global_enemies_proc(void);
 int edit_global_items_proc(void);
 int edit_global_npcs_proc(void);
+int batch_music_ext_proc(void);
 
 int d_save_brush_button_proc(int msg,DIALOG *d,int c);
 int d_load_brush_button_proc(int msg,DIALOG *d,int c);
@@ -208,6 +209,8 @@ MENU misc_menu[]=
 {"&Edit global enemies",edit_global_enemies_proc,   NULL,     0,   NULL},
 {"&Edit global npcs",edit_global_npcs_proc,   NULL,     0,   NULL},
 {"&Edit global items",edit_global_items_proc,   NULL,     0,   NULL},
+{"",  NULL,   NULL,     0,         NULL},
+{"&Batch replace music ext",batch_music_ext_proc,   NULL,     0,   NULL},
 {NULL,      NULL,   NULL,          0,         NULL}
 };
 
@@ -396,10 +399,7 @@ int init_mapeditor(void)
 
 void exit_mapeditor(void)
 {	
-	int i;
-
-	for(i=0;i<map->num_of_lights;i++)//release the lightmaps!!!
-		 destroy_bitmap(lightmap_data[i]);
+	// Note: lightmaps are freed by release_map() below, not here
 	
 	free_sounds();
 	unload_datafile(misc);

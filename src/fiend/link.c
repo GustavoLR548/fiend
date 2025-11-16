@@ -8,6 +8,7 @@
 
 
 #include <allegro.h>
+#include <stdio.h>
 
 #include "../grafik4.h"
 #include "../fiend.h"
@@ -94,7 +95,18 @@ void check_link_collison(void)
 		///////////////////////////////////
 
 		stop_all_sounds();
+		
+		// DEBUG: Print before saving map state
+		fprintf(stderr, "DEBUG: Map transition - leaving '%s' for '%s'\n", map->name, map_name);
+		fprintf(stderr, "  saved_object_num before save_local_vars: %d\n", saved_object_num);
+		
 		save_local_vars();
+		
+		// DEBUG: Print after saving map state
+		fprintf(stderr, "  saved_object_num after save_local_vars: %d\n", saved_object_num);
+		for(int i = 0; i < saved_object_num; i++) {
+			fprintf(stderr, "    saved_object[%d].name='%s'\n", i, saved_object[i].name);
+		}
 
 		//Load the new map...
 		load_edit_map(map, map_name);
@@ -107,6 +119,17 @@ void check_link_collison(void)
 			
 		//Get the number of the link
 		temp = get_link_num(link_name);
+		
+		// Check if link was found in the new map
+		if(temp == -1) {
+			fprintf(stderr, "ERROR: Link '%s' not found in map '%s', using first link\n", link_name, map_name);
+			if(map->num_of_links > 0) {
+				temp = 0;  // Use first link as fallback
+			} else {
+				fprintf(stderr, "ERROR: No links in map '%s'!\n", map_name);
+				return;  // Can't continue without any links
+			}
+		}
 
 				
 		//Get the new player position you need ...

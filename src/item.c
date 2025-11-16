@@ -117,6 +117,24 @@ int load_item_data(void)
 	fread(item_data, sizeof(ITEM_DATA), MAX_ITEM_DATA, f);
 
 	fclose(f);
+	
+	// DEBUG: Show all items in current map when loaded (only if map is loaded)
+	if(map != NULL)
+	{
+		fprintf(stderr, "\n========== LOADED ITEMS ==========\n");
+		int item_count = 0;
+		for(i=0; i<MAX_ITEM_DATA; i++)
+		{
+			if(item_data[i].used && strcmp(item_data[i].map_name, map->name) == 0)
+			{
+				fprintf(stderr, "Item[%d]: name='%s' active=%d picked_up=%d map='%s'\n",
+					i, item_data[i].name, item_data[i].active, item_data[i].picked_up, item_data[i].map_name);
+				item_count++;
+			}
+		}
+		fprintf(stderr, "Total items in map '%s': %d\n", map->name, item_count);
+		fprintf(stderr, "==================================\n\n");
+	}
 
 	return 1;
 }

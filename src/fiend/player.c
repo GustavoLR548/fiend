@@ -534,6 +534,11 @@ void player_death(void)
 		else if(ans == 3)load_game("save/save3.sav");
 		else if(ans == 4)load_game("save/save4.sav");
 		else if(ans == 5)load_game("save/save5.sav");
+		
+		// Reset transient effects that aren't saved
+		reset_beams();
+		reset_particles();
+		reset_effects();
 	}
 	
 
@@ -621,6 +626,11 @@ void update_global_keys(void)
 			else if(ans == 3)load_game("save/save3.sav");
 			else if(ans == 4)load_game("save/save4.sav");
 			else if(ans == 5)load_game("save/save5.sav");
+			
+			// Reset transient effects that aren't saved
+			reset_beams();
+			reset_particles();
+			reset_effects();
 		}
 	
 

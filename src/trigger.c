@@ -253,6 +253,8 @@ int load_local_vars(void)
 	int i;
 	int num= -1;
 
+	fprintf(stderr, "\nDEBUG: load_local_vars() called for map '%s'\n", map->name);
+	fprintf(stderr, "  saved_object_num=%d, saved_var_num=%d\n", saved_object_num, saved_var_num);
 	
 	//////// Load the vars ///////////
 	for(i=0;i<saved_var_num;i++)
@@ -264,10 +266,12 @@ int load_local_vars(void)
 
 	if(num<0)
 	{
-		return 0;
+		fprintf(stderr, "  No saved vars found for this map\n");
+		// Don't return - still need to check for saved objects!
 	}
 	else
 	{
+		fprintf(stderr, "  Found saved vars at index %d\n", num);
 		for(i=0;i<LOCAL_VAR_NUM;i++)
 			if(saved_local_var[num].var[i].used)
 				map->var[i].value = saved_local_var[num].var[i].value;
@@ -277,25 +281,35 @@ int load_local_vars(void)
 	//////// Load the objects ///////////
 	num = -1;
 	
+	fprintf(stderr, "  Searching for saved objects...\n");
 	for(i=0;i<saved_object_num;i++)
+	{
+		fprintf(stderr, "    saved_object[%d].name='%s'\n", i, saved_object[i].name);
 		if(strcmp(saved_object[i].name,map->name)==0)
 		{
 			num = i;
 			break;
 		}
+	}
 	//allegro_message("%d",num);
 
 	if(num<0)
 	{
+		fprintf(stderr, "  No saved objects found for this map\n");
 		return 0;
 	}
 	else
 	{
+		fprintf(stderr, "DEBUG: load_local_vars for map '%s', restoring %d objects\n", map->name, map->num_of_objects);
+		fprintf(stderr, "DEBUG: map->object pointer = %p\n", (void*)map->object);
 		// BUGFIX: Only loop through actual objects in map, not MAX_OBJECT_NUM
 		for(i=0;i<map->num_of_objects;i++)
 		{
 			if(map->object[i].save_object && map->object[i].type == saved_object[num].object[i].type && strcmp(map->object[i].name, saved_object[num].object[i].name)==0)
 			{
+				fprintf(stderr, "  Restoring object[%d]: type=%d name='%s' energy: %d -> %d\n",
+					i, map->object[i].type, map->object[i].name, 
+					map->object[i].energy, saved_object[num].object[i].energy);
 				map->object[i].x = saved_object[num].object[i].x;
 				map->object[i].y= saved_object[num].object[i].y;
 				map->object[i].angle= saved_object[num].object[i].angle;
@@ -304,6 +318,17 @@ int load_local_vars(void)
 				map->object[i].nextframe= saved_object[num].object[i].nextframe;
 				map->object[i].active= saved_object[num].object[i].active;
 				map->object[i].energy= saved_object[num].object[i].energy;
+			}
+			else if(map->object[i].save_object == 0)
+			{
+				fprintf(stderr, "  Skipping object[%d]: type=%d name='%s' (save_object=0)\n",
+					i, map->object[i].type, map->object[i].name);
+			}
+			else
+			{
+				fprintf(stderr, "  Skipping object[%d]: type mismatch or name mismatch (current: type=%d name='%s', saved: type=%d name='%s')\n",
+					i, map->object[i].type, map->object[i].name,
+					saved_object[num].object[i].type, saved_object[num].object[i].name);
 			}
 		}
 		

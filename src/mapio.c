@@ -22,10 +22,56 @@ extern int map_y;
 int save_map(MAP_DATA *map, char* file)
 {
 	FILE *f;
+	int dummy_ptr = 0;  // 32-bit dummy pointer for compatibility
+	
 	f = fopen(file, "wb");
 	if(f==NULL)return 0;
 
-	fwrite(map, sizeof(MAP_DATA), 1,f);
+	// IMPORTANT: Write fields individually to match 32-bit format
+	// This ensures compatibility with the 32-bit map files
+	
+	// Write fixed-size fields at the beginning
+	fwrite(map->name, sizeof(char), 40, f);  // name[40]
+	fwrite(&map->w, sizeof(int), 1, f);      // w
+	fwrite(&map->h, sizeof(int), 1, f);      // h
+	fwrite(&map->player_x, sizeof(int), 1, f);     // player_x
+	fwrite(&map->player_y, sizeof(int), 1, f);     // player_y
+	fwrite(&map->player_angle, sizeof(int), 1, f); // player_angle
+	fwrite(&map->outside, sizeof(int), 1, f);      // outside
+	fwrite(&map->light_level, sizeof(int), 1, f);  // light_level
+	
+	fwrite(&map->num_of_lights, sizeof(int), 1, f);
+	fwrite(&dummy_ptr, 4, 1, f); // Write 32-bit dummy pointer (light)
+	
+	fwrite(&dummy_ptr, 4, 1, f); // Write 32-bit dummy pointer (layer1)
+	fwrite(&dummy_ptr, 4, 1, f); // Write 32-bit dummy pointer (layer2)
+	fwrite(&dummy_ptr, 4, 1, f); // Write 32-bit dummy pointer (layer3)
+	fwrite(&dummy_ptr, 4, 1, f); // Write 32-bit dummy pointer (shadow)
+	
+	fwrite(&map->num_of_objects, sizeof(int), 1, f);
+	fwrite(&dummy_ptr, 4, 1, f); // Write 32-bit dummy pointer (object)
+	
+	fwrite(&map->num_of_areas, sizeof(int), 1, f);
+	fwrite(&dummy_ptr, 4, 1, f); // Write 32-bit dummy pointer (area)
+	
+	fwrite(&map->num_of_look_at_areas, sizeof(int), 1, f);
+	fwrite(&dummy_ptr, 4, 1, f); // Write 32-bit dummy pointer (look_at_area)
+	
+	fwrite(&map->num_of_links, sizeof(int), 1, f);
+	fwrite(&dummy_ptr, 4, 1, f); // Write 32-bit dummy pointer (link)
+	
+	fwrite(&map->num_of_soundemitors, sizeof(int), 1, f);
+	fwrite(&dummy_ptr, 4, 1, f); // Write 32-bit dummy pointer (soundemitor)
+	
+	fwrite(&map->num_of_triggers, sizeof(int), 1, f);
+	fwrite(&dummy_ptr, 4, 1, f); // Write 32-bit dummy pointer (trigger)
+	
+	fwrite(map->var, sizeof(VARIABLE_DATA), LOCAL_VAR_NUM, f);  // var array
+	
+	fwrite(&map->num_of_path_nodes, sizeof(int), 1, f);
+	fwrite(map->path_node, sizeof(PATH_NODE), MAX_PATHNODE_NUM, f);  // path_node array
+	
+	// Now write the actual data arrays
 	fwrite(map->light, sizeof(LIGHT_DATA), map->num_of_lights, f);		
 	
     fwrite(map->layer1, sizeof(TILE_DATA), map->w*map->h,f);
@@ -192,6 +238,7 @@ int load_edit_map(MAP_DATA* map, char *file)
 	// The first time this is called, new_map() will have already allocated memory
 	// On subsequent calls (map transitions), we need to free the old memory first
 	if(map->light != NULL) {
+		fprintf(stderr, "DEBUG: Freeing old map->object at %p (%d objects)\n", (void*)map->object, map->num_of_objects);
 		for(i=0;i<map->num_of_lights;i++) {
 			destroy_bitmap(lightmap_data[i]);
 			lightmap_data[i] = NULL;  // Prevent double-free on exit
@@ -211,9 +258,21 @@ int load_edit_map(MAP_DATA* map, char *file)
 	}
 
 	
+
+	// Convert Windows path separators to Unix (from backup maps)
+	char fixed_path[256];
+	strncpy(fixed_path, file, sizeof(fixed_path) - 1);
+	fixed_path[sizeof(fixed_path) - 1] = '\0';
+	for(char *p = fixed_path; *p; p++) {
+		if(*p == '\\') *p = '/';
+	}
 	
-	f = fopen(file, "rb");
-	if(f==NULL){sprintf(fiend_errorcode,"couldn't load %s",map);return 0;}
+	f = fopen(fixed_path, "rb");
+	if(f==NULL){
+		fprintf(stderr, "ERROR: Could not open map file '%s' (original: '%s')\n", fixed_path, file);
+		sprintf(fiend_errorcode,"couldn't load %s",file);
+		return 0;
+	}
 
 	// IMPORTANT: The map files were created on a 32-bit system where pointers are 4 bytes.
 	// On 64-bit systems, pointers are 8 bytes, causing struct layout mismatch.
@@ -261,6 +320,18 @@ int load_edit_map(MAP_DATA* map, char *file)
 	fseek(f, 4, SEEK_CUR); // Skip 32-bit pointer (trigger)
 	
 	fread(temp_map->var, sizeof(VARIABLE_DATA), LOCAL_VAR_NUM, f);  // var array
+	
+	// DEBUG: Show local variables loaded from map file
+	fprintf(stderr, "\n========== LOADED LOCAL VARS FROM MAP FILE ==========\n");
+	for(i=0; i<LOCAL_VAR_NUM; i++)
+	{
+		if(strcmp(temp_map->var[i].name, "null") != 0)
+		{
+			fprintf(stderr, "Var[%d]: name='%s' value=%d\n", 
+				i, temp_map->var[i].name, temp_map->var[i].value);
+		}
+	}
+	fprintf(stderr, "=====================================================\n\n");
 	
 	fread(&temp_map->num_of_path_nodes, sizeof(int), 1, f);
 	fread(temp_map->path_node, sizeof(PATH_NODE), MAX_PATHNODE_NUM, f);  // path_node array
@@ -318,12 +389,14 @@ int load_edit_map(MAP_DATA* map, char *file)
 	}
 	
 	// Allocate memory for the new map data
+	fprintf(stderr, "DEBUG: Allocating new map arrays for %d objects\n", map->num_of_objects);
 	map->light = calloc(sizeof(LIGHT_DATA), map->num_of_lights);
 	map->layer1 = calloc(sizeof(TILE_DATA), map->w*map->h);
 	map->layer2 = calloc(sizeof(TILE_DATA), map->w*map->h);
 	map->layer3 = calloc(sizeof(TILE_DATA), map->w*map->h);
 	map->shadow = calloc(sizeof(char), map->w*map->h);
 	map->object = calloc(sizeof(OBJECT_DATA), map->num_of_objects);
+	fprintf(stderr, "DEBUG: New map->object allocated at %p\n", (void*)map->object);
 	map->area = calloc(sizeof(AREA_DATA), map->num_of_areas);
 	map->look_at_area = calloc(sizeof(LOOK_AT_AREA_DATA), map->num_of_look_at_areas);
 	map->link = calloc(sizeof(LINK_DATA), map->num_of_links);

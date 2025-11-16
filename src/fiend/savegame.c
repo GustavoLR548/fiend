@@ -73,6 +73,23 @@ int save_game(char *file, char* name)
 	time_t date;
 	int i;
 	
+	// DEBUG: Print saved map states before saving
+	fprintf(stderr, "DEBUG: save_game() - About to save game\n");
+	fprintf(stderr, "  Current map: %s\n", map->name);
+	fprintf(stderr, "  saved_object_num=%d (before save_local_vars)\n", saved_object_num);
+	for(i = 0; i < saved_object_num; i++) {
+		fprintf(stderr, "    saved_object[%d].name='%s'\n", i, saved_object[i].name);
+	}
+	
+	// CRITICAL FIX: Save the current map state before writing to disk
+	// Without this, the map you're currently on won't be saved!
+	save_local_vars();
+	
+	fprintf(stderr, "  saved_object_num=%d (after save_local_vars)\n", saved_object_num);
+	for(i = 0; i < saved_object_num; i++) {
+		fprintf(stderr, "    saved_object[%d].name='%s'\n", i, saved_object[i].name);
+	}
+	
 	pause_fiend_music();
 
 	// Create save directory if it doesn't exist
@@ -258,8 +275,17 @@ int load_game(char *file)
 	
 	free(temp_map);
 
+	fprintf(stderr, "Loading saved objects: %d objects\n", map->num_of_objects);
 	fread(map->light, sizeof(LIGHT_DATA), map->num_of_lights, f);		
 	fread(map->object, sizeof(OBJECT_DATA),map->num_of_objects, f);
+	fprintf(stderr, "Loaded objects from save file\n");
+	
+	// Debug: print first few objects
+	for(i=0; i<map->num_of_objects && i<5; i++) {
+		fprintf(stderr, "  Object[%d]: type=%d name='%s' energy=%d\n", 
+			i, map->object[i].type, map->object[i].name, map->object[i].energy);
+	}
+	
 	fread(map->area, sizeof(AREA_DATA),map->num_of_areas, f);
 	fread(map->link, sizeof(LINK_DATA),map->num_of_links, f);
 	fread(map->soundemitor, sizeof(SOUNDEMITOR_DATA),map->num_of_soundemitors, f);

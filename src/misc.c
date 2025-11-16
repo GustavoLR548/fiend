@@ -283,14 +283,26 @@ void update_beams(void)
 	int i;
 	int type;
 
+	if (!particle_info) {
+		fprintf(stderr, "ERROR: particle_info is NULL in update_beams!\n");
+		return;
+	}
+
 	for(i=0;i<BEAM_NUM;i++)
 		if(beam[i].used)
 		{
+			type = beam[i].type;
+			
+			// Bounds check
+			if (type < 0 || type >= num_of_particles) {
+				fprintf(stderr, "ERROR: Invalid beam type %d in update_beams (num_of_particles=%d), marking unused\n", type, num_of_particles);
+				beam[i].used = 0;
+				continue;
+			}
+			
 			beam[i].next_frame++;
 			if(beam[i].next_frame>=ANIM_SPEED)
 			{
-				type = beam[i].type;
-
 				beam[i].next_frame =0;
 				beam[i].frame++;
 				
@@ -387,10 +399,22 @@ void draw_beams(void)
 	int type;
 	int pic_num;
 
+	if (!particle_info) {
+		fprintf(stderr, "ERROR: particle_info is NULL in draw_beams!\n");
+		return;
+	}
+
 	for(i=0;i<BEAM_NUM;i++)
 		if(beam[i].used)
 		{
 			type = beam[i].type;
+			
+			// Bounds check
+			if (type < 0 || type >= num_of_particles) {
+				fprintf(stderr, "ERROR: Invalid beam type %d (num_of_particles=%d)\n", type, num_of_particles);
+				continue;
+			}
+			
 			pic_num = particle_info[type].anim_frame[beam[i].frame];
 
 			draw_fiend_beam(virt, particle_info[type].pic[pic_num].dat,beam[i].x1-map_x, beam[i].y1-map_y,beam[i].x2-map_x, beam[i].y2-map_y); 			

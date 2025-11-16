@@ -367,6 +367,24 @@ void check_triggers(int type)
 			condition_used_something=0;
 			condition_item_something=0;
 			
+			// DEBUG: Log trigger checking (including Death trigger)
+			if(type>0 && (strcmp(map->trigger[i].name, "Shot 1") == 0 || 
+			              strcmp(map->trigger[i].name, "Shot 2") == 0 || 
+			              strcmp(map->trigger[i].name, "Scream") == 0 ||
+			              strcmp(map->trigger[i].name, "Death") == 0))
+			{
+				fprintf(stderr, "DEBUG: Checking trigger '%s' (type=%d, active=%d)\n", 
+				        map->trigger[i].name, map->trigger[i].type, map->trigger[i].active);
+				fprintf(stderr, "  Trigger has %d conditions:\n", MAX_CONDITION_NUM);
+				for(int k=0; k<MAX_CONDITION_NUM; k++)
+				{
+					if(map->trigger[i].condition[k].used)
+					{
+						fprintf(stderr, "    Condition[%d]: type=%d, used=1\n", 
+						        k, map->trigger[i].condition[k].type);
+					}
+				}
+			}
 				
 			// BEGIN --check the condition			
 			for(j=0;j<MAX_CONDITION_NUM;j++)
@@ -374,6 +392,16 @@ void check_triggers(int type)
 				if(map->trigger[i].condition[j].used)
 				{
 					v = check_cond(i,j,0);
+					
+				// DEBUG: Log condition results
+				if(type>0 && (strcmp(map->trigger[i].name, "Shot 1") == 0 || 
+				              strcmp(map->trigger[i].name, "Shot 2") == 0 || 
+				              strcmp(map->trigger[i].name, "Scream") == 0 ||
+				              strcmp(map->trigger[i].name, "Death") == 0))
+				{
+						fprintf(stderr, "  Condition[%d]: result=%d\n", j, v);
+					}
+					
 					if(v>0)
 						condition_true=1;
 					else if(v==0)
@@ -388,10 +416,37 @@ void check_triggers(int type)
 
 				}
 			}
-			if(!condition_true)continue;
+			if(!condition_true)
+			{
+				// DEBUG: Log when trigger is skipped
+				if(type>0 && (strcmp(map->trigger[i].name, "Shot 1") == 0 || 
+				              strcmp(map->trigger[i].name, "Shot 2") == 0 || 
+				              strcmp(map->trigger[i].name, "Scream") == 0))
+				{
+					fprintf(stderr, "  Trigger SKIPPED - no conditions were true\n");
+				}
+				continue;
+			}
 			//END --check the condition
 
 			
+			// DEBUG: Log when events are about to execute
+			if(type>0 && (strcmp(map->trigger[i].name, "Shot 1") == 0 || 
+			              strcmp(map->trigger[i].name, "Shot 2") == 0 || 
+			              strcmp(map->trigger[i].name, "Scream") == 0 ||
+			              strcmp(map->trigger[i].name, "Death") == 0))
+			{
+				fprintf(stderr, "  Trigger EXECUTING - conditions passed!\n");
+				fprintf(stderr, "  Checking %d events:\n", MAX_EVENT_NUM);
+				for(int k=0; k<MAX_EVENT_NUM; k++)
+				{
+					if(map->trigger[i].event[k].used)
+					{
+						fprintf(stderr, "    Event[%d]: type=%d, used=1, x='%s', string1='%s'\n", 
+						        k, map->trigger[i].event[k].type, map->trigger[i].event[k].x, map->trigger[i].event[k].string1);
+					}
+				}
+			}
 			
 			//BEGIN --make the events
 			for(j=0;j<MAX_EVENT_NUM;j++)
@@ -411,7 +466,18 @@ void check_triggers(int type)
 			//END --making events
 
 			//Make trigger not functional if it is check once or check startup type....
-			if(map->trigger[i].type<2)map->trigger[i].active=0;
+			if(map->trigger[i].type<2)
+			{
+				// DEBUG: Log trigger deactivation
+				if(strcmp(map->trigger[i].name, "Shot 1") == 0 || 
+				   strcmp(map->trigger[i].name, "Shot 2") == 0 || 
+				   strcmp(map->trigger[i].name, "Scream") == 0)
+				{
+					fprintf(stderr, "  Trigger '%s' DEACTIVATED (type=%d)\n", 
+					        map->trigger[i].name, map->trigger[i].type);
+				}
+				map->trigger[i].active=0;
+			}
 			
 						
 			//Check if something has been used. If so nothing can be used

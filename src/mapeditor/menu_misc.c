@@ -1,10 +1,15 @@
 #include <allegro.h>
 #include <stdio.h>
+#include <string.h>
 #include "../fiend.h"
 #include "mapedit.h"
+#include "batch_util.h"
 
 
 static char temp_string[100];
+static char batch_folder[256] = "maps/";
+static char batch_old_ext[40] = ".it";
+static char batch_new_ext[40] = ".wav";
 
 //JUst show some stuff
 int misc_about_proc(void)
@@ -350,4 +355,62 @@ int edit_global_items_proc(void)
  
  return D_REDRAW;
 
+}
+
+
+///////////////////////////////////////////
+/////// Batch Music Extension Utility /////
+///////////////////////////////////////////
+
+int batch_music_ext_proc(void)
+{
+	DIALOG temp_dialog[] =
+	{
+		/* (dialog proc)     (x)   (y)   (w)   (h)   (fg)  (bg)  (key) (flags)  (d1)  (d2)         (dp) */
+		{d_shadow_box_proc, 200, 150,  400, 230,  FG_COLOR,   BG_COLOR,     0,     0,     0,     0,     NULL},
+		{d_text_proc,       210, 165,  380,  20,  FG_COLOR,   BG_COLOR,     0,     0,     0,     0,  "Batch Replace Music Extensions"},
+		{d_text_proc,       210, 195,  100,  20,  FG_COLOR,   BG_COLOR,     0,     0,     0,     0,  "Folder:"},
+		{d_edit_proc,       280, 195,  300,  20,  FG_COLOR,   BG_COLOR,     0,     0,     255,   0,  batch_folder},
+		{d_text_proc,       210, 225,  100,  20,  FG_COLOR,   BG_COLOR,     0,     0,     0,     0,  "Old Extension:"},
+		{d_edit_proc,       320, 225,  100,  20,  FG_COLOR,   BG_COLOR,     0,     0,     39,    0,  batch_old_ext},
+		{d_text_proc,       210, 255,  100,  20,  FG_COLOR,   BG_COLOR,     0,     0,     0,     0,  "New Extension:"},
+		{d_edit_proc,       320, 255,  100,  20,  FG_COLOR,   BG_COLOR,     0,     0,     39,    0,  batch_new_ext},
+		{d_text_proc,       210, 290,  380,  10,  FG_COLOR,   BG_COLOR,     0,     0,     0,     0,  "This will recursively search for .map files and"},
+		{d_text_proc,       210, 300,  380,  10,  FG_COLOR,   BG_COLOR,     0,     0,     0,     0,  "replace extensions in EVENT_PLAY_MUSIC triggers."},
+		{d_button_proc,     280, 345,  80,  20,  FG_COLOR,   BG_COLOR,     '\r',  D_EXIT,     0,     0,  "Process"},
+		{d_button_proc,     370, 345,  80,  20,  FG_COLOR,   BG_COLOR,     27,    D_EXIT,     0,     0,  "Cancel"},
+		{NULL,              0,   0,    0,     0,    0,    0,     0,     0,     0,    0,    NULL}
+	};
+	
+	int result = popup_dialog(temp_dialog, -1);
+	
+	// If user clicked "Process" (button at index 9)
+	if (result == 9) {
+		// Validate inputs
+		if (strlen(batch_folder) == 0) {
+			alert("Error", "Please specify a folder", NULL, "OK", NULL, 0, 0);
+			return D_REDRAW;
+		}
+		if (strlen(batch_old_ext) == 0 || strlen(batch_new_ext) == 0) {
+			alert("Error", "Please specify both extensions", NULL, "OK", NULL, 0, 0);
+			return D_REDRAW;
+		}
+		
+		// Show confirmation
+		char confirm_msg[256];
+		sprintf(confirm_msg, "Replace '%s' with '%s' in folder '%s'?", 
+		        batch_old_ext, batch_new_ext, batch_folder);
+		int confirm = alert(confirm_msg, "This will modify map files!", NULL, "Continue", "Cancel", 0, 0);
+		
+		if (confirm == 1) {
+			// Run the batch operation
+			if (batch_replace_music_extension(batch_folder, batch_old_ext, batch_new_ext)) {
+				alert("Success", "Batch replacement complete!", "Check console for details", "OK", NULL, 0, 0);
+			} else {
+				alert("Error", "Batch replacement failed!", "Check console for details", "OK", NULL, 0, 0);
+			}
+		}
+	}
+	
+	return D_REDRAW;
 }

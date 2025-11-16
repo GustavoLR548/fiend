@@ -23,6 +23,7 @@ set(MAPEDITOR_SOURCES
     menu_file.c
     menu_misc.c
     menu_options.c
+    batch_util.c
 )
 
 # Common source files from parent directory

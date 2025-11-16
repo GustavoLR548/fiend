@@ -30,9 +30,19 @@ int check_logic(int n1, int n2, int type)
 	{
 		if(n1>n2)return 1;
 	}
-	else
+	else if(type==2)
 	{
-		if(n1<n2)return 1;
+		// BUGFIX: type==2 should be <= for decrementing timers
+		// The intro sound triggers use logic=2 to check if timer has decremented to threshold
+		if(n1<=n2)return 1;
+	}
+	else if(type==3)
+	{
+		if(n1>=n2)return 1;
+	}
+	else if(type==4)
+	{
+		if(n1<=n2)return 1;
 	}
 
 	return 0;
@@ -62,6 +72,16 @@ int check_cond(int t_num,int c_num ,int global)
 		logic = map->trigger[t_num].condition[c_num].logic;
 		strcpy(string1, map->trigger[t_num].condition[c_num].string1);
 		strcpy(string2, map->trigger[t_num].condition[c_num].string2);
+		
+		// DEBUG: Log condition details for sound triggers
+		if(strcmp(map->trigger[t_num].name, "Shot 1") == 0 || 
+		   strcmp(map->trigger[t_num].name, "Shot 2") == 0 || 
+		   strcmp(map->trigger[t_num].name, "Scream") == 0 ||
+		   strcmp(map->trigger[t_num].name, "Death") == 0)
+		{
+			fprintf(stderr, "    check_cond: type=%d, x=%d, true_state=%d, string1='%s'\n", 
+			        type, x, true_state, string1);
+		}
 	}
 	else
 	{
@@ -289,6 +309,21 @@ int check_cond(int t_num,int c_num ,int global)
 		for(i=0;i<player.num_of_items;i++)
 			if(player.item_space[i].item>-1)
 				if(strcmp(item_data[player.item_space[i].item].name, string1)==0)num = i;
+		
+		// DEBUG: Log item check results
+		if(!global && (strcmp(map->trigger[t_num].name, "Shot 1") == 0 || 
+		               strcmp(map->trigger[t_num].name, "Shot 2") == 0 || 
+		               strcmp(map->trigger[t_num].name, "Scream") == 0))
+		{
+			fprintf(stderr, "      COND_HAS_ITEM: looking for item '%s', found=%d, player has %d items\n", 
+			        string1, (num != -1), player.num_of_items);
+			for(i=0; i<player.num_of_items; i++)
+			{
+				if(player.item_space[i].item>-1)
+					fprintf(stderr, "        player item[%d]: '%s'\n", 
+					        i, item_data[player.item_space[i].item].name);
+			}
+		}
 			
 		if(num!=-1)
 		{
@@ -549,8 +584,23 @@ int check_cond(int t_num,int c_num ,int global)
 	{
 		num = get_local_var_num(string1);
 		if(num<0){
+			// DEBUG: Variable not found
+			if(!global && (strcmp(map->trigger[t_num].name, "Shot 1") == 0 || 
+			               strcmp(map->trigger[t_num].name, "Shot 2") == 0 || 
+			               strcmp(map->trigger[t_num].name, "Scream") == 0))
+			{
+				fprintf(stderr, "      COND_LOCAL_VAR: variable '%s' NOT FOUND (num=%d)\n", string1, num);
+			}
 			return -1;}
 		
+		// DEBUG: Log variable check
+		if(!global && (strcmp(map->trigger[t_num].name, "Shot 1") == 0 || 
+		               strcmp(map->trigger[t_num].name, "Shot 2") == 0 || 
+		               strcmp(map->trigger[t_num].name, "Scream") == 0))
+		{
+			fprintf(stderr, "      COND_LOCAL_VAR: '%s' = %d, checking if >= %d, logic=%d\n", 
+			        string1, map->var[num].value, x, logic);
+		}
 
 		if(check_logic(map->var[num].value,x,logic))
 		{
@@ -570,6 +620,15 @@ int check_cond(int t_num,int c_num ,int global)
 	if(type==COND_ITEM_PICKED)
 	{
 		z = get_item_num(string1);
+		
+		// DEBUG: Log item picked check
+		if(!global && (strcmp(map->trigger[t_num].name, "Shot 1") == 0 || 
+		               strcmp(map->trigger[t_num].name, "Shot 2") == 0 || 
+		               strcmp(map->trigger[t_num].name, "Scream") == 0))
+		{
+			fprintf(stderr, "      COND_ITEM_PICKED: looking for item '%s' (index=%d), picked_up=%d\n", 
+			        string1, z, (z >= 0 ? item_data[z].picked_up : -1));
+		}
 		
 		if(item_data[z].picked_up)
 		{

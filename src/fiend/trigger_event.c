@@ -970,15 +970,26 @@ int check_sound_events(void)
 {
 	if(type==EVENT_PLAY_SOUND)
 	{
+		fprintf(stderr, "DEBUG: EVENT_PLAY_SOUND trigger fired!\n");
+		fprintf(stderr, "  string1 (sound name): '%s'\n", string1);
+		fprintf(stderr, "  string2 (area name): '%s'\n", string2);
+		fprintf(stderr, "  x (loop): %d\n", x);
+		
 		if(strcmp(string2,"null")==0 || strcmp(string2,"none")==0)
 			num=-1;
 		else
 			num = get_area_num(string2);
 
 		if(num==-1)
+		{
+			fprintf(stderr, "  Playing sound at position (0,0) - no area\n");
 			play_fiend_sound(string1,0,0,0,x,210);
+		}
 		else
+		{
+			fprintf(stderr, "  Playing sound at area position (%d,%d)\n", map->area[num].x, map->area[num].y);
 			play_fiend_sound(string1,map->area[num].x,map->area[num].y,1,x,210);
+		}
 
 		return 1;
 	}
@@ -1045,6 +1056,13 @@ int check_var_events(void)
 	{
 		num = get_local_var_num(string1);
 		if(num<0)return -1;
+
+		// DEBUG: Log timer variable changes
+		if(strcmp(string1, "timer") == 0)
+		{
+			fprintf(stderr, "DEBUG EVENT_LOCAL_VAR_ADD: '%s' %d += %d (will become %d)\n",
+			        string1, map->var[num].value, x, map->var[num].value + x);
+		}
 
 		map->var[num].value += x;
 		return 1;

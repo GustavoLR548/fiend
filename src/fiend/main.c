@@ -12,9 +12,9 @@
 #include "../console.h"
 
 
-
-char map_file[80] = "maps/lauder_dead/lauder.map";
-//char map_file[80] = "maps/lauder_alive/lauder.map";
+// Quick check if sounds are being loaded correctly
+//char map_file[80] = "maps/lauder_dead/lauder.map";
+char map_file[80] = "maps/lauder_alive/lauder.map";
 
 //some variables
 int game_ended=0;
@@ -189,6 +189,11 @@ void the_game(void)
 		else if(ans == 3)load_game("save/save3.sav");
 		else if(ans == 4)load_game("save/save4.sav");
 		else if(ans == 5)load_game("save/save5.sav");
+		
+		// Reset transient effects that aren't saved
+		reset_beams();
+		reset_particles();
+		reset_effects();
 	}
 	
 	// Reset screen fade flag after loading
