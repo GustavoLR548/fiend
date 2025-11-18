@@ -70,8 +70,15 @@ BMP_ARRAY* load_bmp_array(char *dir_tmp,int item_num)
 		i= for_each_file/*_ex*/(file_path,FA_ALL/*,0*/,find_one_file,0);
 		log_info("for_each_file returned: %d (expected 1)", i);
 
-		if(i!=1){allegro_message("couldn't load %s",file_path);exit(-1);}
+		// Check if bitmap was actually loaded instead of relying on return value
+		if(temp_bmp_data[0].dat == NULL)
+		{
+			log_error("Failed to load bitmap from: %s", file_path);
+			allegro_message("couldn't load %s",file_path);
+			exit(-1);
+		}
 		
+		log_info("Successfully loaded bitmap from pattern: %s", file_path);
 		temp_bmp_data[0].num = item_num;
 	}
 	else if(item_num==-1)
@@ -203,7 +210,12 @@ RLE_ARRAY* load_rle_array(char *dir_tmp,int item_num)
 		sprintf(file_path,"%s*.bmp",dir);
 		i= for_each_file/*_ex*/(file_path,FA_ARCH/*,0*/,find_one_rle_file,0);
 
-		if(i!=1){allegro_message("couldn't load %s",file_path);exit(-1);}
+		// Check if RLE sprite was actually loaded instead of relying on return value
+		if(temp_rle_data[0].dat == NULL)
+		{
+			allegro_message("couldn't load %s",file_path);
+			exit(-1);
+		}
 		
 		temp_rle_data[0].num = item_num;
 	}

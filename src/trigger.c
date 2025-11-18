@@ -85,7 +85,8 @@ int load_message_faces(void)
 
 	i= for_each_file/*_ex*/("graphic/faces/*.bmp",FA_ARCH/*,0*/,get_one_face,0);
 
-	if(face_load_error || i<1)
+	// Check if any faces were actually loaded instead of relying on return value
+	if(face_load_error || num_of_message_faces < 1)
 	{
 		strcpy(fiend_errorcode,"couldn't load graphic/faces/*.bmp");
 		return 1;
