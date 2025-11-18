@@ -36,6 +36,7 @@ static char* find_first_file(const char *pattern)
 	static char result_path[512];
 	char dir_part[512];
 	char *last_sep;
+	int find_result;
 	
 	/* Extract directory part from pattern */
 	strcpy(dir_part, pattern);
@@ -49,9 +50,27 @@ static char* find_first_file(const char *pattern)
 	}
 	
 	log_info("Searching for files matching: %s", pattern);
+	log_info("Directory part: '%s'", dir_part);
 	
-	if(al_findfirst(pattern, &file_info, FA_ARCH) != 0) {
-		log_error("No files found matching pattern: %s", pattern);
+	/* Try with FA_ALL to match all file types */
+	find_result = al_findfirst(pattern, &file_info, FA_ALL);
+	
+	if(find_result != 0) {
+		log_error("No files found matching pattern: %s (error code: %d)", pattern, find_result);
+		
+		/* Try listing directory to see what's there */
+		char debug_pattern[512];
+		strcpy(debug_pattern, dir_part);
+		strcat(debug_pattern, "*.*");
+		log_info("Trying to list directory with: %s", debug_pattern);
+		
+		if(al_findfirst(debug_pattern, &file_info, FA_ALL) == 0) {
+			log_info("Directory exists, first file: %s", file_info.name);
+			al_findclose(&file_info);
+		} else {
+			log_error("Directory doesn't exist or is empty: %s", dir_part);
+		}
+		
 		return NULL;
 	}
 	
