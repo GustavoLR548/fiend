@@ -9,43 +9,34 @@
 #include "path_utils.h"
 
 /* ensure_trailing_slash:
- * Ensures the path ends with the platform-appropriate path separator.
+ * Ensures the path ends with a forward slash.
+ * Forward slashes work on all platforms including Windows with Allegro.
  */
 void ensure_trailing_slash(char *path)
 {
 	size_t len = strlen(path);
 	if (len > 0 && path[len - 1] != '/' && path[len - 1] != '\\') {
-		/* Use strncat for safety - ensures null termination */
-		strncat(path, PATH_SEP_STR, 1);
+		/* Always use forward slash for compatibility */
+		strcat(path, "/");
 	}
-	/* If path ends with wrong separator, replace it */
-	else if (len > 0) {
-		if (path[len - 1] == '/' && PATH_SEP == '\\') {
-			path[len - 1] = '\\\\';
-		} else if (path[len - 1] == '\\' && PATH_SEP == '/') {
-			path[len - 1] = '/';
-		}
+	/* If path ends with backslash, replace it with forward slash */
+	else if (len > 0 && path[len - 1] == '\\') {
+		path[len - 1] = '/';
 	}
 }
 
 /* normalize_path:
- * Converts all path separators to the platform-appropriate separator.
+ * Converts all path separators to forward slashes.
+ * Forward slashes work on all platforms including Windows with Allegro.
  */
 void normalize_path(char *path)
 {
 	char *p = path;
 	while (*p) {
-#ifdef _WIN32
-		/* On Windows, convert forward slashes to backslashes */
-		if (*p == '/') {
-			*p = '\\';
-		}
-#else
-		/* On Unix, convert backslashes to forward slashes */
+		/* Always convert to forward slashes - Allegro handles them on all platforms */
 		if (*p == '\\') {
 			*p = '/';
 		}
-#endif
 		p++;
 	}
 }
