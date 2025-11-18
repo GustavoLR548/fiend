@@ -65,9 +65,14 @@ static char* find_first_file(const char *pattern)
 		log_info("Removed trailing slash, directory: '%s'", search_pattern);
 	}
 	
-	strcat(search_pattern, "\\*.*");
+	/* Try with forward slashes - sometimes Windows al_findfirst prefers them */
+	for(int i = 0; search_pattern[i]; i++) {
+		if(search_pattern[i] == '\\') search_pattern[i] = '/';
+	}
 	
-	log_info("Using search pattern: %s", search_pattern);
+	strcat(search_pattern, "/*.*");
+	
+	log_info("Using search pattern (converted to forward slashes): %s", search_pattern);
 	find_result = al_findfirst(search_pattern, &file_info, FA_ALL);
 	
 	if(find_result != 0) {
