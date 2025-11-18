@@ -35,6 +35,7 @@ static char* find_first_file(const char *pattern)
 	struct al_ffblk file_info;
 	static char result_path[512];
 	char dir_part[512];
+	char search_pattern[512];
 	char *last_sep;
 	int find_result;
 	
@@ -52,34 +53,37 @@ static char* find_first_file(const char *pattern)
 	log_info("Searching for files matching: %s", pattern);
 	log_info("Directory part: '%s'", dir_part);
 	
-	/* Try with FA_ALL to match all file types */
-	find_result = al_findfirst(pattern, &file_info, FA_ALL);
+	/* On Windows, al_findfirst with *.bmp wildcards is unreliable
+	 * Use *.* and filter for .bmp files manually */
+	strcpy(search_pattern, dir_part);
+	strcat(search_pattern, "*.*");
+	
+	log_info("Using search pattern: %s", search_pattern);
+	find_result = al_findfirst(search_pattern, &file_info, FA_ALL);
 	
 	if(find_result != 0) {
-		log_error("No files found matching pattern: %s (error code: %d)", pattern, find_result);
-		
-		/* Try listing directory to see what's there */
-		char debug_pattern[512];
-		strcpy(debug_pattern, dir_part);
-		strcat(debug_pattern, "*.*");
-		log_info("Trying to list directory with: %s", debug_pattern);
-		
-		if(al_findfirst(debug_pattern, &file_info, FA_ALL) == 0) {
-			log_info("Directory exists, first file: %s", file_info.name);
-			al_findclose(&file_info);
-		} else {
-			log_error("Directory doesn't exist or is empty: %s", dir_part);
-		}
-		
+		log_error("No files found in directory: %s (error code: %d)", dir_part, find_result);
 		return NULL;
 	}
 	
-	/* Build full path */
-	sprintf(result_path, "%s%s", dir_part, file_info.name);
-	log_info("Found file: %s", result_path);
+	/* Iterate through files looking for first .bmp file */
+	do {
+		char *ext = get_extension(file_info.name);
+		log_info("Checking file: %s (extension: %s)", file_info.name, ext ? ext : "none");
+		
+		if(ext && (strcmp(ext, "bmp") == 0 || strcmp(ext, "BMP") == 0)) {
+			/* Found a BMP file! */
+			sprintf(result_path, "%s%s", dir_part, file_info.name);
+			log_info("Found matching BMP file: %s", result_path);
+			al_findclose(&file_info);
+			return result_path;
+		}
+	} while(al_findnext(&file_info) == 0);
 	
+	/* No BMP files found */
+	log_error("No .bmp files found in directory: %s", dir_part);
 	al_findclose(&file_info);
-	return result_path;
+	return NULL;
 }
  
 static /*int*/ void find_one_file(const char *file,int attr,/*void **/int param)
