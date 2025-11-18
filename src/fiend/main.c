@@ -258,22 +258,21 @@ void main(int argc, char *argv[])
 		log_info("Fiend starting up...");
 	}
 	
-	// Log current working directory
-	if (getcwd(cwd, sizeof(cwd)) != NULL) {
-		log_info("Current working directory: %s", cwd);
+	BITMAP *test_bmp = load_bitmap("graphic/tiles/default/000.bmp", NULL);
+	if (test_bmp) {
+		log_info("  SUCCESS: Loaded with forward slashes!");
+		destroy_bitmap(test_bmp);
 	} else {
-		log_error("Failed to get current working directory");
+		log_info("  FAILED: Could not load with forward slashes");
 	}
-	
-	// Test file existence with relative and absolute paths
-	log_info("Testing file existence...");
-	log_info("  exists('graphic\\tiles\\default\\000.bmp') = %d", exists("graphic\\tiles\\default\\000.bmp"));
-	log_info("  exists('graphic/tiles/default/000.bmp') = %d", exists("graphic/tiles/default/000.bmp"));
-	
-	// Build absolute path for testing
-	char abs_path[768];
-	sprintf(abs_path, "%s\\graphic\\tiles\\default\\000.bmp", cwd);
-	log_info("  exists('%s') = %d", abs_path, exists(abs_path));
+
+	test_bmp = load_bitmap("graphic\\tiles\\default\\000.bmp", NULL);
+	if (test_bmp) {
+		log_info("  SUCCESS: Loaded with backslashes!");
+		destroy_bitmap(test_bmp);
+	} else {
+		log_info("  FAILED: Could not load with backslashes");
+	}
 
 	install_mouse();
     install_keyboard();
