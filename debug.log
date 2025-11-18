@@ -1,0 +1,22 @@
+[INFO] Fiend starting up...
+[DEBUG] Initializing Fiend engine...
+[DEBUG] Graphics driver: 2
+[DEBUG] Color depth: 16
+[INFO] Graphics initialized: 640x480 at 16-bit color
+[INFO] miniaudio engine initialized successfully
+[INFO] Audio initialized successfully
+[INFO] Loading font: graphic/fonts/small1.dat
+[INFO] Font loaded successfully
+[INFO] load_bmp_array: Original dir='graphic\characters\nick', Normalized dir='graphic\characters\nick\', item_num=23
+[INFO] load_bmp_array: Original dir='graphic\characters\george', Normalized dir='graphic\characters\george\', item_num=7
+[INFO] load_bmp_array: Original dir='graphic\characters\farmer_m1', Normalized dir='graphic\characters\farmer_m1\', item_num=3
+[INFO] load_bmp_array: Original dir='graphic\characters\farmer_m2', Normalized dir='graphic\characters\farmer_m2\', item_num=3
+[INFO] load_bmp_array: Original dir='graphic\characters\farmer_f1', Normalized dir='graphic\characters\farmer_f1\', item_num=3
+[INFO] load_bmp_array: Original dir='graphic\characters\farmer_f2', Normalized dir='graphic\characters\farmer_f2\', item_num=3
+[INFO] load_bmp_array: Original dir='graphic\enemies\wolf', Normalized dir='graphic\enemies\wolf\', item_num=11
+[INFO] load_bmp_array: Original dir='graphic\enemies\rat', Normalized dir='graphic\enemies\rat\', item_num=8
+[INFO] load_bmp_array: Original dir='graphic\enemies\ghoul', Normalized dir='graphic\enemies\ghoul\', item_num=11
+[INFO] load_bmp_array: Original dir='graphic\enemies\joseph', Normalized dir='graphic\enemies\joseph\', item_num=17
+[INFO] load_bmp_array: Original dir='graphic\enemies\shoggoth', Normalized dir='graphic\enemies\shoggoth\', item_num=4
+[INFO] load_bmp_array: Original dir='graphic\objects\house\chair1', Normalized dir='graphic\objects\house\chair1\', item_num=1
+[INFO] Loading bitmap array from: graphic\objects\house\chair1\*.bmp
