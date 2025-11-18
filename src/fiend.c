@@ -125,8 +125,10 @@ int init_fiend2(void)
 	if(load_inventory_gfx())return CSLMSG_QUIT;
 	if(load_message_faces())return CSLMSG_QUIT;
 	
+	log_info("About to draw progress bar after face loading...");
 	//csl_textout(2,"Intializing data...");
 	rectfill(screen,30+80,420,345+80,460,makecol(160,20,10));
+	log_info("Progress bar drawn successfully");
 	//Init some data...
 	init_npc_data();
 	init_enemy_data();
