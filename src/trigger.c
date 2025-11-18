@@ -132,29 +132,34 @@ int load_message_faces(void)
 			return 1;
 		}
 		
-		/* Extract filename without path or extension */
-		/* Find last slash (works for both / and \) */
-		slash_pos = strrchr(file_path, '/');
-		if(slash_pos == NULL) {
-			slash_pos = strrchr(file_path, '\\');
-		}
-		
-		if(slash_pos != NULL) {
-			strcpy(name2, slash_pos + 1);
-		} else {
-			strcpy(name2, file_path);
-		}
-		
-		/* Remove extension */
-		dot_pos = strrchr(name2, '.');
-		if(dot_pos != NULL) {
-			*dot_pos = '\0';
-		}
-		
-		strcpy(message_face[num_of_message_faces].name, name2);
-		log_info("Loaded face '%s' successfully", name2);
-		
-		num_of_message_faces++;
+	/* Extract filename without path or extension */
+	/* Find last slash (works for both / and \) */
+	slash_pos = strrchr(file_path, '/');
+	if(slash_pos == NULL) {
+		slash_pos = strrchr(file_path, '\\');
+	}
+	
+	if(slash_pos != NULL) {
+		/* Use strncpy to prevent buffer overflow - name2 is only 40 bytes */
+		strncpy(name2, slash_pos + 1, sizeof(name2) - 1);
+		name2[sizeof(name2) - 1] = '\0';
+	} else {
+		strncpy(name2, file_path, sizeof(name2) - 1);
+		name2[sizeof(name2) - 1] = '\0';
+	}
+	
+	/* Remove extension */
+	dot_pos = strrchr(name2, '.');
+	if(dot_pos != NULL) {
+		*dot_pos = '\0';
+	}
+	
+	/* Use strncpy to prevent buffer overflow */
+	strncpy(message_face[num_of_message_faces].name, name2, sizeof(message_face[num_of_message_faces].name) - 1);
+	message_face[num_of_message_faces].name[sizeof(message_face[num_of_message_faces].name) - 1] = '\0';
+	log_info("Loaded face '%s' successfully", message_face[num_of_message_faces].name);
+	
+	num_of_message_faces++;
 	}
 	
 	fclose(list_file);
