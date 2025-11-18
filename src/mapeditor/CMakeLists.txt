@@ -65,11 +65,13 @@ target_link_libraries(mapeditor
     dl      # Required by miniaudio for dlopen
 )
 
-# Set RPATH using target_link_options (avoids shell escaping issues)
-target_link_options(mapeditor PRIVATE
-    "LINKER:--disable-new-dtags"
-    "LINKER:-rpath,$ORIGIN/lib"
-)
+# Set RPATH for Linux (not needed on Windows)
+if(UNIX AND NOT APPLE)
+    target_link_options(mapeditor PRIVATE
+        "LINKER:--disable-new-dtags"
+        "LINKER:-rpath,$ORIGIN/lib"
+    )
+endif()
 
 # Set output properties
 set_target_properties(mapeditor PROPERTIES
