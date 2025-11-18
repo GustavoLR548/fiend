@@ -209,7 +209,7 @@ def main():
     generate_tile_list(base_path, output_path)
     generate_particle_list(base_path, output_path)
     
-    print(f"\n✓ All resource lists generated in {output_path}")
+    print(f"\nAll resource lists generated successfully in {output_path}")
 
 
 if __name__ == "__main__":
