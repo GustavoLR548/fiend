@@ -82,42 +82,39 @@ static /*int*/ void get_one_face(const char *file,int attr,/*void **/int param)
 
 int load_message_faces(void)
 {
-	struct al_ffblk file_info;
+	FILE *list_file;
 	char file_path[512];
-	char *name;
+	char normalized_path[512];
 	char name2[40];
-	int i, k;
-	int find_result;
+	char *slash_pos;
+	char *dot_pos;
+	int i;
 	
-	log_info("Loading message faces from: graphic/faces/*.bmp");
+	log_info("Loading message faces from resource list");
 	
-	/* Use al_findfirst/al_findnext to iterate through all matching files */
-	#ifdef _WIN32
-		find_result = al_findfirst("graphic\\faces\\*.bmp", &file_info, FA_ARCH);
-	#else
-		find_result = al_findfirst("graphic/faces/*.bmp", &file_info, FA_ARCH);
-	#endif
-	
-	if(find_result != 0) {
-		log_error("No face files found in graphic/faces/");
-		strcpy(fiend_errorcode,"couldn't load graphic/faces/*.bmp");
+	/* Open the faces resource list */
+	list_file = fopen("data/resource_lists/faces.txt", "r");
+	if(list_file == NULL) {
+		log_error("Failed to open data/resource_lists/faces.txt");
+		strcpy(fiend_errorcode,"couldn't load face resource list");
 		return 1;
 	}
 	
-	do {
-		/* Skip . and .. entries if they appear */
-		if(strcmp(file_info.name, ".") == 0 || strcmp(file_info.name, "..") == 0) {
+	/* Read each line from the resource list */
+	while(fgets(file_path, sizeof(file_path), list_file) != NULL) {
+		/* Remove trailing newline */
+		file_path[strcspn(file_path, "\r\n")] = '\0';
+		
+		/* Skip empty lines */
+		if(strlen(file_path) == 0) {
 			continue;
 		}
 		
-		/* Build full path */
-		#ifdef _WIN32
-			sprintf(file_path, "graphic\\faces\\%s", file_info.name);
-		#else
-			sprintf(file_path, "graphic/faces/%s", file_info.name);
-		#endif
+		/* Normalize path for current platform */
+		strcpy(normalized_path, file_path);
+		normalize_path(normalized_path);
 		
-		log_info("Loading face: %s", file_path);
+		log_info("Loading face: %s", normalized_path);
 		
 		/* Check bounds before loading */
 		if(num_of_message_faces >= FACE_NUM) {
@@ -125,34 +122,42 @@ int load_message_faces(void)
 			break;
 		}
 		
-		message_face[num_of_message_faces].pic = load_bmp(file_path, NULL);
+		message_face[num_of_message_faces].pic = load_bmp(normalized_path, NULL);
 		
 		if(message_face[num_of_message_faces].pic == NULL) {
-			log_error("Failed to load face: %s", file_path);
+			log_error("Failed to load face: %s", normalized_path);
 			face_load_error = 1;
-			al_findclose(&file_info);
-			strcpy(fiend_errorcode,"couldn't load graphic/faces/*.bmp");
+			fclose(list_file);
+			strcpy(fiend_errorcode,"couldn't load face from resource list");
 			return 1;
 		}
 		
-		/* Extract filename without extension */
-		name = file_info.name;
-		strcpy(name2, name);
-		k = strlen(name2);
-		for(i=0; i<k; i++) {
-			if(name2[i] == '.') {
-				name2[i] = 0;
-				break;
-			}
+		/* Extract filename without path or extension */
+		/* Find last slash (works for both / and \) */
+		slash_pos = strrchr(file_path, '/');
+		if(slash_pos == NULL) {
+			slash_pos = strrchr(file_path, '\\');
 		}
+		
+		if(slash_pos != NULL) {
+			strcpy(name2, slash_pos + 1);
+		} else {
+			strcpy(name2, file_path);
+		}
+		
+		/* Remove extension */
+		dot_pos = strrchr(name2, '.');
+		if(dot_pos != NULL) {
+			*dot_pos = '\0';
+		}
+		
 		strcpy(message_face[num_of_message_faces].name, name2);
 		log_info("Loaded face '%s' successfully", name2);
 		
 		num_of_message_faces++;
-		
-	} while(al_findnext(&file_info) == 0);
+	}
 	
-	al_findclose(&file_info);
+	fclose(list_file);
 	
 	log_info("Loaded %d faces total", num_of_message_faces);
 	
