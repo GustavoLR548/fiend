@@ -9,29 +9,57 @@ import sys
 from pathlib import Path
 
 
+def to_relative_path(path, base_path):
+    """Return a relative path from base_path to path robustly across Windows/MSYS.
+
+    Uses os.path.relpath as primary method, but also handles cases where
+    path and base_path are expressed with different separators or drive
+    letters (common in MSYS/MinGW CI).
+    Returns a path using forward slashes.
+    """
+    # Convert to str and normalize separators
+    p = os.path.normpath(str(path))
+    b = os.path.normpath(str(base_path))
+
+    # On Windows, os.path.relpath handles drive letters; on POSIX it works too.
+    try:
+        rel = os.path.relpath(p, b)
+    except Exception:
+        # Fallback: if relpath fails, try to strip prefix case-insensitively
+        lp = p.lower()
+        lb = b.lower()
+        if lp.startswith(lb):
+            rel = p[len(b):].lstrip('/\\')
+        else:
+            # As a last resort, return the basename
+            rel = os.path.basename(p)
+
+    # Use forward slashes for consistency in resource lists
+    rel = rel.replace('\\', '/').replace(os.sep, '/')
+    return rel
+
+
 def scan_bmp_array_directory(base_path, rel_dir, output_file):
     """Scan a directory for BMP files and write the list to output file."""
-    full_dir = base_path / rel_dir
-    
+    # Accept rel_dir as either a Path or a relative string
+    full_dir = Path(base_path) / rel_dir
+
     if not full_dir.exists():
         print(f"Warning: Directory not found: {full_dir}")
         return 0
-    
+
     # Find all .bmp files
     bmp_files = sorted(full_dir.glob("*.bmp"))
-    
+
     if not bmp_files:
         print(f"Warning: No BMP files found in {full_dir}")
         return 0
-    
+
     # Write relative paths (with forward slashes for consistency)
     for bmp_file in bmp_files:
-        # Get relative path from base
-        rel_path = bmp_file.relative_to(base_path)
-        # Convert to forward slashes (will be normalized at runtime per platform)
-        path_str = str(rel_path).replace(os.sep, '/')
-        output_file.write(f"{path_str}\n")
-    
+        rel_path = to_relative_path(bmp_file, base_path)
+        output_file.write(f"{rel_path}\n")
+
     return len(bmp_files)
 
 

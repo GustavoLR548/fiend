@@ -107,18 +107,23 @@ endif()
 add_subdirectory(src/fiend)
 add_subdirectory(src/mapeditor)
 
-# Determine Python command (python3 on Unix, python on Windows)
-if(WIN32)
-    set(PYTHON_CMD python)
+# Find Python for resource list generation
+# On Windows with actions/setup-python, this finds the native Python
+# On Unix, this finds python3
+find_package(Python3 COMPONENTS Interpreter)
+if(NOT Python3_FOUND)
+    message(WARNING "Python 3 not found - resource lists will not be generated automatically")
+    set(PYTHON_EXECUTABLE "python3")
 else()
-    set(PYTHON_CMD python3)
+    set(PYTHON_EXECUTABLE "${Python3_EXECUTABLE}")
+    message(STATUS "Found Python: ${Python3_EXECUTABLE}")
 endif()
 
 # Generate resource list files before building
 add_custom_target(generate_resources ALL
     COMMAND ${CMAKE_COMMAND} -E echo "Generating resource list files..."
     COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/data/resource_lists"
-    COMMAND ${PYTHON_CMD} "${CMAKE_SOURCE_DIR}/tools/generate_resource_lists.py" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
+    COMMAND ${PYTHON_EXECUTABLE} "${CMAKE_SOURCE_DIR}/tools/generate_resource_lists.py" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
     COMMENT "Generating resource lists for faster asset loading"
     VERBATIM
