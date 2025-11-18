@@ -5,7 +5,7 @@
  */
 
 #define MINIAUDIO_IMPLEMENTATION
-#include "../vendor/miniaudio/miniaudio.h"
+#include "../external/miniaudio/miniaudio.h"
 #include "audio.h"
 #include "logger.h"
 #include <stdio.h>
