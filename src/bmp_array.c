@@ -54,9 +54,18 @@ static char* find_first_file(const char *pattern)
 	log_info("Directory part: '%s'", dir_part);
 	
 	/* On Windows, al_findfirst with *.bmp wildcards is unreliable
-	 * Use *.* and filter for .bmp files manually */
+	 * Use *.* and filter for .bmp files manually 
+	 * Also, on Windows, remove trailing slash/backslash before searching */
 	strcpy(search_pattern, dir_part);
-	strcat(search_pattern, "*.*");
+	
+	/* Remove trailing slash/backslash if present - Windows al_findfirst doesn't like it */
+	int len = strlen(search_pattern);
+	if(len > 0 && (search_pattern[len-1] == '\\' || search_pattern[len-1] == '/')) {
+		search_pattern[len-1] = '\0';
+		log_info("Removed trailing slash, directory: '%s'", search_pattern);
+	}
+	
+	strcat(search_pattern, "\\*.*");
 	
 	log_info("Using search pattern: %s", search_pattern);
 	find_result = al_findfirst(search_pattern, &file_info, FA_ALL);
