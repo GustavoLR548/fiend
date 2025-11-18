@@ -48,6 +48,8 @@ BMP_ARRAY* load_bmp_array(char *dir_tmp,int item_num)
 	normalize_path(dir);
 	ensure_trailing_slash(dir);
 	
+	log_debug("load_bmp_array: Original dir='%s', Normalized dir='%s', item_num=%d", dir_tmp, dir, item_num);
+	
 	if(item_num==-1)
 		temp_bmp_data = calloc(sizeof(BMP_ARRAY), MAX_BMP_ARRAY_DATA);
 	else
@@ -81,6 +83,7 @@ BMP_ARRAY* load_bmp_array(char *dir_tmp,int item_num)
 				exit(-1);
 			}
 
+			log_debug("Checking file: %s (exists=%d)", file_path, exists(file_path));
 			
 			if(!exists(file_path))
 			{
