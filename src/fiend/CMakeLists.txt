@@ -67,10 +67,16 @@ target_include_directories(fiend PRIVATE
 # Link libraries
 target_link_libraries(fiend 
     ${ALLEGRO_LIBRARIES}
-    m       # Math library
-    pthread # Required by miniaudio
-    dl      # Required by miniaudio for dlopen
 )
+
+# Add platform-specific libraries
+if(UNIX)
+    target_link_libraries(fiend
+        m       # Math library
+        pthread # Required by miniaudio
+        dl      # Required by miniaudio for dlopen
+    )
+endif()
 
 # Set RPATH for Linux (not needed on Windows)
 if(UNIX AND NOT APPLE)
