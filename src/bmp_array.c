@@ -22,6 +22,18 @@ BMP_ARRAY *temp_bmp_data;
 
 RLE_ARRAY *temp_rle_data;
 
+/* ensure_trailing_slash:
+ * Ensures the path ends with a forward slash.
+ * Forward slashes work on all platforms including Windows with Allegro.
+ */
+static void ensure_trailing_slash(char *path)
+{
+	size_t len = strlen(path);
+	if (len > 0 && path[len - 1] != '/' && path[len - 1] != '\\') {
+		strcat(path, "/");
+	}
+}
+
 
 ///////////////////////////////////////////////////////
 ////// THE BITMAP ARRAY FUNCTIONS /////////////////////
@@ -40,10 +52,10 @@ BMP_ARRAY* load_bmp_array(char *dir_tmp,int item_num)
 	char file_name[20];
 	int i;
 	
-	char dir[256];  // NOTE: Workaround; don't call put_backslash() with a string literal (which dir_tmp is).
+	char dir[256];
 	sprintf(dir, "%s", dir_tmp);
 	
-	put_backslash(dir);
+	ensure_trailing_slash(dir);
 	
 	if(item_num==-1)
 		temp_bmp_data = calloc(sizeof(BMP_ARRAY), MAX_BMP_ARRAY_DATA);
@@ -159,10 +171,10 @@ RLE_ARRAY* load_rle_array(char *dir_tmp,int item_num)
 	BITMAP *bmp;
 	int i;
 	
-	char dir[256];  // NOTE: Workaround; don't call put_backslash() with a string literal (which dir_tmp is).
+	char dir[256];
 	sprintf(dir, "%s", dir_tmp);
 	
-	put_backslash(dir);
+	ensure_trailing_slash(dir);
 	
 	if(item_num==-1)
 		temp_rle_data = calloc(sizeof(RLE_ARRAY), MAX_RLE_ARRAY_DATA);
