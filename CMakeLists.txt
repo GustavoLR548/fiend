@@ -107,6 +107,19 @@ endif()
 add_subdirectory(src/fiend)
 add_subdirectory(src/mapeditor)
 
+# Generate resource list files before building
+add_custom_target(generate_resources ALL
+    COMMAND ${CMAKE_COMMAND} -E echo "Generating resource list files..."
+    COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/data/resource_lists"
+    COMMAND python3 "${CMAKE_SOURCE_DIR}/tools/generate_resource_lists.py" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
+    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+    COMMENT "Generating resource lists for faster asset loading"
+    VERBATIM
+)
+
+# Make fiend depend on resource generation
+add_dependencies(fiend generate_resources)
+
 # Print build summary
 message(STATUS "========================================")
 message(STATUS "Fiend Build Configuration:")

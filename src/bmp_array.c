@@ -28,76 +28,89 @@ RLE_ARRAY *temp_rle_data;
 ////// THE BITMAP ARRAY FUNCTIONS /////////////////////
 //////////////////////////////////////////////////////
 
-/* Helper function to load first matching file using al_findfirst/al_findnext
- * Returns the full path to the first file found, or NULL if none found */
-static char* find_first_file(const char *pattern)
+/* Helper function to find first matching file by reading from preprocessed resource lists
+ * This avoids Windows al_findfirst issues and is faster than directory scanning */
+static char* find_first_file_from_list(const char *dir_pattern)
 {
-	struct al_ffblk file_info;
 	static char result_path[512];
+	static char resource_list_path[512];
+	FILE *list_file;
+	char line[512];
 	char dir_part[512];
-	char search_pattern[512];
 	char *last_sep;
-	int find_result;
+	int dir_len;
 	
-	/* Extract directory part from pattern */
-	strcpy(dir_part, pattern);
+	/* Extract directory part from pattern (remove *.bmp) */
+	strcpy(dir_part, dir_pattern);
 	last_sep = strrchr(dir_part, '\\');
 	if(!last_sep) last_sep = strrchr(dir_part, '/');
 	
 	if(last_sep) {
-		last_sep[1] = '\0'; /* Keep the separator */
+		*last_sep = '\0'; /* Remove everything after last separator */
+	}
+	
+	/* Convert to forward slashes for comparison */
+	for(char *p = dir_part; *p; p++) {
+		if(*p == '\\') *p = '/';
+	}
+	dir_len = strlen(dir_part);
+	
+	log_info("Looking for files in directory: %s", dir_part);
+	
+	/* Determine which resource list file to use based on path */
+	if(strstr(dir_part, "graphic/characters")) {
+		strcpy(resource_list_path, "data/resource_lists/characters.txt");
+	} else if(strstr(dir_part, "graphic/enemies")) {
+		strcpy(resource_list_path, "data/resource_lists/enemies.txt");
+	} else if(strstr(dir_part, "graphic/objects")) {
+		strcpy(resource_list_path, "data/resource_lists/objects.txt");
+	} else if(strstr(dir_part, "graphic/faces")) {
+		strcpy(resource_list_path, "data/resource_lists/faces.txt");
+	} else if(strstr(dir_part, "graphic/tiles")) {
+		strcpy(resource_list_path, "data/resource_lists/tiles.txt");
+	} else if(strstr(dir_part, "graphic/particles")) {
+		strcpy(resource_list_path, "data/resource_lists/particles.txt");
 	} else {
-		dir_part[0] = '\0'; /* No directory part */
-	}
-	
-	log_info("Searching for files matching: %s", pattern);
-	log_info("Directory part: '%s'", dir_part);
-	
-	/* On Windows, al_findfirst with *.bmp wildcards is unreliable
-	 * Use *.* and filter for .bmp files manually 
-	 * Also, on Windows, remove trailing slash/backslash before searching */
-	strcpy(search_pattern, dir_part);
-	
-	/* Remove trailing slash/backslash if present - Windows al_findfirst doesn't like it */
-	int len = strlen(search_pattern);
-	if(len > 0 && (search_pattern[len-1] == '\\' || search_pattern[len-1] == '/')) {
-		search_pattern[len-1] = '\0';
-		log_info("Removed trailing slash, directory: '%s'", search_pattern);
-	}
-	
-	/* Try with forward slashes - sometimes Windows al_findfirst prefers them */
-	for(int i = 0; search_pattern[i]; i++) {
-		if(search_pattern[i] == '\\') search_pattern[i] = '/';
-	}
-	
-	strcat(search_pattern, "/*.*");
-	
-	log_info("Using search pattern (converted to forward slashes): %s", search_pattern);
-	find_result = al_findfirst(search_pattern, &file_info, FA_ALL);
-	
-	if(find_result != 0) {
-		log_error("No files found in directory: %s (error code: %d)", dir_part, find_result);
+		log_error("Unknown resource directory: %s", dir_part);
 		return NULL;
 	}
 	
-	/* Iterate through files looking for first .bmp file */
-	do {
-		char *ext = get_extension(file_info.name);
-		log_info("Checking file: %s (extension: %s)", file_info.name, ext ? ext : "none");
+	log_info("Opening resource list: %s", resource_list_path);
+	
+	list_file = fopen(resource_list_path, "r");
+	if(!list_file) {
+		log_error("Failed to open resource list: %s", resource_list_path);
+		return NULL;
+	}
+	
+	/* Read through the list file looking for matching directory */
+	while(fgets(line, sizeof(line), list_file)) {
+		/* Remove newline */
+		line[strcspn(line, "\r\n")] = 0;
 		
-		if(ext && (strcmp(ext, "bmp") == 0 || strcmp(ext, "BMP") == 0)) {
-			/* Found a BMP file! */
-			sprintf(result_path, "%s%s", dir_part, file_info.name);
-			log_info("Found matching BMP file: %s", result_path);
-			al_findclose(&file_info);
+		/* Check if this file is in the directory we're looking for */
+		if(strncmp(line, dir_part, dir_len) == 0) {
+			/* Found a matching file! */
+			strcpy(result_path, line);
+			
+			/* Normalize path for current platform */
+			normalize_path(result_path);
+			
+			log_info("Found file from resource list: %s", result_path);
+			fclose(list_file);
 			return result_path;
 		}
-	} while(al_findnext(&file_info) == 0);
+	}
 	
-	/* No BMP files found */
-	log_error("No .bmp files found in directory: %s", dir_part);
-	al_findclose(&file_info);
+	fclose(list_file);
+	log_error("No files found in resource list for directory: %s", dir_part);
 	return NULL;
+}
+
+/* Use the resource list approach for finding files */
+static char* find_first_file(const char *pattern)
+{
+	return find_first_file_from_list(pattern);
 }
  
 static /*int*/ void find_one_file(const char *file,int attr,/*void **/int param)
