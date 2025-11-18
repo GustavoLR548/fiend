@@ -235,12 +235,15 @@ int init_fiend(void)
 
     //destroy_bitmap(bmp);
 
+	log_info("Loading font: graphic/fonts/small1.dat");
 	font_small1 = load_datafile("graphic/fonts/small1.dat");
 	if(font_small1==NULL)
     {
+		log_error("Failed to load font: graphic/fonts/small1.dat");
 		strcpy(fiend_errorcode,"couldn't load font small1");
 		return 1;
     }
+	log_info("Font loaded successfully");
 	
 	//make the virtual screen
 	virt = create_bitmap(480,480);

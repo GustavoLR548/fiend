@@ -21,7 +21,7 @@ echo "Found run #$RUN_NUMBER (ID: $RUN_ID)"
 # Download the Windows artifact
 echo "Downloading Windows artifact..."
 ARTIFACT_ID=$(gh api "/repos/$OWNER/$REPO/actions/runs/$RUN_ID/artifacts" \
-  --jq '.artifacts[] | select(.name == "windows-bundled-build") | .id')
+  --jq '.artifacts[] | select(.name == "fiend-windows-x64-bundled") | .id')
 
 if [ -z "$ARTIFACT_ID" ]; then
     echo "ERROR: No Windows artifact found!"
@@ -38,14 +38,14 @@ unzip -q artifact.zip
 echo "Extracted to $DOWNLOAD_DIR/"
 
 # Run with Wine if available
-if command -v wine64 &> /dev/null; then
+if command -v wine &> /dev/null; then
     echo ""
     echo "=== Testing with Wine ==="
     echo "Press Ctrl+C to stop"
     echo ""
-    wine64 fiend.exe
+    wine fiend.exe
 else
     echo ""
     echo "Wine not installed. To test, run:"
-    echo "  cd $DOWNLOAD_DIR && wine64 fiend.exe"
+    echo "  cd $DOWNLOAD_DIR && wine fiend.exe"
 fi

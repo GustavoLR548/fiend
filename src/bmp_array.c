@@ -48,7 +48,7 @@ BMP_ARRAY* load_bmp_array(char *dir_tmp,int item_num)
 	normalize_path(dir);
 	ensure_trailing_slash(dir);
 	
-	log_debug("load_bmp_array: Original dir='%s', Normalized dir='%s', item_num=%d", dir_tmp, dir, item_num);
+	log_info("load_bmp_array: Original dir='%s', Normalized dir='%s', item_num=%d", dir_tmp, dir, item_num);
 	
 	if(item_num==-1)
 		temp_bmp_data = calloc(sizeof(BMP_ARRAY), MAX_BMP_ARRAY_DATA);
@@ -59,7 +59,7 @@ BMP_ARRAY* load_bmp_array(char *dir_tmp,int item_num)
 	if(item_num==1)
 	{
 		sprintf(file_path,"%s*.bmp",dir);
-		log_debug("Loading bitmap array from: %s", file_path);
+		log_info("Loading bitmap array from: %s", file_path);
 		i= for_each_file/*_ex*/(file_path,FA_ALL/*,0*/,find_one_file,0);
 
 		if(i!=1){allegro_message("couldn't load %s",file_path);exit(-1);}
@@ -83,7 +83,7 @@ BMP_ARRAY* load_bmp_array(char *dir_tmp,int item_num)
 				exit(-1);
 			}
 
-			log_debug("Checking file: %s (exists=%d)", file_path, exists(file_path));
+			log_info("Checking file: %s (exists=%d)", file_path, exists(file_path));
 			
 			if(!exists(file_path))
 			{
