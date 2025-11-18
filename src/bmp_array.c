@@ -91,19 +91,24 @@ BMP_ARRAY* load_bmp_array(char *dir_tmp,int item_num)
 				exit(-1);
 			}
 
-			log_info("Checking file: %s (exists=%d)", file_path, exists(file_path));
+			log_info("Attempting to load: %s", file_path);
 			
-			if(!exists(file_path))
+			temp_bmp_data[i].dat = load_bmp(file_path,NULL);
+			
+			if(temp_bmp_data[i].dat==NULL)
 			{
-				if(i==0){allegro_message("couldn't load %s",file_path);exit(-1);}
-				else{break;}
+				if(i==0){
+					log_error("Failed to load first bitmap: %s", file_path);
+					allegro_message("couldn't load %s",file_path);
+					exit(-1);
+				}
+				else{
+					log_info("No more bitmaps found, loaded %d files", i);
+					break;
+				}
 			}
 			
-		
-			temp_bmp_data[i].dat = load_bmp(file_path,NULL);
-			if(temp_bmp_data[i].dat==NULL){allegro_message("couldn't load %s",file_path);exit(-1);}
-
-					
+			log_info("Successfully loaded: %s", file_path);
 			i++;
 		}
 		temp_bmp_data[0].num = i;
@@ -124,11 +129,14 @@ BMP_ARRAY* load_bmp_array(char *dir_tmp,int item_num)
 				exit(-1);
 			}
 
-			if(!exists(file_path)){allegro_message("couldn't load %s",file_path);exit(-1);}
-				
-
+			log_info("Loading bitmap %d/%d: %s", i+1, item_num, file_path);
 			temp_bmp_data[i].dat = load_bmp(file_path,NULL);
-			if(temp_bmp_data[i].dat==NULL){allegro_message("couldn't load %s",file_path);exit(-1);}
+			
+			if(temp_bmp_data[i].dat==NULL){
+				log_error("Failed to load bitmap: %s", file_path);
+				allegro_message("couldn't load %s",file_path);
+				exit(-1);
+			}
 
 			temp_bmp_data[i].num = item_num;
 		}
@@ -216,21 +224,27 @@ RLE_ARRAY* load_rle_array(char *dir_tmp,int item_num)
 				exit(-1);
 			}
 
+			bmp = load_bmp(file_path,NULL);
 			
-			if(!exists(file_path))
+			if(bmp == NULL)
 			{
-				if(i==0){allegro_message("couldn't load %s",file_path);exit(-1);}
-				else{break;}
+				if(i==0){
+					allegro_message("couldn't load %s",file_path);
+					exit(-1);
+				}
+				else{
+					break;
+				}
 			}
 			
-		
-			bmp = load_bmp(file_path,NULL);
 			temp_rle_data[i].dat = get_rle_sprite(bmp);
 			destroy_bitmap(bmp);
 
-			if(temp_rle_data[i].dat==NULL){allegro_message("couldn't load %s",file_path);exit(-1);}
+			if(temp_rle_data[i].dat==NULL){
+				allegro_message("couldn't load %s",file_path);
+				exit(-1);
+			}
 
-					
 			i++;
 		}
 		temp_rle_data[0].num = i;
@@ -251,14 +265,20 @@ RLE_ARRAY* load_rle_array(char *dir_tmp,int item_num)
 				exit(-1);
 			}
 
-			if(!exists(file_path)){allegro_message("couldn't load %s",file_path);exit(-1);}
-				
-
 			bmp = load_bmp(file_path,NULL);
+			
+			if(bmp == NULL){
+				allegro_message("couldn't load %s",file_path);
+				exit(-1);
+			}
+			
 			temp_rle_data[i].dat = get_rle_sprite(bmp);
 			destroy_bitmap(bmp);
 
-			if(temp_rle_data[i].dat==NULL){allegro_message("couldn't load %s",file_path);exit(-1);}
+			if(temp_rle_data[i].dat==NULL){
+				allegro_message("couldn't load %s",file_path);
+				exit(-1);
+			}
 
 			temp_rle_data[i].num = item_num;
 		}
