@@ -49,6 +49,7 @@ set(COMMON_SOURCES
     ../misc.c
     ../NPC.c
     ../object.c
+    ../path_utils.c
     ../picdata.c
     ../rotate_sprite.c
     ../sound.c

@@ -42,6 +42,7 @@ set(COMMON_SOURCES
     ../mapio.c
     ../NPC.c
     ../object.c
+    ../path_utils.c
     ../picdata.c
     ../rotate_sprite.c
     ../sound.c

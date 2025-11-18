@@ -19,18 +19,7 @@
 #include "picdata.h"
 #include "draw_polygon.h"
 #include "logger.h"
-
-/* ensure_trailing_slash:
- * Ensures the path ends with a forward slash.
- * Forward slashes work on all platforms including Windows with Allegro.
- */
-static void ensure_trailing_slash(char *path)
-{
-	size_t len = strlen(path);
-	if (len > 0 && path[len - 1] != '/' && path[len - 1] != '\\') {
-		strcat(path, "/");
-	}
-}
+#include "path_utils.h"
 
 
 ///////////////////////////////////////////////

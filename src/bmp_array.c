@@ -13,6 +13,7 @@
 #include "fiend.h"
 #include "grafik4.h"
 #include "logger.h"
+#include "path_utils.h"
 
 
 #define MAX_BMP_ARRAY_DATA 100
@@ -21,18 +22,6 @@
 BMP_ARRAY *temp_bmp_data;
 
 RLE_ARRAY *temp_rle_data;
-
-/* ensure_trailing_slash:
- * Ensures the path ends with a forward slash.
- * Forward slashes work on all platforms including Windows with Allegro.
- */
-static void ensure_trailing_slash(char *path)
-{
-	size_t len = strlen(path);
-	if (len > 0 && path[len - 1] != '/' && path[len - 1] != '\\') {
-		strcat(path, "/");
-	}
-}
 
 
 ///////////////////////////////////////////////////////
