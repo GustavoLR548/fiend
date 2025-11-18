@@ -12,6 +12,7 @@
 #include "../fiend.h"
 #include "../grafik4.h"
 #include "../draw.h"
+#include "../path_utils.h"
 
 
 int fiend_note_is_on=0;
@@ -191,11 +192,18 @@ int load_fiend_note(char *file)
 
 void read_fiend_note(char *file)
 {
-	char *file_path ="data/notes/";
-	char final_path[80];
+	char file_path[256] = "data/notes/";
+	char final_path[256];
 	char error[70];
 	
-	sprintf(final_path,"%s%s",file_path,file);
+	/* Normalize path separators for the platform */
+	normalize_path(file_path);
+	
+	if(build_path(final_path, sizeof(final_path), file_path, file) != 0) {
+		sprintf(error,"Path too long for note: %s%s", file_path, file);
+		make_engine_error(error);
+		return;
+	}
 	
 	if(!load_fiend_note(final_path))
 	{

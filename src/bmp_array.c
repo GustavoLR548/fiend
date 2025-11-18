@@ -44,6 +44,8 @@ BMP_ARRAY* load_bmp_array(char *dir_tmp,int item_num)
 	char dir[256];
 	sprintf(dir, "%s", dir_tmp);
 	
+	/* Normalize path separators for the platform */
+	normalize_path(dir);
 	ensure_trailing_slash(dir);
 	
 	if(item_num==-1)
@@ -74,8 +76,10 @@ BMP_ARRAY* load_bmp_array(char *dir_tmp,int item_num)
 			else
 				sprintf(file_name,"%d.bmp",i);
 		
-			strcpy(file_path,dir);
-			strcat(file_path, file_name);
+			if(build_path(file_path, sizeof(file_path), dir, file_name) != 0) {
+				allegro_message("path too long: %s%s", dir, file_name);
+				exit(-1);
+			}
 
 			
 			if(!exists(file_path))
@@ -104,8 +108,10 @@ BMP_ARRAY* load_bmp_array(char *dir_tmp,int item_num)
 			else
 				sprintf(file_name,"%d.bmp",i);
 		
-			strcpy(file_path,dir);
-			strcat(file_path, file_name);
+			if(build_path(file_path, sizeof(file_path), dir, file_name) != 0) {
+				allegro_message("path too long: %s%s", dir, file_name);
+				exit(-1);
+			}
 
 			if(!exists(file_path)){allegro_message("couldn't load %s",file_path);exit(-1);}
 				
@@ -163,6 +169,8 @@ RLE_ARRAY* load_rle_array(char *dir_tmp,int item_num)
 	char dir[256];
 	sprintf(dir, "%s", dir_tmp);
 	
+	/* Normalize path separators for the platform */
+	normalize_path(dir);
 	ensure_trailing_slash(dir);
 	
 	if(item_num==-1)
@@ -192,8 +200,10 @@ RLE_ARRAY* load_rle_array(char *dir_tmp,int item_num)
 			else
 				sprintf(file_name,"%d.bmp",i);
 		
-			strcpy(file_path,dir);
-			strcat(file_path, file_name);
+			if(build_path(file_path, sizeof(file_path), dir, file_name) != 0) {
+				allegro_message("path too long: %s%s", dir, file_name);
+				exit(-1);
+			}
 
 			
 			if(!exists(file_path))
@@ -225,8 +235,10 @@ RLE_ARRAY* load_rle_array(char *dir_tmp,int item_num)
 			else
 				sprintf(file_name,"%d.bmp",i);
 		
-			strcpy(file_path,dir);
-			strcat(file_path, file_name);
+			if(build_path(file_path, sizeof(file_path), dir, file_name) != 0) {
+				allegro_message("path too long: %s%s", dir, file_name);
+				exit(-1);
+			}
 
 			if(!exists(file_path)){allegro_message("couldn't load %s",file_path);exit(-1);}
 				

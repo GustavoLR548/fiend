@@ -18,6 +18,7 @@
 
 #include "fiend.h"
 #include "enemy.h"
+#include "path_utils.h"
 
 
 //the file name that enemy data is loaded from
@@ -44,16 +45,25 @@ int load_enemys(void)
 	char sprite_file_name[100][15];
     char info_file_name[100][15];
 	int num_of_frames=1;
-	char *file_path ="graphic/enemies/";
-	char final_path[40];
+	char file_path[256] = "graphic/enemies/";
+	char final_path[256];
 	int i,j,k,r,g,b;
 	
 	// Set C locale for parsing numbers with periods as decimal separators
 	char *old_locale = setlocale(LC_NUMERIC, "C");
 	
+	/* Normalize path separators for the platform */
+	normalize_path(file_path);
+	
+	char enemies_txt[256];
+	if(build_path(enemies_txt, sizeof(enemies_txt), file_path, "enemies.txt") != 0) {
+		sprintf(fiend_errorcode,"path too long for enemies.txt");
+		return 1;
+	}
+	
 	enemy_info = calloc(sizeof(ENEMY_INFO), MAX_ENEMY_INFO);
 
-	f = fopen("graphic/enemies/enemies.txt", "r");      //Load the Info file
+	f = fopen(enemies_txt, "r");      //Load the Info file
 	
 	if(f==NULL)
 	{sprintf(fiend_errorcode,"couldn't load enemys.txt");return 1;} //error testing...
@@ -71,8 +81,10 @@ int load_enemys(void)
 	{
 		
 		//----------BEGIN GET INFO-----------------------
-		strcpy(final_path, file_path);
-		strcat(final_path, info_file_name[i]);    //Get the info.
+		if(build_path(final_path, sizeof(final_path), file_path, info_file_name[i]) != 0) {
+			sprintf(fiend_errorcode,"path too long: %s%s", file_path, info_file_name[i]);
+			return 1;
+		}
 
 		f = fopen(final_path, "r");
 		if(f==NULL){ sprintf(fiend_errorcode,"couldn't load %s",final_path);return 1;}//error testing...
@@ -142,8 +154,10 @@ int load_enemys(void)
 		
 		
 		//--------BEGIN GET DATA------------------
-		strcpy(final_path, file_path);
-		strcat(final_path, sprite_file_name[i]);   //Get the tile data .
+		if(build_path(final_path, sizeof(final_path), file_path, sprite_file_name[i]) != 0) {
+			sprintf(fiend_errorcode,"path too long: %s%s", file_path, sprite_file_name[i]);
+			return 1;
+		}
 
 														 
 	    temp_data = load_bmp_array(final_path,enemy_info[i].num_of_frames);//load the graphic

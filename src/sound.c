@@ -13,6 +13,7 @@
 #include "audio.h"
 #include "fiend.h"
 #include "grafik4.h"
+#include "path_utils.h"
 
 #define MAX_SOUNDS 200
 
@@ -29,17 +30,25 @@ int load_sounds(void)
 	FILE *f;
 
 	char sound_file_name[70];
-   	char *file_path ="sound/";
-	char final_path[80];
+   	char file_path[256] = "sound/";
+	char final_path[256];
 	char *name;
 	char name2[40];
 	int i;
 	unsigned int j,k;
 	
+	/* Normalize path separators for the platform */
+	normalize_path(file_path);
+	
+	char sounds_txt[256];
+	if(build_path(sounds_txt, sizeof(sounds_txt), file_path, "sounds.txt") != 0) {
+		sprintf(fiend_errorcode,"path too long for sounds.txt");
+		return 1;
+	}
 	
 	sound_info = calloc(sizeof(SOUND_INFO), MAX_SOUNDS);
 
-	f = fopen("sound/sounds.txt", "r");      //Load the Info file
+	f = fopen(sounds_txt, "r");      //Load the Info file
 	
 	if(f==NULL)
 	{sprintf(fiend_errorcode,"couldn't load sounds.txt");return 1;} //error testing...
@@ -64,8 +73,10 @@ int load_sounds(void)
 		
 		
 		//get the sound data
-		strcpy(final_path, file_path);
-		strcat(final_path, sound_file_name);
+		if(build_path(final_path, sizeof(final_path), file_path, sound_file_name) != 0) {
+			sprintf(fiend_errorcode,"path too long: %s%s", file_path, sound_file_name);
+			return 1;
+		}
 		
 		/* Load sound using audio wrapper */
 		if (audio_load_sound(final_path, &sound_info[num_of_sounds].sound) != 0) {

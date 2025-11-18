@@ -15,6 +15,7 @@
 #include "../fiend.h"
 #include "../draw.h"
 #include "../grafik4.h"
+#include "../path_utils.h"
 
 
 PARTICLE_INFO *particle_info;
@@ -220,9 +221,18 @@ int load_particles(void)
 	char buffer[50];
 	char sprite_file_name[100][20];
     char info_file_name[100][20];
-	char *file_path ="graphic/particles/";
-	char final_path[40];
+	char file_path[256] = "graphic/particles/";
+	char final_path[256];
 	int i,k;
+	
+	/* Normalize path separators for the platform */
+	normalize_path(file_path);
+	
+	char particles_txt[256];
+	if(build_path(particles_txt, sizeof(particles_txt), file_path, "particles.txt") != 0) {
+		sprintf(fiend_errorcode,"path too long for particles.txt");
+		return 1;
+	}
 	
 	particle_info = calloc(sizeof(PARTICLE_INFO),MAX_PARTICLE_INFO);
 	
@@ -230,7 +240,7 @@ int load_particles(void)
 	for(i=0;i<MAX_PARTICLE_DATA;i++)
 		particle_data[i].used=0;
 	
-	f = fopen("graphic/particles/particles.txt", "r");      //Load the Info file
+	f = fopen(particles_txt, "r");      //Load the Info file
 	
 	if(f==NULL)
 	{sprintf(fiend_errorcode,"couldn't load particles.txt");return 1;} //error testing...
@@ -247,8 +257,10 @@ int load_particles(void)
 	{
 		
 		//----------BEGIN GET INFO-----------------------
-		strcpy(final_path, file_path);
-		strcat(final_path, info_file_name[i]);    //Get the info.
+		if(build_path(final_path, sizeof(final_path), file_path, info_file_name[i]) != 0) {
+			sprintf(fiend_errorcode,"path too long: %s%s", file_path, info_file_name[i]);
+			return 1;
+		}
 
 		f = fopen(final_path, "r");
 		if(f==NULL){sprintf(fiend_errorcode,"couldn't load %s",final_path); return 1;}//error testing...
@@ -279,8 +291,10 @@ int load_particles(void)
 		
 		
 		//--------BEGIN GET DATA------------------
-		strcpy(final_path, file_path);
-		strcat(final_path, sprite_file_name[i]);   //Get the tile data .
+		if(build_path(final_path, sizeof(final_path), file_path, sprite_file_name[i]) != 0) {
+			sprintf(fiend_errorcode,"path too long: %s%s", file_path, sprite_file_name[i]);
+			return 1;
+		}
 
 		set_color_conversion(COLORCONV_TOTAL);
 

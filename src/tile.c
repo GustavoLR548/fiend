@@ -17,6 +17,7 @@
 #include "grafik4.h"
 #include "console.h"
 #include "logger.h"
+#include "path_utils.h"
 
 
 
@@ -87,16 +88,20 @@ int load_tiles(void)
 	
 	for(i=0;i<num_of_tilesets;i++)
 	{
-		strcpy(final_path, file_path);
-		strcat(final_path, tile_file_name[i]);   //Get the tile data .
+		if(build_path(final_path, sizeof(final_path), file_path, tile_file_name[i]) != 0) {
+			sprintf(fiend_errorcode,"path too long: %s%s", file_path, tile_file_name[i]);
+			return 1;
+		}
 
 														 
 	    tile_data[i] = load_rle_array(final_path,-1);//load the graphic
 		if(tile_data[i]==NULL){sprintf(fiend_errorcode,"couldn't load %s",final_path);return 1;}//error testing...
 		
 
-		strcpy(final_path, file_path);
-		strcat(final_path, info_file_name[i]);    //Get the tile info.
+		if(build_path(final_path, sizeof(final_path), file_path, info_file_name[i]) != 0) {
+			sprintf(fiend_errorcode,"path too long: %s%s", file_path, info_file_name[i]);
+			return 1;
+		}
 
 		f = fopen(final_path, "r");
 		if(f==NULL){sprintf(fiend_errorcode,"couldn't load %s",final_path); return 1;}//error testing...
