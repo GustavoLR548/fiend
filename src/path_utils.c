@@ -21,7 +21,7 @@ void ensure_trailing_slash(char *path)
 	/* If path ends with wrong separator, replace it */
 	else if (len > 0) {
 		if (path[len - 1] == '/' && PATH_SEP == '\\') {
-			path[len - 1] = '\\';
+			path[len - 1] = '\\\\';
 		} else if (path[len - 1] == '\\' && PATH_SEP == '/') {
 			path[len - 1] = '/';
 		}
