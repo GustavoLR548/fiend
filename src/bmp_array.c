@@ -30,7 +30,13 @@ RLE_ARRAY *temp_rle_data;
  
 static /*int*/ void find_one_file(const char *file,int attr,/*void **/int param)
 {
+	log_info("find_one_file callback: Loading file '%s'", file);
 	temp_bmp_data[0].dat = load_bmp(file,NULL);
+	if(temp_bmp_data[0].dat == NULL) {
+		log_error("Failed to load bitmap: %s", file);
+	} else {
+		log_info("Successfully loaded bitmap: %s", file);
+	}
     //return 0;
 }
 
@@ -60,7 +66,9 @@ BMP_ARRAY* load_bmp_array(char *dir_tmp,int item_num)
 	{
 		sprintf(file_path,"%s*.bmp",dir);
 		log_info("Loading bitmap array from: %s", file_path);
+		log_info("About to call for_each_file...");
 		i= for_each_file/*_ex*/(file_path,FA_ALL/*,0*/,find_one_file,0);
+		log_info("for_each_file returned: %d (expected 1)", i);
 
 		if(i!=1){allegro_message("couldn't load %s",file_path);exit(-1);}
 		
