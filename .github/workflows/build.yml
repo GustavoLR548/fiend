@@ -252,6 +252,7 @@ jobs:
           -G "Ninja" \
           -DCMAKE_BUILD_TYPE=Release \
           -DCMAKE_INSTALL_PREFIX="$PWD/install" \
+          -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
           -DSHARED=ON \
           -DWANT_DOCS=OFF \
           -DWANT_EXAMPLES=OFF \
