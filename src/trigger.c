@@ -87,21 +87,29 @@ int load_message_faces(void)
 	char *name;
 	char name2[40];
 	int i, k;
+	int find_result;
 	
 	log_info("Loading message faces from: graphic/faces/*.bmp");
 	
 	/* Use al_findfirst/al_findnext to iterate through all matching files */
 	#ifdef _WIN32
-		if(al_findfirst("graphic\\faces\\*.bmp", &file_info, FA_ARCH) != 0) {
+		find_result = al_findfirst("graphic\\faces\\*.bmp", &file_info, FA_ARCH);
 	#else
-		if(al_findfirst("graphic/faces/*.bmp", &file_info, FA_ARCH) != 0) {
+		find_result = al_findfirst("graphic/faces/*.bmp", &file_info, FA_ARCH);
 	#endif
+	
+	if(find_result != 0) {
 		log_error("No face files found in graphic/faces/");
 		strcpy(fiend_errorcode,"couldn't load graphic/faces/*.bmp");
 		return 1;
 	}
 	
 	do {
+		/* Skip . and .. entries if they appear */
+		if(strcmp(file_info.name, ".") == 0 || strcmp(file_info.name, "..") == 0) {
+			continue;
+		}
+		
 		/* Build full path */
 		#ifdef _WIN32
 			sprintf(file_path, "graphic\\faces\\%s", file_info.name);
@@ -110,12 +118,21 @@ int load_message_faces(void)
 		#endif
 		
 		log_info("Loading face: %s", file_path);
+		
+		/* Check bounds before loading */
+		if(num_of_message_faces >= FACE_NUM) {
+			log_info("Reached maximum face limit (%d), stopping", FACE_NUM);
+			break;
+		}
+		
 		message_face[num_of_message_faces].pic = load_bmp(file_path, NULL);
 		
 		if(message_face[num_of_message_faces].pic == NULL) {
 			log_error("Failed to load face: %s", file_path);
 			face_load_error = 1;
-			break;
+			al_findclose(&file_info);
+			strcpy(fiend_errorcode,"couldn't load graphic/faces/*.bmp");
+			return 1;
 		}
 		
 		/* Extract filename without extension */
@@ -129,11 +146,11 @@ int load_message_faces(void)
 			}
 		}
 		strcpy(message_face[num_of_message_faces].name, name2);
-		log_info("Loaded face '%s'", name2);
+		log_info("Loaded face '%s' successfully", name2);
 		
 		num_of_message_faces++;
 		
-	} while(al_findnext(&file_info) == 0 && num_of_message_faces < FACE_NUM);
+	} while(al_findnext(&file_info) == 0);
 	
 	al_findclose(&file_info);
 	
