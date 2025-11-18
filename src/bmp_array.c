@@ -27,6 +27,41 @@ RLE_ARRAY *temp_rle_data;
 ///////////////////////////////////////////////////////
 ////// THE BITMAP ARRAY FUNCTIONS /////////////////////
 //////////////////////////////////////////////////////
+
+/* Helper function to load first matching file using al_findfirst/al_findnext
+ * Returns the full path to the first file found, or NULL if none found */
+static char* find_first_file(const char *pattern)
+{
+	struct al_ffblk file_info;
+	static char result_path[512];
+	char dir_part[512];
+	char *last_sep;
+	
+	/* Extract directory part from pattern */
+	strcpy(dir_part, pattern);
+	last_sep = strrchr(dir_part, '\\');
+	if(!last_sep) last_sep = strrchr(dir_part, '/');
+	
+	if(last_sep) {
+		last_sep[1] = '\0'; /* Keep the separator */
+	} else {
+		dir_part[0] = '\0'; /* No directory part */
+	}
+	
+	log_info("Searching for files matching: %s", pattern);
+	
+	if(al_findfirst(pattern, &file_info, FA_ARCH) != 0) {
+		log_error("No files found matching pattern: %s", pattern);
+		return NULL;
+	}
+	
+	/* Build full path */
+	sprintf(result_path, "%s%s", dir_part, file_info.name);
+	log_info("Found file: %s", result_path);
+	
+	al_findclose(&file_info);
+	return result_path;
+}
  
 static /*int*/ void find_one_file(const char *file,int attr,/*void **/int param)
 {
@@ -64,13 +99,22 @@ BMP_ARRAY* load_bmp_array(char *dir_tmp,int item_num)
 	
 	if(item_num==1)
 	{
+		char *found_file;
 		sprintf(file_path,"%s*.bmp",dir);
 		log_info("Loading bitmap array from: %s", file_path);
-		log_info("About to call for_each_file...");
-		i= for_each_file/*_ex*/(file_path,FA_ALL/*,0*/,find_one_file,0);
-		log_info("for_each_file returned: %d (expected 1)", i);
+		
+		/* Use al_findfirst directly instead of unreliable for_each_file */
+		found_file = find_first_file(file_path);
+		if(found_file) {
+			temp_bmp_data[0].dat = load_bmp(found_file, NULL);
+			if(temp_bmp_data[0].dat == NULL) {
+				log_error("Failed to load bitmap: %s", found_file);
+			} else {
+				log_info("Successfully loaded bitmap: %s", found_file);
+			}
+		}
 
-		// Check if bitmap was actually loaded instead of relying on return value
+		// Check if bitmap was actually loaded
 		if(temp_bmp_data[0].dat == NULL)
 		{
 			log_error("Failed to load bitmap from: %s", file_path);
@@ -207,12 +251,28 @@ RLE_ARRAY* load_rle_array(char *dir_tmp,int item_num)
 	
 	if(item_num==1)
 	{
+		char *found_file;
+		BITMAP *bmp;
 		sprintf(file_path,"%s*.bmp",dir);
-		i= for_each_file/*_ex*/(file_path,FA_ARCH/*,0*/,find_one_rle_file,0);
+		log_info("Loading RLE sprite from: %s", file_path);
+		
+		/* Use al_findfirst directly instead of unreliable for_each_file */
+		found_file = find_first_file(file_path);
+		if(found_file) {
+			bmp = load_bmp(found_file, NULL);
+			if(bmp) {
+				temp_rle_data[0].dat = get_rle_sprite(bmp);
+				destroy_bitmap(bmp);
+				log_info("Successfully loaded RLE sprite: %s", found_file);
+			} else {
+				log_error("Failed to load bitmap for RLE: %s", found_file);
+			}
+		}
 
-		// Check if RLE sprite was actually loaded instead of relying on return value
+		// Check if RLE sprite was actually loaded
 		if(temp_rle_data[0].dat == NULL)
 		{
+			log_error("Failed to load RLE sprite from: %s", file_path);
 			allegro_message("couldn't load %s",file_path);
 			exit(-1);
 		}

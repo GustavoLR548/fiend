@@ -15,6 +15,7 @@
 
 #include "fiend.h"
 #include "logger.h"
+#include "path_utils.h"
 
 int saved_var_num=0;
 
@@ -81,11 +82,64 @@ static /*int*/ void get_one_face(const char *file,int attr,/*void **/int param)
 
 int load_message_faces(void)
 {
-	int i;
-
-	i= for_each_file/*_ex*/("graphic/faces/*.bmp",FA_ARCH/*,0*/,get_one_face,0);
-
-	// Check if any faces were actually loaded instead of relying on return value
+	struct al_ffblk file_info;
+	char file_path[512];
+	char *name;
+	char name2[40];
+	int i, k;
+	
+	log_info("Loading message faces from: graphic/faces/*.bmp");
+	
+	/* Use al_findfirst/al_findnext to iterate through all matching files */
+	#ifdef _WIN32
+		if(al_findfirst("graphic\\faces\\*.bmp", &file_info, FA_ARCH) != 0) {
+	#else
+		if(al_findfirst("graphic/faces/*.bmp", &file_info, FA_ARCH) != 0) {
+	#endif
+		log_error("No face files found in graphic/faces/");
+		strcpy(fiend_errorcode,"couldn't load graphic/faces/*.bmp");
+		return 1;
+	}
+	
+	do {
+		/* Build full path */
+		#ifdef _WIN32
+			sprintf(file_path, "graphic\\faces\\%s", file_info.name);
+		#else
+			sprintf(file_path, "graphic/faces/%s", file_info.name);
+		#endif
+		
+		log_info("Loading face: %s", file_path);
+		message_face[num_of_message_faces].pic = load_bmp(file_path, NULL);
+		
+		if(message_face[num_of_message_faces].pic == NULL) {
+			log_error("Failed to load face: %s", file_path);
+			face_load_error = 1;
+			break;
+		}
+		
+		/* Extract filename without extension */
+		name = file_info.name;
+		strcpy(name2, name);
+		k = strlen(name2);
+		for(i=0; i<k; i++) {
+			if(name2[i] == '.') {
+				name2[i] = 0;
+				break;
+			}
+		}
+		strcpy(message_face[num_of_message_faces].name, name2);
+		log_info("Loaded face '%s'", name2);
+		
+		num_of_message_faces++;
+		
+	} while(al_findnext(&file_info) == 0 && num_of_message_faces < FACE_NUM);
+	
+	al_findclose(&file_info);
+	
+	log_info("Loaded %d faces total", num_of_message_faces);
+	
+	// Check if any faces were actually loaded
 	if(face_load_error || num_of_message_faces < 1)
 	{
 		strcpy(fiend_errorcode,"couldn't load graphic/faces/*.bmp");
