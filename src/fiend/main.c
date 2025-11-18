@@ -6,6 +6,14 @@
 
 
 #include <allegro.h>
+#include <stdio.h>
+
+#ifdef _WIN32
+    #include <direct.h>
+    #define getcwd _getcwd
+#else
+    #include <unistd.h>
+#endif
 
 #include "../fiend.h"
 #include "../grafik4.h"
@@ -232,6 +240,8 @@ void the_game(void)
 
 void main(int argc, char *argv[])
 {
+	char cwd[512];
+	
 	allegro_init();
 	
 	load_config_file();
@@ -247,6 +257,23 @@ void main(int argc, char *argv[])
 	} else {
 		log_info("Fiend starting up...");
 	}
+	
+	// Log current working directory
+	if (getcwd(cwd, sizeof(cwd)) != NULL) {
+		log_info("Current working directory: %s", cwd);
+	} else {
+		log_error("Failed to get current working directory");
+	}
+	
+	// Test file existence with relative and absolute paths
+	log_info("Testing file existence...");
+	log_info("  exists('graphic\\tiles\\default\\000.bmp') = %d", exists("graphic\\tiles\\default\\000.bmp"));
+	log_info("  exists('graphic/tiles/default/000.bmp') = %d", exists("graphic/tiles/default/000.bmp"));
+	
+	// Build absolute path for testing
+	char abs_path[768];
+	sprintf(abs_path, "%s\\graphic\\tiles\\default\\000.bmp", cwd);
+	log_info("  exists('%s') = %d", abs_path, exists(abs_path));
 
 	install_mouse();
     install_keyboard();
