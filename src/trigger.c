@@ -88,7 +88,6 @@ int load_message_faces(void)
 	char name2[40];
 	char *slash_pos;
 	char *dot_pos;
-	int i;
 	
 	log_info("Loading message faces from resource list");
 	
@@ -455,7 +454,7 @@ int init_global_vars(void)
 	{
 		global_var[i].value=0;
 		
-		sprintf(global_var[i].name,"null",i);
+		strcpy(global_var[i].name,"null");
 	}
 	
 	return 0;
@@ -476,7 +475,7 @@ int load_global_vars(void)
 		{
 			global_var[i].value=0;
 			
-			sprintf(global_var[i].name,"null",i);
+			strcpy(global_var[i].name,"null");
 		}
 	
 		return 1; //when you start fresh you have no vars so you can't give an error code here

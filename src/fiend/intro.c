@@ -100,6 +100,10 @@ void show_poem(void)
 	}
 	
 	log_info("Starting poem display with font_avalon2 at %p, dat at %p", font_avalon2, font_avalon2->dat);
+	log_info("virt bitmap: %p, size: %dx%d", virt, virt ? virt->w : 0, virt ? virt->h : 0);
+	log_info("screen bitmap: %p, size: %dx%d", screen, screen ? screen->w : 0, screen ? screen->h : 0);
+	log_info("text1: '%s', text2: '%s'", text1, text2);
+	log_info("Positions: x1=%.1f, y1=%.1f, x2=%.1f, y2=%.1f", x1, y1, x2, y2);
 	
 	while(!key[KEY_ESC] && !key[KEY_SPACE] && !key[KEY_ENTER] && !end)
 	{
@@ -146,10 +150,21 @@ void show_poem(void)
 		}
 		
 		clear(virt);
-		log_debug("About to textout_ex line 1, alpha1=%.1f", alpha1);
-		textout_ex(virt,font_avalon2->dat,text1, x1,y1,makecol(alpha1,alpha1,alpha1), -1);
-		log_debug("About to textout_ex line 2, alpha2=%.1f", alpha2);
-		textout_ex(virt,font_avalon2->dat,text2, x2,y2,makecol(alpha2,alpha2,alpha2), -1);
+		
+		// Detailed logging before crash point
+		log_debug("Frame start - alpha1=%.1f, alpha2=%.1f, time=%d", alpha1, alpha2, time);
+		log_debug("Calling makecol(%.1f, %.1f, %.1f)", alpha1, alpha1, alpha1);
+		int color1 = makecol((int)alpha1, (int)alpha1, (int)alpha1);
+		log_debug("color1 = 0x%08X", color1);
+		
+		log_debug("About to textout_ex: virt=%p, font=%p, text='%s', x=%.1f, y=%.1f, color=0x%X", 
+		          virt, font_avalon2->dat, text1, x1, y1, color1);
+		
+		textout_ex(virt,font_avalon2->dat,text1, (int)x1,(int)y1,color1, -1);
+		log_debug("First textout_ex succeeded");
+		
+		int color2 = makecol((int)alpha2, (int)alpha2, (int)alpha2);
+		textout_ex(virt,font_avalon2->dat,text2, (int)x2,(int)y2,color2, -1);
 		log_debug("Both text lines drawn successfully");
 	
 		blit(virt,screen,0,0,80,0,480,480);

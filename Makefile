@@ -1,4 +1,4 @@
-.PHONY: all build clean run run-log test analyze help asan asan-run release debug
+.PHONY: all build clean run run-log test analyze help asan asan-build release debug valgrind valgrind-build strict gdb gdb-run quick quick-log log editor
 
 # Default target
 all: build
@@ -42,6 +42,85 @@ asan-run: asan
 	@cd release && ./fiend 2>&1 | tee asan-test.log
 	@echo ""
 	@echo "✓ Test complete! Check asan-test.log for any memory errors"
+
+# Build with Valgrind-friendly flags for deep memory checking
+valgrind-build:
+	@echo "Building with Valgrind-friendly flags..."
+	@mkdir -p build
+	@cd build && rm -rf * && \
+	cmake .. \
+	  -DCMAKE_BUILD_TYPE=Debug \
+	  -DCMAKE_C_FLAGS="-g -O0 -fno-omit-frame-pointer -fno-inline" && \
+	$(MAKE) -j$$(nproc)
+	@echo "✓ Build complete for Valgrind testing!"
+
+# Run with Valgrind for deep memory checking
+valgrind: valgrind-build
+	@echo "Running Fiend with Valgrind (memory error detection)..."
+	@command -v valgrind >/dev/null 2>&1 || { \
+		echo "Error: Valgrind not installed. Install with:"; \
+		echo "  sudo apt install valgrind"; \
+		exit 1; \
+	}
+	@cd release && valgrind \
+		--leak-check=full \
+		--show-leak-kinds=all \
+		--track-origins=yes \
+		--verbose \
+		--log-file=valgrind.log \
+		--error-limit=no \
+		./fiend 2>&1 | tee valgrind-console.log || true
+	@echo ""
+	@echo "========================================="
+	@echo "✓ Valgrind complete!"
+	@echo "Full report: release/valgrind.log"
+	@echo "Console output: release/valgrind-console.log"
+	@echo "========================================="
+	@echo ""
+	@echo "Checking for errors..."
+	@grep -E "Invalid (read|write)|Invalid free|Source and destination overlap" release/valgrind.log || echo "✓ No critical errors found"
+
+# Build with strict compiler warnings
+strict: 
+	@echo "Building with strict warnings (catches many bugs at compile time)..."
+	@mkdir -p build
+	@cd build && rm -rf * && \
+	cmake .. \
+	  -DCMAKE_BUILD_TYPE=Debug \
+	  -DCMAKE_C_FLAGS="-g -O0 -Wall -Wextra -Wformat=2 -Wformat-security \
+	  -Wnull-dereference -Wstack-protector -Wstrict-overflow=2 \
+	  -fstack-protector-strong -D_FORTIFY_SOURCE=2 -Werror" && \
+	$(MAKE) -j$$(nproc)
+	@echo "✓ Strict build complete!"
+
+# Build with AddressSanitizer (fast memory bug detection)
+asan-build:
+	@echo "Building with AddressSanitizer..."
+	@mkdir -p build/asan
+	@cd build/asan && \
+	cmake ../.. \
+	  -DCMAKE_BUILD_TYPE=Debug \
+	  -DCMAKE_C_FLAGS="-g -O1 -fsanitize=address -fsanitize=undefined -fno-omit-frame-pointer -fno-optimize-sibling-calls" \
+	  -DCMAKE_EXE_LINKER_FLAGS="-fsanitize=address -fsanitize=undefined" && \
+	$(MAKE) -j$$(nproc)
+	@echo "✓ ASan build complete! Binary already in release/"
+
+# Run with AddressSanitizer (much faster than Valgrind!)
+asan: asan-build
+	@echo "Running with AddressSanitizer (finds buffer overflows, use-after-free, etc.)..."
+	@cd release && ASAN_OPTIONS=detect_leaks=0:halt_on_error=0:log_path=asan.log ./fiend 2>&1 | tee asan-console.log || true
+	@echo ""
+	@echo "========================================="
+	@echo "✓ ASan run complete!"
+	@echo "Check release/asan.log.* for errors"
+	@echo "========================================="
+	@if ls release/asan.log.* >/dev/null 2>&1; then \
+		echo ""; \
+		echo "Errors found:"; \
+		cat release/asan.log.*; \
+	else \
+		echo "✓ No errors detected!"; \
+	fi
 
 # Clean build artifacts
 clean:
@@ -148,11 +227,13 @@ help:
 	@echo "  make run-log    - Build and run with logging to debug.log"
 	@echo "  make quick-log  - Quick rebuild and run with logging"
 	@echo "  make asan-run   - Build and run with AddressSanitizer"
+	@echo "  make valgrind   - Build and run with Valgrind (deep memory check)"
 	@echo "  make log        - View the last debug.log"
 	@echo ""
 	@echo "Debug Targets:"
 	@echo "  make gdb        - Run the game with GDB debugger"
 	@echo "  make gdb-run    - Run with GDB (auto-start and backtrace)"
+	@echo "  make strict     - Build with strict compiler warnings"
 	@echo ""
 	@echo "Other Targets:"
 	@echo "  make editor     - Build and run the map editor"
@@ -165,4 +246,5 @@ help:
 	@echo "  make run-log    # Build and capture output to debug.log"
 	@echo "  make debug      # Build for debugging with GDB"
 	@echo "  make asan-run   # Memory debugging with AddressSanitizer"
+	@echo "  make valgrind   # Deep memory check (finds ALL bugs)"
 	@echo ""

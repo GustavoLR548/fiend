@@ -43,7 +43,7 @@ if command -v wine &> /dev/null; then
     echo "=== Testing with Wine ==="
     echo "Press Ctrl+C to stop"
     echo ""
-    wine fiend.exe --log-level debug
+    wine fiend.exe --log-level debug > wine-debug.log
 else
     echo ""
     echo "Wine not installed. To test, run:"
