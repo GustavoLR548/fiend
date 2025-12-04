@@ -4,20 +4,9 @@ This document describes how to build Fiend from source, with special attention t
 
 ## Quick Start (System Dependencies)
 
-### Linux (Debian/Ubuntu)
+### Linux 
 ```bash
-sudo apt-get install build-essential cmake git liballegro4-dev
-git clone --recursive https://github.com/YOUR_USERNAME/fiend.git
-cd fiend
-mkdir build && cd build
-cmake ..
-make -j$(nproc)
-./release/fiend
-```
-
-### Linux (Fedora/RHEL)
-```bash
-sudo dnf install gcc gcc-c++ cmake git allegro-devel
+sudo apt install build-essential cmake git liballegro4-dev
 git clone --recursive https://github.com/YOUR_USERNAME/fiend.git
 cd fiend
 mkdir build && cd build
@@ -177,48 +166,4 @@ Check the logs in `release/logs/` for any runtime errors.
 ## Cross-Platform Notes
 
 ### Windows
-Windows builds require MinGW or Visual Studio. The bundled Allegro approach is recommended for Windows to avoid DLL dependency issues.
-
-### macOS
-macOS builds may require additional frameworks. System Allegro via Homebrew is recommended:
-```bash
-brew install allegro@4
-```
-
-## Static Linking (Future Enhancement)
-
-For maximum portability, static linking is planned. This will create standalone executables with no external dependencies. Track issue #XX for progress.
-
-## Preservation Philosophy
-
-This project prioritizes long-term preservation:
-
-1. **Bundled Dependencies**: All core dependencies (Allegro 4.4.3.1) are included as git submodules
-2. **Pinned Versions**: Submodules are pinned to specific release tags, not branches
-3. **Offline Building**: Complete source code is version-controlled; no internet required after initial clone
-4. **Documentation**: Comprehensive build instructions for when package managers change
-5. **Self-Contained**: Goal is executables that run without system dependencies
-
-## Getting Help
-
-If you encounter build issues:
-
-1. Check `CMakeLists.txt` for current dependency requirements
-2. Review `DEPENDENCIES.txt` for exact version information
-3. Check GitHub Issues for similar problems
-4. The game was originally built with Allegro 4.4.3.1 on Linux - this is the reference platform
-
-## Future Enhancements
-
-- [ ] Fully automated bundled Allegro build integrated into CMake
-- [ ] Static linking support for standalone executables
-- [ ] Windows cross-compilation from Linux
-- [ ] macOS application bundle generation
-- [ ] Flatpak/AppImage packaging
-- [ ] Pre-built binaries via GitHub Actions
-
----
-
-Last Updated: November 2024
-Allegro Version: 4.4.3.1 (bundled)
-Target Platforms: Linux (primary), Windows, macOS
+Windows builds require MinGW 6.3.0 and DirectX8. The bundled Allegro approach is recommended for Windows to avoid DLL dependency issues.
