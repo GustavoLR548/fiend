@@ -19,7 +19,7 @@ jobs:
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
-        submodules: recursive  # Critical: Initialize submodules
+        submodules: recursive 
     
     - name: Install build dependencies only
       run: |
@@ -33,19 +33,15 @@ jobs:
           libxxf86vm-dev \
           libasound2-dev \
           libpulse-dev
-        # Note: NOT installing liballegro4-dev - we'll build it ourselves
     
     - name: Verify submodule
       run: |
-        echo "Checking Allegro submodule..."
         cd external/allegro4
         git describe --tags
-        ls -la CMakeLists.txt
         cd ../..
     
     - name: Build bundled Allegro 4.4.3.1
       run: |
-        echo "Building Allegro from submodule..."
         cd external/allegro4
         mkdir -p build
         cd build
@@ -65,18 +61,6 @@ jobs:
         
         make -j$(nproc)
         make install
-        
-        echo "=== Allegro built and installed ==="
-        echo "Install directory: $PWD/install"
-        echo ""
-        echo "=== Library files ==="
-        ls -la install/lib/
-        echo ""
-        echo "=== pkg-config files ==="
-        ls -la install/lib/pkgconfig/
-        echo ""
-        echo "=== allegro.pc content ==="
-        cat install/lib/pkgconfig/allegro.pc || echo "allegro.pc not found"
         cd ../../..
     
     - name: Configure Fiend with bundled Allegro
@@ -84,33 +68,18 @@ jobs:
         mkdir -p build
         cd build
         
-        # Set paths to find our bundled Allegro
         export PKG_CONFIG_PATH="$PWD/../external/allegro4/build/install/lib/pkgconfig:$PKG_CONFIG_PATH"
         export ALLEGRO_LIB_DIR="$PWD/../external/allegro4/build/install/lib"
-        
-        # Verify pkg-config can find Allegro
-        echo "=== Testing pkg-config ==="
-        echo "PKG_CONFIG_PATH=$PKG_CONFIG_PATH"
-        echo ""
-        pkg-config --modversion allegro || echo "ERROR: pkg-config cannot find allegro"
-        pkg-config --libs allegro || echo "ERROR: pkg-config --libs failed"
-        pkg-config --cflags allegro || echo "ERROR: pkg-config --cflags failed"
-        echo ""
         
         cmake .. \
           -DCMAKE_BUILD_TYPE=Release \
           -DUSE_BUNDLED_ALLEGRO=OFF \
           -DCMAKE_LIBRARY_PATH="${ALLEGRO_LIB_DIR}" \
           -DCMAKE_PREFIX_PATH="$PWD/../external/allegro4/build/install"
-        
-        # Note: USE_BUNDLED_ALLEGRO=OFF because pkg-config will find our bundled version
-        # RPATH is configured in CMakeLists.txt to look for libraries in ./lib/ relative to executable
     
     - name: Build Fiend
       run: |
         cd build
-        
-        # Set library path for linking
         export PKG_CONFIG_PATH="$PWD/../external/allegro4/build/install/lib/pkgconfig:$PKG_CONFIG_PATH"
         export ALLEGRO_LIB_DIR="$PWD/../external/allegro4/build/install/lib"
         export LD_LIBRARY_PATH="${ALLEGRO_LIB_DIR}:${LD_LIBRARY_PATH}"
@@ -118,34 +87,11 @@ jobs:
         
         make -j$(nproc) VERBOSE=1
     
-    - name: Check binaries and dependencies
-      run: |
-        echo "=== Fiend binary ==="
-        ls -lh release/fiend
-        file release/fiend
-        echo ""
-        echo "=== RPATH check ==="
-        readelf -d release/fiend | grep -i rpath || echo "No RPATH set"
-        echo ""
-        echo "=== Allegro dependency (may fail if lib not in path yet) ==="
-        ldd release/fiend | grep allegro || echo "Library will be found via RPATH at runtime"
-        echo ""
-        echo "=== Mapeditor binary ==="
-        ls -lh release/mapeditor
-        file release/mapeditor
-        echo ""
-        echo "=== RPATH check ==="
-        readelf -d release/mapeditor | grep -i rpath || echo "No RPATH set"
-        echo ""
-        ldd release/mapeditor | grep allegro || echo "Library will be found via RPATH at runtime"
-    
     - name: Bundle Allegro library with executables
       run: |
-        echo "Copying bundled Allegro library..."
         mkdir -p release/lib
         cp external/allegro4/build/install/lib/liballeg*.so* release/lib/
         
-        # Create wrapper scripts that set LD_LIBRARY_PATH
         cat > release/fiend.sh << 'EOF'
         #!/bin/bash
         SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -161,29 +107,6 @@ jobs:
         EOF
         
         chmod +x release/fiend.sh release/mapeditor.sh
-        
-        echo "Bundled library structure:"
-        ls -lh release/lib/
-    
-    - name: Test bundled build
-      run: |
-        cd release
-        
-        echo "=== Verifying RPATH works with bundled libraries ==="
-        echo "Contents of ./lib/:"
-        ls -lh lib/
-        echo ""
-        
-        echo "=== Detailed RPATH check ==="
-        readelf -d fiend | grep -E '(RPATH|RUNPATH|NEEDED)'
-        echo ""
-        
-        echo "=== LDD check from release directory ==="
-        ldd fiend
-        echo ""
-        
-        echo "=== RPATH verification complete ==="
-        echo "Note: Skipping executable test as it requires game assets to initialize"
     
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
@@ -203,9 +126,9 @@ jobs:
           release/readme.txt
         if-no-files-found: error
 
-  build-windows-bundled:
-    name: Build on Windows (Bundled Allegro)
-    runs-on: windows-latest
+  build-windows-legacy:
+    name: Build on Windows (MinGW 6.3.0 + DX8)
+    runs-on: windows-2019
     
     steps:
     - name: Checkout code with submodules
@@ -214,167 +137,111 @@ jobs:
         fetch-depth: 0
         submodules: recursive
     
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.10'
-    
-    - name: Set up MSYS2
-      uses: msys2/setup-msys2@v2
-      with:
-        msystem: MINGW64
-        update: true
-        install: >-
-          mingw-w64-x86_64-gcc
-          mingw-w64-x86_64-cmake
-          mingw-w64-x86_64-ninja
-          make
-          git
-    
-    - name: Verify submodule
-      shell: msys2 {0}
+    - name: Setup MinGW 6.3.0 and DX8 (From Repo)
+      shell: powershell
       run: |
-        echo "Checking Allegro submodule..."
-        cd external/allegro4
-        git describe --tags
-        ls -la CMakeLists.txt
-        cd ../..
+        Write-Host "Extracting tools..."
+        # Use 7z to extract. The '&' operator runs the command in PowerShell.
+        & "C:\Program Files\7-Zip\7z.exe" x build_tools\mingw.7z -oC:\ -y
+        & "C:\Program Files\7-Zip\7z.exe" x build_tools\dx80_mgw.zip -oC:\DX8 -y
+        
+        Write-Host "Configuring MinGW..."
+        # Add MinGW bin to the system PATH for future steps
+        "C:\mingw32\bin" | Out-File -FilePath $env:GITHUB_PATH -Append
+        
+        Write-Host "Injecting DX8 into MinGW..."
+        # We copy DX8 headers/libs to BOTH locations GCC might check.
+        # This fixes the "Could NOT find DDRAW" error.
+        $targets = @(
+            "C:\mingw32",
+            "C:\mingw32\i686-w64-mingw32"
+        )
+        
+        foreach ($target in $targets) {
+            Write-Host "Injecting into $target..."
+            Copy-Item -Path "C:\DX8\include\*" -Destination "$target\include" -Recurse -Force
+            Copy-Item -Path "C:\DX8\lib\*" -Destination "$target\lib" -Recurse -Force
+        }
+
+    - name: Verify Environment
+      shell: cmd
+      run: |
+        gcc --version
+        mingw32-make --version
+        echo "Checking for ddraw.h..."
+        if exist C:\mingw32\include\ddraw.h echo "Found in local include"
+        if exist C:\mingw32\i686-w64-mingw32\include\ddraw.h echo "Found in system include"
     
     - name: Build bundled Allegro 4.4.3.1
-      shell: msys2 {0}
       run: |
-        echo "Building Allegro from submodule..."
         cd external/allegro4
-        mkdir -p build
+        mkdir build
         cd build
         
-        cmake .. \
-          -G "Ninja" \
-          -DCMAKE_BUILD_TYPE=Release \
-          -DCMAKE_INSTALL_PREFIX="$PWD/install" \
-          -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
-          -DSHARED=ON \
-          -DWANT_DOCS=OFF \
-          -DWANT_EXAMPLES=OFF \
-          -DWANT_TOOLS=OFF \
-          -DWANT_TESTS=OFF \
-          -DWANT_ALLEGROGL=OFF \
-          -DWANT_LOADPNG=OFF \
-          -DWANT_LOGG=OFF \
+        # Explicitly use MinGW Makefiles generator
+        cmake .. -G "MinGW Makefiles" `
+          -DCMAKE_C_COMPILER=gcc `
+          -DCMAKE_CXX_COMPILER=g++ `
+          -DCMAKE_BUILD_TYPE=Release `
+          -DCMAKE_INSTALL_PREFIX="$PWD/install" `
+          -DSHARED=ON `
+          -DWANT_DOCS=OFF `
+          -DWANT_EXAMPLES=OFF `
+          -DWANT_TOOLS=OFF `
+          -DWANT_TESTS=OFF `
+          -DWANT_ALLEGROGL=OFF `
+          -DWANT_LOADPNG=OFF `
+          -DWANT_LOGG=OFF `
           -DWANT_JPGALLEG=OFF
         
-        ninja
-        ninja install
-        
-        echo "=== Allegro built and installed ==="
-        echo "Install directory: $PWD/install"
-        echo ""
-        echo "=== Library files ==="
-        ls -la install/lib/ || ls -la install/bin/
-        echo ""
-        echo "=== pkg-config files ==="
-        ls -la install/lib/pkgconfig/ || echo "No pkgconfig directory"
-        cd ../../..
+        mingw32-make -j2
+        mingw32-make install
     
-    - name: Configure Fiend with bundled Allegro
-      shell: msys2 {0}
+    - name: Configure Fiend
       run: |
-        mkdir -p build
+        mkdir build
         cd build
         
-        # Set paths to find our bundled Allegro
-        ALLEGRO_ROOT="$(cygpath -u "$PWD/../external/allegro4/build/install")"
-        ALLEGRO_INCLUDE_DIR="${ALLEGRO_ROOT}/include"
-        ALLEGRO_LIBRARY_DIR="${ALLEGRO_ROOT}/lib"
+        $env:ALLEGRO_ROOT = "$PWD/../external/allegro4/build/install"
+        $env:ALLEGRO_INCLUDE_DIR = "$env:ALLEGRO_ROOT/include"
         
-        echo "=== Allegro paths ==="
-        echo "ALLEGRO_ROOT=${ALLEGRO_ROOT}"
-        echo "ALLEGRO_INCLUDE_DIR=${ALLEGRO_INCLUDE_DIR}"
-        echo "ALLEGRO_LIBRARY_DIR=${ALLEGRO_LIBRARY_DIR}"
-        echo ""
-        echo "Include directory contents:"
-        ls -la "${ALLEGRO_INCLUDE_DIR}"
-        echo ""
-        echo "Library directory contents:"
-        ls -la "${ALLEGRO_LIBRARY_DIR}"
-        echo ""
+        # We need to point to the .dll.a (import library)
+        $env:ALLEGRO_LIBRARY = "$env:ALLEGRO_ROOT/lib/liballeg44.dll.a"
         
-        cmake .. \
-          -G "Ninja" \
-          -DCMAKE_BUILD_TYPE=Release \
-          -DUSE_BUNDLED_ALLEGRO=OFF \
-          -DALLEGRO_INCLUDE_DIR="${ALLEGRO_INCLUDE_DIR}" \
-          -DALLEGRO_LIBRARY="${ALLEGRO_LIBRARY_DIR}/liballeg44.dll.a" \
-          -DCMAKE_PREFIX_PATH="${ALLEGRO_ROOT}"
+        cmake .. -G "MinGW Makefiles" `
+          -DCMAKE_C_COMPILER=gcc `
+          -DCMAKE_CXX_COMPILER=g++ `
+          -DCMAKE_BUILD_TYPE=Release `
+          -DUSE_BUNDLED_ALLEGRO=OFF `
+          -DALLEGRO_INCLUDE_DIR="$env:ALLEGRO_INCLUDE_DIR" `
+          -DALLEGRO_LIBRARY="$env:ALLEGRO_LIBRARY" `
+          -DCMAKE_PREFIX_PATH="$env:ALLEGRO_ROOT"
     
     - name: Build Fiend
-      shell: msys2 {0}
       run: |
         cd build
-        
-        # Set library path for linking
-        ALLEGRO_ROOT="$(cygpath -u "$PWD/../external/allegro4/build/install")"
-        export PATH="${ALLEGRO_ROOT}/bin:$PATH"
-        
-        ninja -v
+        mingw32-make -j2
     
-    - name: Check binaries and dependencies
-      shell: msys2 {0}
+    - name: Bundle DLLs and Assets
       run: |
-        echo "=== Fiend binary ==="
-        ls -lh release/fiend.exe
-        file release/fiend.exe || echo "file command not available"
-        echo ""
-        echo "=== Allegro dependency ==="
-        ldd release/fiend.exe | grep -i allegro || echo "Library dependencies checked"
-        echo ""
-        echo "=== Mapeditor binary ==="
-        ls -lh release/mapeditor.exe
-        file release/mapeditor.exe || echo "file command not available"
-        echo ""
-        ldd release/mapeditor.exe | grep -i allegro || echo "Library dependencies checked"
-    
-    - name: Bundle Allegro library with executables
-      shell: msys2 {0}
-      run: |
-        echo "Copying bundled Allegro DLLs..."
-        mkdir -p release/lib
+        mkdir release/lib
         
-        # Copy Allegro DLLs from build/install
-        cp external/allegro4/build/install/bin/*.dll release/ || cp external/allegro4/build/install/lib/*.dll release/ || echo "DLLs copied"
+        # Copy Allegro DLL
+        copy external\allegro4\build\install\bin\*.dll release\
         
-        # Copy MinGW runtime DLLs that the executables depend on
-        mingw_bin="/mingw64/bin"
-        if [ -d "$mingw_bin" ]; then
-          for dll in $(ldd release/fiend.exe | grep mingw64 | awk '{print $3}'); do
-            if [ -f "$dll" ]; then
-              cp "$dll" release/
-            fi
-          done
-        fi
+        # Copy GCC/MinGW Runtime DLLs
+        # Since we are not in MSYS2, we verify which DLLs are needed
+        # Usually: libgcc_s_dw2-1.dll, libstdc++-6.dll, libwinpthread-1.dll
+        copy C:\mingw32\bin\libgcc_s_dw2-1.dll release\
+        copy C:\mingw32\bin\libstdc++-6.dll release\
+        copy C:\mingw32\bin\libwinpthread-1.dll release\
         
-        echo "Bundled library structure:"
-        ls -lh release/*.dll || echo "DLLs listed"
-    
-    - name: Test bundled build
-      shell: msys2 {0}
-      run: |
-        cd release
-        
-        echo "=== Verifying DLLs are present ==="
-        ls -lh *.dll
-        echo ""
-        
-        echo "=== DLL dependencies ==="
-        ldd fiend.exe
-        echo ""
-        echo "=== Bundled build complete ==="
-        echo "Note: Skipping executable test as it requires game assets to initialize"
+        dir release\*.dll
     
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: fiend-windows-x64-bundled
+        name: fiend-windows-x86-bundled
         path: |
           release/fiend.exe
           release/mapeditor.exe
@@ -389,9 +256,8 @@ jobs:
 
   create-release:
     name: Create Release
-    needs: [build-linux-bundled, build-windows-bundled]
+    needs: [build-linux-bundled, build-windows-legacy]
     runs-on: ubuntu-latest
-    # Only create releases for master/main branch or version tags
     if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/')
     
     permissions:
@@ -400,146 +266,63 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
     
     - name: Generate version number
       id: version
       run: |
         if [[ "${{ github.ref }}" == refs/tags/* ]]; then
-          # If it's a tag, use the tag name
           VERSION=${GITHUB_REF#refs/tags/}
         else
-          # Auto-generate version based on date and commit count
           BUILD_NUMBER=$(git rev-list --count HEAD)
           DATE=$(date +%Y.%m.%d)
           SHORT_SHA=$(git rev-parse --short HEAD)
           VERSION="nightly-${DATE}-build${BUILD_NUMBER}-${SHORT_SHA}"
         fi
         echo "VERSION=${VERSION}" >> $GITHUB_OUTPUT
-        echo "Generated version: ${VERSION}"
     
-    - name: Download Linux artifacts (bundled)
+    - name: Download Linux artifacts
       uses: actions/download-artifact@v4
       with:
         name: fiend-linux-x64-bundled
         path: fiend-linux-x64-bundled
     
-    - name: Download Windows artifacts (bundled)
+    - name: Download Windows artifacts (32-bit Legacy)
       uses: actions/download-artifact@v4
       with:
-        name: fiend-windows-x64-bundled
-        path: fiend-windows-x64-bundled
+        name: fiend-windows-x86-bundled
+        path: fiend-windows-x86-bundled
     
     - name: Create release archives
       run: |
-        # Create bundled Linux release (includes Allegro)
-        echo "Creating Linux bundled release..."
+        # Linux
         mkdir -p fiend-linux-bundled-release
         cp -r fiend-linux-x64-bundled/* fiend-linux-bundled-release/
-        
         cd fiend-linux-bundled-release
-        
-        # Create README for bundled release
-        cat > README.txt << 'EOF'
-        Fiend - Linux Bundled Release
-        ==============================
-        
-        This release includes a bundled version of Allegro 4.4.3.1.
-        It should work on most modern Linux distributions without installing Allegro separately.
-        
-        To run:
-        1. Extract this archive
-        2. Run: ./fiend.sh (for the game)
-        3. Run: ./mapeditor.sh (for the map editor)
-        
-        The wrapper scripts (.sh) set up the library path automatically.
-        
-        System Requirements:
-        - Linux x86_64
-        - X11
-        - ALSA or PulseAudio
-        - glibc 2.31+ (Ubuntu 20.04+, similar distributions)
-        
-        EOF
-        
         zip -r ../fiend-linux-x64-bundled-${{ steps.version.outputs.VERSION }}.zip .
-        tar -czf ../fiend-linux-x64-bundled-${{ steps.version.outputs.VERSION }}.tar.gz .
         cd ..
         
-        # Create bundled Windows release (includes Allegro)
-        echo "Creating Windows bundled release..."
+        # Windows (Legacy x86)
         mkdir -p fiend-windows-bundled-release
-        cp -r fiend-windows-x64-bundled/* fiend-windows-bundled-release/
-        
+        cp -r fiend-windows-x86-bundled/* fiend-windows-bundled-release/
         cd fiend-windows-bundled-release
         
         cat > README.txt << 'EOF'
-        Fiend - Windows Bundled Release
+        Fiend - Windows Legacy Release
         ================================
+        Built with MinGW 6.3.0 and DirectX 8 SDK for maximum compatibility.
         
-        This release includes a bundled version of Allegro 4.4.3.1 and all required DLLs.
-        It should work on most modern Windows systems without installing anything.
-        
-        To run:
-        1. Extract this archive
-        2. Double-click fiend.exe to start the game
-        3. Double-click mapeditor.exe to edit maps
-        
-        System Requirements:
-        - Windows 7 or later (x64)
-        - DirectX compatible graphics
-        
+        1. Extract archive
+        2. Run fiend.exe
         EOF
         
-        zip -r ../fiend-windows-x64-bundled-${{ steps.version.outputs.VERSION }}.zip .
+        zip -r ../fiend-windows-x86-bundled-${{ steps.version.outputs.VERSION }}.zip .
         cd ..
-    
-    - name: Extract version from tag
-      id: get_version
-      run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
     
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v1
       with:
         tag_name: ${{ steps.version.outputs.VERSION }}
-        name: ${{ startsWith(github.ref, 'refs/tags/') && format('Fiend {0}', steps.version.outputs.VERSION) || format('Fiend Build {0}', steps.version.outputs.VERSION) }}
-        body: |
-          ${{ startsWith(github.ref, 'refs/tags/') && 'Stable release' || 'Automated nightly build' }}
-          
-          **Build Date:** ${{ steps.version.outputs.DATE }}
-          **Commit:** ${{ steps.version.outputs.SHORT_SHA }}
-          **Branch:** ${{ github.ref_name }}
-          
-          ## Downloads
-          
-          ### Linux (Bundled Allegro)
-          - `fiend-linux-x64-bundled-${{ steps.version.outputs.VERSION }}.zip` - Complete package with bundled Allegro 4.4.3.1
-          - `fiend-linux-x64-bundled-${{ steps.version.outputs.VERSION }}.tar.gz` - Same as above, tar.gz format
-          
-          ### Windows (Bundled Allegro)
-          - `fiend-windows-x64-bundled-${{ steps.version.outputs.VERSION }}.zip` - Complete package with bundled Allegro 4.4.3.1 and all DLLs
-          
-          ## How to Run
-          
-          ### Linux:
-          1. Extract the archive
-          2. Run `./fiend.sh` to start the game or `./mapeditor.sh` to edit maps
-          
-          ### Windows:
-          1. Extract the archive
-          2. Double-click `fiend.exe` to start the game or `mapeditor.exe` to edit maps
-          
-          ## Preservation Notes
-          Both releases include Allegro 4.4.3.1 built from the git submodule. This ensures the game can run even if system packages become unavailable. The builds are fully self-contained and portable.
-          
-          ## Changes
-          See commit history for details.
+        name: Fiend Build ${{ steps.version.outputs.VERSION }}
         files: |
           fiend-linux-x64-bundled-${{ steps.version.outputs.VERSION }}.zip
-          fiend-linux-x64-bundled-${{ steps.version.outputs.VERSION }}.tar.gz
-          fiend-windows-x64-bundled-${{ steps.version.outputs.VERSION }}.zip
-        draft: false
-        prerelease: ${{ github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main' }}
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          fiend-windows-x86-bundled-${{ steps.version.outputs.VERSION }}.zip
